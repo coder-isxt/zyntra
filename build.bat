@@ -66,4 +66,3 @@ echo   Released v%VERSION% to GitHub!
 echo   GitHub Actions will build the release.
 echo ========================================
 echo.
-pause
