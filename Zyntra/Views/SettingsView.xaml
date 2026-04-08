@@ -70,41 +70,7 @@
                                    Foreground="{StaticResource TextBrush}" />
                         <TextBlock Text="Choose the accent color used throughout the app" FontSize="11"
                                    Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,10" />
-                        <ItemsControl ItemsSource="{Binding AccentOptions}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Button Margin="0,0,8,8" Padding="0" Cursor="Hand"
-                                            ToolTip="{Binding Name}"
-                                            Command="{Binding DataContext.SetAccentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            CommandParameter="{Binding Hex}">
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="Button">
-                                                <Grid Width="36" Height="36">
-                                                    <Ellipse Width="36" Height="36">
-                                                        <Ellipse.Fill>
-                                                            <SolidColorBrush Color="{Binding Hex}" />
-                                                        </Ellipse.Fill>
-                                                    </Ellipse>
-                                                    <Ellipse Width="36" Height="36" StrokeThickness="2.5"
-                                                             Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisConverter}}">
-                                                        <Ellipse.Stroke>
-                                                            <SolidColorBrush Color="{StaticResource TextColor}" />
-                                                        </Ellipse.Stroke>
-                                                    </Ellipse>
-                                                    <Ellipse Width="14" Height="14" Fill="White" Opacity="0.9"
-                                                             Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisConverter}}" />
-                                                </Grid>
-                                            </ControlTemplate>
-                                        </Button.Template>
-                                    </Button>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <WrapPanel x:Name="AccentPanel" />
                     </StackPanel>
                 </Border>
 

@@ -36,6 +36,14 @@ echo.
 echo Updating version to %VERSION% in source...
 powershell.exe -NoProfile -Command "$f = 'Zyntra\Services\UpdateService.cs'; $c = [System.IO.File]::ReadAllText($f); $c = $c -replace 'CurrentVersion = \"[^\"]*\"', 'CurrentVersion = \"%VERSION%\"'; [System.IO.File]::WriteAllText($f, $c)"
 
+:: Kill running Zyntra if any
+taskkill /f /im Zyntra.exe >nul 2>&1
+timeout /t 2 /nobreak >nul
+
+:: Clean old build output
+if exist build\Zyntra.exe del /f /q build\Zyntra.exe >nul 2>&1
+if exist build rmdir /s /q build >nul 2>&1
+
 :: Build
 echo.
 echo Building Zyntra (Release, single-file)...

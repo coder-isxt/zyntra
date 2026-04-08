@@ -1,7 +1,4 @@
 using System.Windows;
-using Color = System.Windows.Media.Color;
-using ColorConverter = System.Windows.Media.ColorConverter;
-using SolidColorBrush = System.Windows.Media.SolidColorBrush;
 
 namespace Zyntra.Services;
 
