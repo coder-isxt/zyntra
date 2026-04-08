@@ -17,6 +17,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         InitializeTrayIcon();
+        VersionText.Text = $"Zyntra v{UpdateService.CurrentVersion}";
     }
 
     private void InitializeTrayIcon()
@@ -165,7 +166,6 @@ public partial class MainWindow : Window
 
             BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
             BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
-            BtnSteam.Style = tag == "Steam" ? activeStyle : normalStyle;
             BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;
         }
     }

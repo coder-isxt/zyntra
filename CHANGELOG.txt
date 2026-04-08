@@ -1,6 +1,5 @@
 - Added account groups/tags (tag accounts, filter by tag)
 - Added cookie health monitor (validate all cookies, green/red status dots)
-- Added Steam module (detect accounts, quick-switch, restart Steam, launch games)
 - Added custom game modules (launch args, env vars, working directory per app)
 - Added auto-updater (check GitHub releases)
 - Added theme system with 9 accent color presets
@@ -11,3 +10,7 @@
 - Added splash screen on startup
 - Added CI/CD with GitHub Actions
 - Added dark-themed ComboBox style
+- Fixed TextBox cursor/text offset in all input fields
+- Fixed version display in sidebar now syncs with UpdateService.CurrentVersion
+- Fixed Roblox tab layout (filter bar no longer overlaps account list)
+- Removed Steam accounts manager

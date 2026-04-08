@@ -20,7 +20,6 @@ public class MainViewModel : BaseViewModel
 
     public AppsViewModel AppsVM { get; }
     public RobloxAccountsViewModel RobloxVM { get; }
-    public SteamViewModel SteamVM { get; }
     public SettingsViewModel SettingsVM { get; }
 
     public ICommand NavigateCommand { get; }
@@ -29,7 +28,6 @@ public class MainViewModel : BaseViewModel
     {
         AppsVM = new AppsViewModel();
         RobloxVM = new RobloxAccountsViewModel();
-        SteamVM = new SteamViewModel();
         SettingsVM = new SettingsViewModel();
         _currentPage = AppsVM;
 
@@ -48,10 +46,6 @@ public class MainViewModel : BaseViewModel
             case "Roblox":
                 CurrentPage = RobloxVM;
                 CurrentPageName = "Roblox Accounts";
-                break;
-            case "Steam":
-                CurrentPage = SteamVM;
-                CurrentPageName = "Steam";
                 break;
             case "Settings":
                 CurrentPage = SettingsVM;

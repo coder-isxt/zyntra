@@ -91,13 +91,6 @@
                                 </Button.Style>
                             </Button>
 
-                            <Button x:Name="BtnSteam" Content="🎮  Steam"
-                                    Command="{Binding NavigateCommand}" CommandParameter="Steam"
-                                    Click="SidebarNav_Click" Tag="Steam">
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
-                                </Button.Style>
-                            </Button>
                         </StackPanel>
 
                         <!-- Footer -->
@@ -113,7 +106,7 @@
                             </Border>
                             <Border BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,1,0,0"
                                     Padding="14,10">
-                                <TextBlock Text="Zyntra v1.0" FontSize="11"
+                                <TextBlock x:Name="VersionText" FontSize="11"
                                            Foreground="{StaticResource SubTextBrush}" Opacity="0.5" />
                             </Border>
                         </StackPanel>
@@ -129,9 +122,6 @@
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type vm:RobloxAccountsViewModel}">
                                 <views:RobloxAccountsView />
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type vm:SteamViewModel}">
-                                <views:SteamView />
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                                 <views:SettingsView />

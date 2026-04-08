@@ -183,15 +183,15 @@
                 <ControlTemplate TargetType="TextBox">
                     <Border x:Name="Bd" Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="6">
-                        <Grid Margin="{TemplateBinding Padding}">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          Margin="0" Padding="0" />
+                            CornerRadius="6" Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <Grid VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden" />
                             <TextBlock x:Name="Placeholder" Text="{TemplateBinding Tag}"
                                        Foreground="{StaticResource SubTextBrush}" Opacity="0.5"
                                        IsHitTestVisible="False"
-                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                        Visibility="Collapsed" />
                         </Grid>
                     </Border>
