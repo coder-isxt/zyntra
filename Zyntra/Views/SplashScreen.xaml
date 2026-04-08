@@ -45,7 +45,7 @@
                 </Border>
 
                 <!-- Version -->
-                <TextBlock Text="v1.0.8" FontSize="10" Foreground="{StaticResource SubTextBrush}"
+                <TextBlock x:Name="VersionText" FontSize="10" Foreground="{StaticResource SubTextBrush}"
                            HorizontalAlignment="Center" Margin="0,10,0,0" Opacity="0.5" />
             </StackPanel>
         </Grid>

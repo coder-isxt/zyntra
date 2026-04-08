@@ -130,10 +130,7 @@
 
                 <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
                     <StackPanel>
-                        <TextBlock FontSize="13" Foreground="{StaticResource TextBrush}">
-                            <Run Text="Zyntra" FontWeight="Bold" />
-                            <Run Text=" v1.0.0" />
-                        </TextBlock>
+                        <TextBlock x:Name="AboutVersionText" FontSize="13" Foreground="{StaticResource TextBrush}" />
                         <TextBlock Text="A universal app launcher and Roblox account manager."
                                    FontSize="11" Foreground="{StaticResource SubTextBrush}" Margin="0,4,0,0" />
                     </StackPanel>

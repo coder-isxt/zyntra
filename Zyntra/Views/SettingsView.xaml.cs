@@ -18,6 +18,7 @@ public partial class SettingsView : UserControl
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        AboutVersionText.Text = $"Zyntra v{UpdateService.CurrentVersion}";
         BuildAccentPicker();
     }
 

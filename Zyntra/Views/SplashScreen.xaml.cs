@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using Zyntra.Services;
 
 namespace Zyntra.Views;
 
@@ -18,6 +19,7 @@ public partial class SplashScreen : Window
     public SplashScreen()
     {
         InitializeComponent();
+        VersionText.Text = $"v{UpdateService.CurrentVersion}";
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(400) };
         _timer.Tick += OnTick;

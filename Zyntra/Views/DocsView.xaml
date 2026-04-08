@@ -28,6 +28,13 @@
                 <Button x:Name="BtnBatch" Content="Batch Notes" Padding="10,7"
                         Style="{StaticResource SidebarButtonStyle}"
                         Click="OnDocNav" Tag="batch" />
+
+                <TextBlock Text="EXTENSIONS" FontSize="10" FontWeight="Bold"
+                           Foreground="{StaticResource SubTextBrush}" Opacity="0.6"
+                           Margin="8,14,0,8" />
+                <Button x:Name="BtnPlugins" Content="Plugin SDK" Padding="10,7"
+                        Style="{StaticResource SidebarButtonStyle}"
+                        Click="OnDocNav" Tag="plugins" />
             </StackPanel>
         </Border>
 

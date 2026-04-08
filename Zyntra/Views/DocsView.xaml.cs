@@ -26,12 +26,14 @@ public partial class DocsView : UserControl
         BtnPowerShell.Style = tag == "powershell" ? activeStyle : normalStyle;
         BtnPython.Style = tag == "python" ? activeStyle : normalStyle;
         BtnBatch.Style = tag == "batch" ? activeStyle : normalStyle;
+        BtnPlugins.Style = tag == "plugins" ? activeStyle : normalStyle;
 
         switch (tag)
         {
             case "powershell": ShowPowerShell(); break;
             case "python": ShowPython(); break;
             case "batch": ShowBatch(); break;
+            case "plugins": ShowPlugins(); break;
             default: ShowOverview(); break;
         }
     }
@@ -435,7 +437,7 @@ else:
         AddHeading("Context JSON Structure");
         AddParagraph("The context file contains your Zyntra data in this format:");
         AddCodeBlock("", @"{
-  ""Version"": ""1.0.7"",
+  ""Version"": ""<current version>"",
   ""DataDir"": ""C:\\Users\\...\\AppData\\Roaming\\Zyntra"",
   ""ResponseFile"": ""C:\\...\\zyntra_response.json"",
   ""Accounts"": [
@@ -445,5 +447,84 @@ else:
     { ""Id"": ""..."", ""Name"": ""MyApp"", ""ExePath"": ""C:\\..."" }
   ]
 }", "JSON");
+    }
+
+    private void ShowPlugins()
+    {
+        Clear();
+        AddTitle("Plugin SDK");
+        AddSubtitle("Extend Zyntra with custom plugins. Plugins are .NET class libraries that implement the IZyntraPlugin interface.");
+
+        AddHeading("Getting Started");
+        AddParagraph("1.  Create a .NET class library project targeting the same framework as Zyntra.");
+        AddParagraph("2.  Reference the IZyntraPlugin interface (or copy it into your project).");
+        AddParagraph("3.  Implement the interface in a public class.");
+        AddParagraph("4.  Build and install the DLL via the Plugins tab in Zyntra.");
+
+        AddHeading("IZyntraPlugin Interface");
+        AddCodeBlock("", @"public interface IZyntraPlugin
+{
+    string Name { get; }
+    string Description { get; }
+    string Version { get; }
+    void Initialize();
+    void Execute();
+    void Shutdown();
+}", "C#");
+
+        AddHeading("Interface Members");
+        AddFunctionRow("Name", "Display name shown in the Plugins list");
+        AddFunctionRow("Description", "Short description of what the plugin does");
+        AddFunctionRow("Version", "Version string (e.g. \"1.0.0\")");
+        AddFunctionRow("Initialize()", "Called when the plugin is loaded at startup");
+        AddFunctionRow("Execute()", "Called when the plugin is triggered to run");
+        AddFunctionRow("Shutdown()", "Called when Zyntra is closing or the plugin is disabled");
+
+        AddDivider();
+        AddHeading("Example Plugin");
+        AddCodeBlock("MyPlugin.cs", @"using Zyntra.Services;
+
+public class MyPlugin : IZyntraPlugin
+{
+    public string Name => ""My Plugin"";
+    public string Description => ""A sample Zyntra plugin"";
+    public string Version => ""1.0.0"";
+
+    public void Initialize()
+    {
+        // Called once when plugin loads
+    }
+
+    public void Execute()
+    {
+        // Your plugin logic here
+        NotificationService.Push(
+            ""My Plugin"",
+            ""Plugin executed successfully!"",
+            NotificationType.Success
+        );
+    }
+
+    public void Shutdown()
+    {
+        // Cleanup resources
+    }
+}", "C#");
+
+        AddHeading("Plugin Lifecycle");
+        AddParagraph("1.  Install — User selects a .DLL file from the Plugins tab. Zyntra copies it to the plugins folder and reads metadata.");
+        AddParagraph("2.  Enable — The plugin is loaded and Initialize() is called on application startup.");
+        AddParagraph("3.  Execute — Execute() can be called by Zyntra when triggered.");
+        AddParagraph("4.  Shutdown — Shutdown() is called when the app closes or the plugin is disabled.");
+
+        AddNote("Plugins run in the same process as Zyntra. Be careful with exceptions — unhandled errors will be caught, but may cause the plugin to be marked as failed.");
+
+        AddDivider();
+        AddHeading("File Locations");
+        AddFunctionRow("Plugin DLLs", "%AppData%\\Zyntra\\plugins\\");
+        AddFunctionRow("Plugin index", "%AppData%\\Zyntra\\plugins.json");
+
+        AddHeading("Tips");
+        AddNote("Keep plugins lightweight. Avoid blocking the UI thread in Initialize() or Execute(). Use async patterns or background threads for long-running operations.");
     }
 }
