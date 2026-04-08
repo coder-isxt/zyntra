@@ -57,8 +57,30 @@
             </Grid>
         </Border>
 
+        <!-- Tag Filter & Health Check Bar -->
+        <Border Grid.Row="4" Margin="0,0,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Filter:" FontSize="12" VerticalAlignment="Center"
+                           Foreground="{StaticResource SubTextBrush}" />
+                <ComboBox Grid.Column="2" ItemsSource="{Binding AvailableTags}"
+                          SelectedItem="{Binding SelectedTag}"
+                          Style="{StaticResource DarkComboBoxStyle}"
+                          Width="140" HorizontalAlignment="Left" />
+                <Button Grid.Column="4" Content="🔍 Check Health" Padding="12,6"
+                        Style="{StaticResource ControlButtonStyle}" VerticalAlignment="Center"
+                        Command="{Binding CheckHealthCommand}" ToolTip="Validate all cookies" />
+            </Grid>
+        </Border>
+
         <!-- Account List -->
-        <ListBox Grid.Row="4" ItemsSource="{Binding Accounts}"
+        <ListBox Grid.Row="4" Margin="0,36,0,0" ItemsSource="{Binding FilteredAccounts}"
                  SelectedItem="{Binding SelectedAccount}"
                  Style="{StaticResource DarkListBoxStyle}"
                  ItemContainerStyle="{StaticResource DarkListBoxItemStyle}"
@@ -75,30 +97,57 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="8" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- Avatar Circle -->
+                        <!-- Avatar Circle with health indicator -->
                         <Grid Grid.Column="0" Width="36" Height="36" VerticalAlignment="Center">
-                            <!-- Fallback letter -->
                             <Border Width="36" Height="36" CornerRadius="18"
                                     Background="{StaticResource AccentBrush}">
                                 <TextBlock Text="{Binding DisplayName[0]}" FontSize="16" FontWeight="Bold"
                                            Foreground="#FF0D1117"
                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
-                            <!-- Profile picture -->
                             <Border Width="36" Height="36" CornerRadius="18"
                                     Visibility="{Binding AvatarUrl, Converter={StaticResource NonEmptyToVisConverter}}">
                                 <Border.Background>
                                     <ImageBrush ImageSource="{Binding AvatarUrl}" Stretch="UniformToFill" />
                                 </Border.Background>
                             </Border>
+                            <!-- Health dot -->
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                     Stroke="{StaticResource MainBrush}" StrokeThickness="2">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="#FF6B6B6B" />
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding CookieValid}" Value="True">
+                                                <Setter Property="Fill" Value="#FF6BCB77" />
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding CookieValid}" Value="False">
+                                                <Setter Property="Fill" Value="#FFFF6B6B" />
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
                         </Grid>
 
                         <!-- Account Info -->
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0">
-                            <TextBlock Text="{Binding DisplayName}" FontSize="14" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextBrush}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding DisplayName}" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextBrush}" />
+                                <Border CornerRadius="4" Padding="6,1" Margin="8,0,0,0"
+                                        Background="{StaticResource ControlHoverBrush}"
+                                        Visibility="{Binding Tag, Converter={StaticResource NonEmptyToVisConverter}}">
+                                    <TextBlock Text="{Binding Tag}" FontSize="10" Foreground="{StaticResource AccentBrush}" />
+                                </Border>
+                            </StackPanel>
                             <TextBlock FontSize="12" Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0">
                                 <Run Text="@" /><Run Text="{Binding Username, Mode=OneWay}" />
                                 <Run Text=" · ID: " /><Run Text="{Binding UserId, Mode=OneWay}" />
@@ -111,15 +160,22 @@
                                 Command="{Binding DataContext.LaunchRobloxCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                 CommandParameter="{Binding}" />
 
+                        <!-- Tag -->
+                        <Button Grid.Column="4" Content="🏷" FontSize="14" Padding="8,5"
+                                Style="{StaticResource ControlButtonStyle}" VerticalAlignment="Center"
+                                ToolTip="Set tag"
+                                Command="{Binding DataContext.SetTagCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                CommandParameter="{Binding}" />
+
                         <!-- Refresh -->
-                        <Button Grid.Column="4" Content="↻" FontSize="16" Padding="8,5"
+                        <Button Grid.Column="6" Content="↻" FontSize="16" Padding="8,5"
                                 Style="{StaticResource ControlButtonStyle}" VerticalAlignment="Center"
                                 ToolTip="Refresh account info"
                                 Command="{Binding DataContext.RefreshAccountCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                 CommandParameter="{Binding}" />
 
                         <!-- Remove -->
-                        <Button Grid.Column="6" Content="✕" FontSize="14" Padding="8,5"
+                        <Button Grid.Column="8" Content="✕" FontSize="14" Padding="8,5"
                                 Style="{StaticResource DangerButtonStyle}" VerticalAlignment="Center"
                                 ToolTip="Remove account"
                                 Command="{Binding DataContext.RemoveAccountCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
@@ -130,10 +186,10 @@
         </ListBox>
 
         <!-- Empty state -->
-        <TextBlock Grid.Row="4" Text="No accounts added yet. Paste a .ROBLOSECURITY cookie above to add one."
+        <TextBlock Grid.Row="4" Margin="0,36,0,0" Text="No accounts added yet. Paste a .ROBLOSECURITY cookie above to add one."
                    Foreground="{StaticResource SubTextBrush}" FontSize="14"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                   Visibility="{Binding Accounts.Count, Converter={StaticResource ZeroToVisConverter}}" />
+                   Visibility="{Binding FilteredAccounts.Count, Converter={StaticResource ZeroToVisConverter}}" />
 
         <!-- Status Bar -->
         <Border Grid.Row="5" Margin="0,12,0,0" Padding="0,8,0,0"

@@ -8,4 +8,7 @@ public class RobloxAccount
     public string EncryptedCookie { get; set; } = string.Empty;
     public string AvatarUrl { get; set; } = string.Empty;
     public DateTime AddedAt { get; set; } = DateTime.UtcNow;
+    public string Tag { get; set; } = string.Empty;
+    public bool? CookieValid { get; set; }
+    public DateTime? LastHealthCheck { get; set; }
 }

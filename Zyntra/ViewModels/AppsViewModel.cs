@@ -49,11 +49,34 @@ public class AppsViewModel : BaseViewModel
 
         try
         {
-            Process.Start(new ProcessStartInfo
+            var psi = new ProcessStartInfo
             {
                 FileName = app.ExePath,
-                UseShellExecute = true,
-            });
+                UseShellExecute = !app.IsGameModule,
+            };
+
+            if (app.IsGameModule)
+            {
+                if (!string.IsNullOrEmpty(app.LaunchArgs))
+                    psi.Arguments = app.LaunchArgs;
+
+                if (!string.IsNullOrEmpty(app.WorkingDirectory))
+                    psi.WorkingDirectory = app.WorkingDirectory;
+                else
+                    psi.WorkingDirectory = System.IO.Path.GetDirectoryName(app.ExePath) ?? string.Empty;
+
+                if (!string.IsNullOrEmpty(app.EnvironmentVars))
+                {
+                    foreach (var line in app.EnvironmentVars.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        var parts = line.Split('=', 2);
+                        if (parts.Length == 2)
+                            psi.EnvironmentVariables[parts[0].Trim()] = parts[1].Trim();
+                    }
+                }
+            }
+
+            Process.Start(psi);
         }
         catch (Exception ex)
         {

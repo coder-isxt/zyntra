@@ -9,12 +9,25 @@ namespace Zyntra.ViewModels;
 public class RobloxAccountsViewModel : BaseViewModel
 {
     public ObservableCollection<RobloxAccount> Accounts { get; } = new();
+    public ObservableCollection<RobloxAccount> FilteredAccounts { get; } = new();
+    public ObservableCollection<string> AvailableTags { get; } = new();
 
     private RobloxAccount? _selectedAccount;
     public RobloxAccount? SelectedAccount
     {
         get => _selectedAccount;
         set => SetProperty(ref _selectedAccount, value);
+    }
+
+    private string _selectedTag = "All";
+    public string SelectedTag
+    {
+        get => _selectedTag;
+        set
+        {
+            if (SetProperty(ref _selectedTag, value))
+                ApplyFilter();
+        }
     }
 
     private bool _isLoading;
@@ -35,13 +48,17 @@ public class RobloxAccountsViewModel : BaseViewModel
     public ICommand RemoveAccountCommand { get; }
     public ICommand LaunchRobloxCommand { get; }
     public ICommand RefreshAccountCommand { get; }
+    public ICommand CheckHealthCommand { get; }
+    public ICommand SetTagCommand { get; }
 
     public RobloxAccountsViewModel()
     {
         AddAccountCommand = new RelayCommand(_ => { }, _ => true);
-        RemoveAccountCommand = new RelayCommand(async p => await RemoveAccountAsync(p), _ => SelectedAccount != null);
-        LaunchRobloxCommand = new RelayCommand(async p => await LaunchRobloxAsync(p), _ => SelectedAccount != null);
-        RefreshAccountCommand = new RelayCommand(async p => await RefreshAccountAsync(p), _ => SelectedAccount != null);
+        RemoveAccountCommand = new RelayCommand(async p => await RemoveAccountAsync(p));
+        LaunchRobloxCommand = new RelayCommand(async p => await LaunchRobloxAsync(p));
+        RefreshAccountCommand = new RelayCommand(async p => await RefreshAccountAsync(p));
+        CheckHealthCommand = new RelayCommand(async _ => await CheckAllHealthAsync());
+        SetTagCommand = new RelayCommand(SetTag);
 
         LoadAccounts();
     }
@@ -52,6 +69,80 @@ public class RobloxAccountsViewModel : BaseViewModel
         var saved = AccountStorageService.Load();
         foreach (var acc in saved)
             Accounts.Add(acc);
+        RebuildTags();
+        ApplyFilter();
+    }
+
+    private void RebuildTags()
+    {
+        AvailableTags.Clear();
+        AvailableTags.Add("All");
+        var tags = Accounts.Select(a => a.Tag).Where(t => !string.IsNullOrEmpty(t)).Distinct().OrderBy(t => t);
+        foreach (var tag in tags)
+            AvailableTags.Add(tag);
+    }
+
+    private void ApplyFilter()
+    {
+        FilteredAccounts.Clear();
+        var source = _selectedTag == "All"
+            ? Accounts
+            : Accounts.Where(a => a.Tag == _selectedTag);
+        foreach (var acc in source)
+            FilteredAccounts.Add(acc);
+    }
+
+    private void SetTag(object? param)
+    {
+        if (param is not RobloxAccount account) return;
+
+        string currentTag = account.Tag;
+        string? newTag = PromptForTag(currentTag);
+        if (newTag == null) return;
+
+        account.Tag = newTag;
+        SaveAccounts();
+        RebuildTags();
+        ApplyFilter();
+
+        int idx = Accounts.IndexOf(account);
+        if (idx >= 0) { Accounts.RemoveAt(idx); Accounts.Insert(idx, account); }
+
+        StatusText = string.IsNullOrEmpty(newTag)
+            ? $"Removed tag from {account.Username}"
+            : $"Tagged {account.Username} as \"{newTag}\"";
+    }
+
+    private static string? PromptForTag(string currentTag)
+    {
+        var input = new Views.TagInputWindow(currentTag);
+        input.Owner = Application.Current.MainWindow;
+        return input.ShowDialog() == true ? input.TagResult : null;
+    }
+
+    private async Task CheckAllHealthAsync()
+    {
+        IsLoading = true;
+        StatusText = "Checking cookie health...";
+        int valid = 0, invalid = 0;
+
+        await CookieHealthService.CheckAllAccountsAsync(
+            Accounts.ToList(),
+            (account, isValid) =>
+            {
+                if (isValid) valid++; else invalid++;
+                StatusText = $"Checking... ({valid + invalid}/{Accounts.Count})";
+
+                int idx = Accounts.IndexOf(account);
+                if (idx >= 0) { Accounts.RemoveAt(idx); Accounts.Insert(idx, account); }
+            },
+            () =>
+            {
+                SaveAccounts();
+                ApplyFilter();
+                StatusText = $"Health check done: {valid} valid, {invalid} expired";
+                IsLoading = false;
+            });
     }
 
     public async Task AddAccountWithCookieAsync(string cookie)

@@ -22,6 +22,11 @@ public partial class AppSettingsWindow : Window
         DescInput.Text = entry.Description ?? string.Empty;
         ExePathInput.Text = entry.ExePath;
         IconPathInput.Text = entry.IconPath ?? string.Empty;
+        GameModuleToggle.IsChecked = entry.IsGameModule;
+        LaunchArgsInput.Text = entry.LaunchArgs ?? string.Empty;
+        EnvVarsInput.Text = entry.EnvironmentVars ?? string.Empty;
+        WorkDirInput.Text = entry.WorkingDirectory ?? string.Empty;
+        GameModulePanel.Visibility = entry.IsGameModule ? Visibility.Visible : Visibility.Collapsed;
 
         ResultEntry = entry;
     }
@@ -54,9 +59,18 @@ public partial class AppSettingsWindow : Window
         ResultEntry.Description = string.IsNullOrWhiteSpace(DescInput.Text) ? null : DescInput.Text.Trim();
         ResultEntry.ExePath = exePath;
         ResultEntry.IconPath = string.IsNullOrWhiteSpace(IconPathInput.Text) ? null : IconPathInput.Text.Trim();
+        ResultEntry.IsGameModule = GameModuleToggle.IsChecked == true;
+        ResultEntry.LaunchArgs = string.IsNullOrWhiteSpace(LaunchArgsInput.Text) ? null : LaunchArgsInput.Text.Trim();
+        ResultEntry.EnvironmentVars = string.IsNullOrWhiteSpace(EnvVarsInput.Text) ? null : EnvVarsInput.Text.Trim();
+        ResultEntry.WorkingDirectory = string.IsNullOrWhiteSpace(WorkDirInput.Text) ? null : WorkDirInput.Text.Trim();
 
         DialogResult = true;
         Close();
+    }
+
+    private void OnGameModuleToggled(object sender, RoutedEventArgs e)
+    {
+        GameModulePanel.Visibility = GameModuleToggle.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void OnCancelClick(object sender, RoutedEventArgs e)

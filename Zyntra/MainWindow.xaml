@@ -90,6 +90,14 @@
                                     <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
                                 </Button.Style>
                             </Button>
+
+                            <Button x:Name="BtnSteam" Content="🎮  Steam"
+                                    Command="{Binding NavigateCommand}" CommandParameter="Steam"
+                                    Click="SidebarNav_Click" Tag="Steam">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
+                                </Button.Style>
+                            </Button>
                         </StackPanel>
 
                         <!-- Footer -->
@@ -121,6 +129,9 @@
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type vm:RobloxAccountsViewModel}">
                                 <views:RobloxAccountsView />
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type vm:SteamViewModel}">
+                                <views:SteamView />
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                                 <views:SettingsView />

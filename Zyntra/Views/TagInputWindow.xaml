@@ -1,0 +1,42 @@
+<Window x:Class="Zyntra.Views.TagInputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Set Tag" Height="200" Width="340"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent" ResizeMode="NoResize">
+
+    <Border Background="{StaticResource MainBrush}" CornerRadius="10"
+            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Account Tag" FontSize="16" FontWeight="Bold"
+                       Foreground="{StaticResource TextBrush}" />
+
+            <TextBlock Grid.Row="2" Text="Enter a tag (e.g. Main, Alt, Trading) or leave empty to remove"
+                       FontSize="11" Foreground="{StaticResource SubTextBrush}" TextWrapping="Wrap" />
+
+            <TextBox x:Name="TagInput" Grid.Row="4"
+                     Style="{StaticResource DarkTextBoxStyle}" Tag="Tag name..."
+                     FontSize="13" />
+
+            <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Clear" Style="{StaticResource ControlButtonStyle}"
+                        Click="OnClearClick" Padding="14,8" Margin="0,0,8,0" />
+                <Button Content="Cancel" Style="{StaticResource ControlButtonStyle}"
+                        Click="OnCancelClick" Padding="14,8" Margin="0,0,8,0" />
+                <Button Content="Save" Style="{StaticResource AccentButtonStyle}"
+                        Click="OnSaveClick" Padding="20,8" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

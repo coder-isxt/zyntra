@@ -92,6 +92,43 @@
                             Click="OnClearIconClick" />
                 </Grid>
 
+                <!-- Game Module Toggle -->
+                <Grid Grid.Row="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Game Module" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{StaticResource SubTextBrush}" />
+                        <TextBlock Text="Enable custom launch args, env vars, and working directory"
+                                   FontSize="10" Foreground="{StaticResource SubTextBrush}" Opacity="0.6" />
+                    </StackPanel>
+                    <CheckBox x:Name="GameModuleToggle" Grid.Column="1" VerticalAlignment="Center"
+                              Style="{StaticResource ToggleSwitchStyle}"
+                              Checked="OnGameModuleToggled" Unchecked="OnGameModuleToggled" />
+                </Grid>
+
+                <!-- Game Module Fields (shown when toggle is on) -->
+                <StackPanel x:Name="GameModulePanel" Grid.Row="8" Margin="0,52,0,0" Visibility="Collapsed">
+                    <TextBlock Text="Launch Arguments" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource SubTextBrush}" Margin="0,0,0,4" />
+                    <TextBox x:Name="LaunchArgsInput" Style="{StaticResource DarkTextBoxStyle}"
+                             Tag="e.g. --fullscreen --fps=60" FontFamily="Consolas" FontSize="12" />
+
+                    <TextBlock Text="Environment Variables" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource SubTextBrush}" Margin="0,10,0,4" />
+                    <TextBox x:Name="EnvVarsInput" Style="{StaticResource DarkTextBoxStyle}"
+                             Tag="KEY=VALUE, one per line" FontFamily="Consolas" FontSize="12"
+                             AcceptsReturn="True" Height="50" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto" />
+
+                    <TextBlock Text="Working Directory" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource SubTextBrush}" Margin="0,10,0,4" />
+                    <TextBox x:Name="WorkDirInput" Style="{StaticResource DarkTextBoxStyle}"
+                             Tag="Leave empty for exe directory" FontFamily="Consolas" FontSize="12" />
+                </StackPanel>
+
                 <!-- Buttons -->
                 <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="Cancel" Style="{StaticResource ControlButtonStyle}"
