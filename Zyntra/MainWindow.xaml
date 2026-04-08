@@ -46,6 +46,20 @@
 
                     <!-- Window Controls -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <!-- Notification Bell -->
+                        <Button Style="{StaticResource TitleBarButtonStyle}"
+                                Command="{Binding ToggleNotificationsCommand}" ToolTip="Notifications">
+                            <Grid>
+                                <TextBlock Text="🔔" FontSize="13" />
+                                <Border Width="14" Height="14" CornerRadius="7"
+                                        Background="{StaticResource AccentBrush}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8,-4,-4,0"
+                                        Visibility="{Binding UnreadNotifications, Converter={StaticResource NonZeroToVisConverter}}">
+                                    <TextBlock Text="{Binding UnreadNotifications}" FontSize="8" FontWeight="Bold"
+                                               Foreground="#FF0D1117" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                            </Grid>
+                        </Button>
                         <Button Content="─" Style="{StaticResource TitleBarButtonStyle}" Click="MinimizeClick" />
                         <Button Content="□" Style="{StaticResource TitleBarButtonStyle}" Click="MaximizeClick" />
                         <Button Content="✕" Style="{StaticResource CloseButtonStyle}" Click="CloseClick" />
@@ -75,17 +89,45 @@
                                        Foreground="{StaticResource SubTextBrush}"
                                        Margin="18,8,0,8" Opacity="0.6" />
 
+                            <Button x:Name="BtnDashboard" Content="◆  Dashboard"
+                                    Command="{Binding NavigateCommand}" CommandParameter="Dashboard"
+                                    Click="SidebarNav_Click" Tag="Dashboard">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarActiveButtonStyle}" />
+                                </Button.Style>
+                            </Button>
+
                             <Button x:Name="BtnApps" Content="⊞  Applications"
                                     Command="{Binding NavigateCommand}" CommandParameter="Apps"
                                     Click="SidebarNav_Click" Tag="Apps">
                                 <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarActiveButtonStyle}" />
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
                                 </Button.Style>
                             </Button>
 
                             <Button x:Name="BtnRoblox" Content="◉  Roblox Accounts"
                                     Command="{Binding NavigateCommand}" CommandParameter="Roblox"
                                     Click="SidebarNav_Click" Tag="Roblox">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
+                                </Button.Style>
+                            </Button>
+
+                            <TextBlock Text="TOOLS" FontSize="10" FontWeight="Bold"
+                                       Foreground="{StaticResource SubTextBrush}"
+                                       Margin="18,12,0,8" Opacity="0.6" />
+
+                            <Button x:Name="BtnPlugins" Content="⧉  Plugins"
+                                    Command="{Binding NavigateCommand}" CommandParameter="Plugins"
+                                    Click="SidebarNav_Click" Tag="Plugins">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
+                                </Button.Style>
+                            </Button>
+
+                            <Button x:Name="BtnScripts" Content="⟐  Scripts"
+                                    Command="{Binding NavigateCommand}" CommandParameter="Scripts"
+                                    Click="SidebarNav_Click" Tag="Scripts">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
                                 </Button.Style>
@@ -114,21 +156,72 @@
                 </Border>
 
                 <!-- Page Content -->
-                <Border Grid.Column="1" Background="{StaticResource PanelBrush}">
-                    <ContentControl Content="{Binding CurrentPage}">
-                        <ContentControl.Resources>
-                            <DataTemplate DataType="{x:Type vm:AppsViewModel}">
-                                <views:AppsView />
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type vm:RobloxAccountsViewModel}">
-                                <views:RobloxAccountsView />
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
-                                <views:SettingsView />
-                            </DataTemplate>
-                        </ContentControl.Resources>
-                    </ContentControl>
-                </Border>
+                <Grid Grid.Column="1">
+                    <Border Background="{StaticResource PanelBrush}">
+                        <ContentControl Content="{Binding CurrentPage}">
+                            <ContentControl.Resources>
+                                <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+                                    <views:DashboardView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:AppsViewModel}">
+                                    <views:AppsView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:RobloxAccountsViewModel}">
+                                    <views:RobloxAccountsView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:PluginsViewModel}">
+                                    <views:PluginsView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:ScriptsViewModel}">
+                                    <views:ScriptsView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+                                    <views:SettingsView />
+                                </DataTemplate>
+                            </ContentControl.Resources>
+                        </ContentControl>
+                    </Border>
+
+                    <!-- Notification Panel Overlay -->
+                    <Border HorizontalAlignment="Right" VerticalAlignment="Top"
+                            Width="320" MaxHeight="400" Margin="0,4,8,0"
+                            Background="{StaticResource MainBrush}" CornerRadius="8"
+                            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+                            Visibility="{Binding NotificationPanelOpen, Converter={StaticResource BoolToVisConverter}}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="14,10">
+                                <TextBlock Text="Notifications" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextBrush}" />
+                                <Button Content="Clear all" HorizontalAlignment="Right" Padding="8,3"
+                                        Style="{StaticResource ControlButtonStyle}" FontSize="11"
+                                        Command="{Binding ClearNotificationsCommand}" />
+                            </Grid>
+                            <ListBox Grid.Row="1" ItemsSource="{Binding Notifications}"
+                                     Style="{StaticResource DarkListBoxStyle}"
+                                     ItemContainerStyle="{StaticResource DarkListBoxItemStyle}"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     HorizontalContentAlignment="Stretch" MaxHeight="340">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="2">
+                                            <TextBlock Text="{Binding Title}" FontSize="12" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}" />
+                                            <TextBlock Text="{Binding Message}" FontSize="11"
+                                                       Foreground="{StaticResource SubTextBrush}"
+                                                       TextWrapping="Wrap" Margin="0,2,0,0" />
+                                            <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:HH:mm}'}" FontSize="10"
+                                                       Foreground="{StaticResource SubTextBrush}" Opacity="0.5" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+                </Grid>
             </Grid>
         </Grid>
     </Border>

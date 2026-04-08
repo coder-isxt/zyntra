@@ -1,3 +1,9 @@
+- Added Dashboard home page with stats cards and quick actions
+- Added Plugin system (install, enable/disable, remove DLL plugins)
+- Added Scripting / automation tab (create, edit, run PowerShell/Batch/Python scripts)
+- Added Search / filter bar on Applications page
+- Added Drag-and-drop reorder (move up/down) for apps list
+- Added Notifications panel with bell icon badge in title bar
 - Added account groups/tags (tag accounts, filter by tag)
 - Added cookie health monitor (validate all cookies, green/red status dots)
 - Added custom game modules (launch args, env vars, working directory per app)

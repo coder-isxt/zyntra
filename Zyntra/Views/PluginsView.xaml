@@ -1,0 +1,117 @@
+<UserControl x:Class="Zyntra.Views.PluginsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Zyntra.ViewModels">
+    <Grid Margin="24,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="Plugins" FontSize="22" FontWeight="Bold"
+                           Foreground="{StaticResource TextBrush}" />
+                <TextBlock Text="Install and manage plugins to extend Zyntra" FontSize="13"
+                           Foreground="{StaticResource SubTextBrush}" Margin="0,4,0,0" />
+            </StackPanel>
+            <Button Grid.Column="1" Content="+ Install Plugin" Style="{StaticResource AccentButtonStyle}"
+                    Command="{Binding InstallPluginCommand}" VerticalAlignment="Top" />
+        </Grid>
+
+        <!-- Plugin List -->
+        <ListBox Grid.Row="2" ItemsSource="{Binding Plugins}"
+                 SelectedItem="{Binding SelectedPlugin}"
+                 Style="{StaticResource DarkListBoxStyle}"
+                 ItemContainerStyle="{StaticResource DarkListBoxItemStyle}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="44" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Icon -->
+                        <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18"
+                                Background="{StaticResource ControlBrush}" VerticalAlignment="Center">
+                            <TextBlock Text="⧉" FontSize="16" Foreground="{StaticResource AccentBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+
+                        <!-- Info -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextBrush}" />
+                                <Border CornerRadius="4" Padding="6,1" Margin="8,0,0,0"
+                                        Background="{StaticResource ControlHoverBrush}"
+                                        Visibility="{Binding Version, Converter={StaticResource NonEmptyToVisConverter}}">
+                                    <TextBlock Text="{Binding Version}" FontSize="10"
+                                               Foreground="{StaticResource SubTextBrush}" />
+                                </Border>
+                            </StackPanel>
+                            <TextBlock FontSize="12" Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0"
+                                       TextTrimming="CharacterEllipsis">
+                                <Run Text="{Binding Description, Mode=OneWay, TargetNullValue='No description'}" />
+                            </TextBlock>
+                        </StackPanel>
+
+                        <!-- Toggle -->
+                        <Button Grid.Column="2" Padding="10,6"
+                                Style="{StaticResource ControlButtonStyle}" VerticalAlignment="Center"
+                                Command="{Binding DataContext.TogglePluginCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                CommandParameter="{Binding}">
+                            <Button.Content>
+                                <TextBlock>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="Enabled" />
+                                            <Setter Property="Foreground" Value="#FF6BCB77" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                    <Setter Property="Text" Value="Disabled" />
+                                                    <Setter Property="Foreground" Value="{StaticResource SubTextBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Button.Content>
+                        </Button>
+
+                        <!-- Remove -->
+                        <Button Grid.Column="4" Content="✕" FontSize="14" Padding="8,4"
+                                Style="{StaticResource DangerButtonStyle}" VerticalAlignment="Center"
+                                Command="{Binding DataContext.RemovePluginCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                CommandParameter="{Binding}" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Empty -->
+        <TextBlock Grid.Row="2" Text="No plugins installed. Click '+ Install Plugin' to add one."
+                   Foreground="{StaticResource SubTextBrush}" FontSize="14"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Visibility="{Binding Plugins.Count, Converter={StaticResource ZeroToVisConverter}}" />
+
+        <!-- Status -->
+        <Border Grid.Row="3" Margin="0,12,0,0" Padding="0,8,0,0"
+                BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,1,0,0">
+            <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource SubTextBrush}" FontSize="12" />
+        </Border>
+    </Grid>
+</UserControl>

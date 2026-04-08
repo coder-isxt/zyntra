@@ -10,6 +10,7 @@ namespace Zyntra.ViewModels;
 public class AppsViewModel : BaseViewModel
 {
     public ObservableCollection<AppEntry> Apps { get; } = new();
+    public ObservableCollection<AppEntry> FilteredApps { get; } = new();
 
     private AppEntry? _selectedApp;
     public AppEntry? SelectedApp
@@ -18,10 +19,23 @@ public class AppsViewModel : BaseViewModel
         set => SetProperty(ref _selectedApp, value);
     }
 
+    private string _searchText = string.Empty;
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (SetProperty(ref _searchText, value))
+                ApplyFilter();
+        }
+    }
+
     public ICommand LaunchAppCommand { get; }
     public ICommand RemoveAppCommand { get; }
     public ICommand AddAppCommand { get; }
     public ICommand EditAppCommand { get; }
+    public ICommand MoveUpCommand { get; }
+    public ICommand MoveDownCommand { get; }
 
     public AppsViewModel()
     {
@@ -29,6 +43,8 @@ public class AppsViewModel : BaseViewModel
         RemoveAppCommand = new RelayCommand(RemoveApp);
         AddAppCommand = new RelayCommand(_ => AddApp());
         EditAppCommand = new RelayCommand(EditApp);
+        MoveUpCommand = new RelayCommand(MoveUp);
+        MoveDownCommand = new RelayCommand(MoveDown);
 
         LoadApps();
     }
@@ -40,6 +56,43 @@ public class AppsViewModel : BaseViewModel
         var customApps = AppStorageService.Load();
         foreach (var app in customApps)
             Apps.Add(app);
+
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        FilteredApps.Clear();
+        var source = string.IsNullOrWhiteSpace(_searchText)
+            ? Apps
+            : new ObservableCollection<AppEntry>(Apps.Where(a =>
+                a.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ||
+                (a.Description?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false)));
+
+        foreach (var app in source)
+            FilteredApps.Add(app);
+    }
+
+    private void MoveUp(object? param)
+    {
+        var app = param as AppEntry ?? SelectedApp;
+        if (app == null) return;
+        int idx = Apps.IndexOf(app);
+        if (idx <= 0) return;
+        Apps.Move(idx, idx - 1);
+        SaveCustomApps();
+        ApplyFilter();
+    }
+
+    private void MoveDown(object? param)
+    {
+        var app = param as AppEntry ?? SelectedApp;
+        if (app == null) return;
+        int idx = Apps.IndexOf(app);
+        if (idx < 0 || idx >= Apps.Count - 1) return;
+        Apps.Move(idx, idx + 1);
+        SaveCustomApps();
+        ApplyFilter();
     }
 
     private void LaunchApp(object? param)
@@ -91,6 +144,7 @@ public class AppsViewModel : BaseViewModel
 
         Apps.Remove(app);
         SaveCustomApps();
+        ApplyFilter();
     }
 
     public void AddApp()
@@ -115,6 +169,7 @@ public class AppsViewModel : BaseViewModel
             entry.IsBuiltIn = false;
             Apps.Add(entry);
             SaveCustomApps();
+            ApplyFilter();
         }
     }
 
@@ -138,6 +193,7 @@ public class AppsViewModel : BaseViewModel
                 Apps.Insert(idx, settings.ResultEntry);
             }
             SaveCustomApps();
+            ApplyFilter();
         }
     }
 

@@ -164,8 +164,11 @@ public partial class MainWindow : Window
             var activeStyle = (Style)FindResource("SidebarActiveButtonStyle");
             var normalStyle = (Style)FindResource("SidebarButtonStyle");
 
+            BtnDashboard.Style = tag == "Dashboard" ? activeStyle : normalStyle;
             BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
             BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
+            BtnPlugins.Style = tag == "Plugins" ? activeStyle : normalStyle;
+            BtnScripts.Style = tag == "Scripts" ? activeStyle : normalStyle;
             BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;
         }
     }

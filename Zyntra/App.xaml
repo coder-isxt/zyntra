@@ -17,6 +17,7 @@
             <conv:ExeIconConverter x:Key="ExeIconConverter" />
             <conv:ExeHasIconToVisibilityConverter x:Key="ExeHasIconVis" />
             <conv:ExeHasIconToInverseVisibilityConverter x:Key="ExeNoIconVis" />
+            <conv:NonZeroToVisibilityConverter x:Key="NonZeroToVisConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

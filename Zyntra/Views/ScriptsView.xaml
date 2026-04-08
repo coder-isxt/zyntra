@@ -1,0 +1,135 @@
+<UserControl x:Class="Zyntra.Views.ScriptsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Zyntra.ViewModels">
+    <Grid Margin="24,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="12" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="Scripts" FontSize="22" FontWeight="Bold"
+                           Foreground="{StaticResource TextBrush}" />
+                <TextBlock Text="Create and run automation scripts" FontSize="13"
+                           Foreground="{StaticResource SubTextBrush}" Margin="0,4,0,0" />
+            </StackPanel>
+            <Button Grid.Column="1" Content="+ New Script" Style="{StaticResource AccentButtonStyle}"
+                    Command="{Binding NewScriptCommand}" VerticalAlignment="Top" />
+            <Button Grid.Column="3" Content="Save" Style="{StaticResource ControlButtonStyle}"
+                    Command="{Binding SaveScriptsCommand}" VerticalAlignment="Top" />
+        </Grid>
+
+        <!-- Main Content: Split Panel -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Script List -->
+            <Border Grid.Column="0" Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
+                    BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+                <ListBox ItemsSource="{Binding Scripts}" SelectedItem="{Binding SelectedScript}"
+                         Style="{StaticResource DarkListBoxStyle}"
+                         ItemContainerStyle="{StaticResource DarkListBoxItemStyle}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         HorizontalContentAlignment="Stretch">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="4,2">
+                                <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock FontSize="10" Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0">
+                                    <Run Text="{Binding ScriptType, Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+
+            <!-- Editor -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="120" />
+                </Grid.RowDefinitions>
+
+                <!-- Script Settings Bar -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding EditorName, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource DarkTextBoxStyle}" Tag="Script name"
+                             IsEnabled="{Binding HasSelection}" />
+                    <ComboBox Grid.Column="2" ItemsSource="{x:Static vm:ScriptsViewModel.ScriptTypes}"
+                              SelectedItem="{Binding EditorType}"
+                              Style="{StaticResource DarkComboBoxStyle}"
+                              IsEnabled="{Binding HasSelection}" />
+                    <Button Grid.Column="4" Content="▶ Run" Padding="14,7"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Command="{Binding RunScriptCommand}"
+                            IsEnabled="{Binding HasSelection}" />
+                    <Button Grid.Column="6" Content="🗑" FontSize="14" Padding="8,5"
+                            Style="{StaticResource DangerButtonStyle}"
+                            Command="{Binding DeleteScriptCommand}"
+                            IsEnabled="{Binding HasSelection}" />
+                </Grid>
+
+                <!-- Code Editor -->
+                <TextBox Grid.Row="2"
+                         Text="{Binding EditorContent, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource DarkTextBoxStyle}"
+                         FontFamily="Consolas" FontSize="13"
+                         AcceptsReturn="True" AcceptsTab="True"
+                         TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                         VerticalContentAlignment="Top"
+                         IsEnabled="{Binding HasSelection}"
+                         Tag="Select or create a script..." />
+
+                <!-- Output Label -->
+                <TextBlock Grid.Row="4" Text="OUTPUT" FontSize="10" FontWeight="Bold"
+                           Foreground="{StaticResource SubTextBrush}" Opacity="0.6" />
+
+                <!-- Output -->
+                <Border Grid.Row="6" Background="{StaticResource PanelInsetBrush}" CornerRadius="6"
+                        BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1" Padding="10,8">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBlock Text="{Binding Output}" FontFamily="Consolas" FontSize="12"
+                                   Foreground="{StaticResource SubTextBrush}" TextWrapping="Wrap" />
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Status -->
+        <Border Grid.Row="3" Margin="0,12,0,0" Padding="0,8,0,0"
+                BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,1,0,0">
+            <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource SubTextBrush}" FontSize="12" />
+        </Border>
+    </Grid>
+</UserControl>
