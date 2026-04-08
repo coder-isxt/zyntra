@@ -41,6 +41,7 @@ public class MainViewModel : BaseViewModel
     public RobloxAccountsViewModel RobloxVM { get; }
     public PluginsViewModel PluginsVM { get; }
     public ScriptsViewModel ScriptsVM { get; }
+    public DocsViewModel DocsVM { get; }
     public SettingsViewModel SettingsVM { get; }
 
     public ICommand NavigateCommand { get; }
@@ -55,6 +56,7 @@ public class MainViewModel : BaseViewModel
         RobloxVM = new RobloxAccountsViewModel();
         PluginsVM = new PluginsViewModel();
         ScriptsVM = new ScriptsViewModel();
+        DocsVM = new DocsViewModel();
         SettingsVM = new SettingsViewModel();
         _currentPage = DashboardVM;
 
@@ -114,6 +116,10 @@ public class MainViewModel : BaseViewModel
             case "Scripts":
                 CurrentPage = ScriptsVM;
                 CurrentPageName = "Scripts";
+                break;
+            case "Docs":
+                CurrentPage = DocsVM;
+                CurrentPageName = "API Docs";
                 break;
             case "Settings":
                 CurrentPage = SettingsVM;

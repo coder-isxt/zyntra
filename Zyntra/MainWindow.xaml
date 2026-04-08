@@ -133,6 +133,14 @@
                                 </Button.Style>
                             </Button>
 
+                            <Button x:Name="BtnDocs" Content="📄  API Docs"
+                                    Command="{Binding NavigateCommand}" CommandParameter="Docs"
+                                    Click="SidebarNav_Click" Tag="Docs">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
+                                </Button.Style>
+                            </Button>
+
                         </StackPanel>
 
                         <!-- Footer -->
@@ -174,6 +182,9 @@
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:ScriptsViewModel}">
                                     <views:ScriptsView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:DocsViewModel}">
+                                    <views:DocsView />
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                                     <views:SettingsView />

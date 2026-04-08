@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text.Json;
 using Zyntra.Models;
 
@@ -32,6 +33,11 @@ public static class ScriptService
 
     public static async Task<string> RunAsync(ScriptEntry script)
     {
+        // Export context + extract API modules
+        string contextPath = ScriptContextService.ExportContext();
+        string apiDir = ScriptContextService.GetApiDir();
+        ExtractApiModules(apiDir);
+
         string tempFile;
         ProcessStartInfo psi;
 
@@ -52,8 +58,11 @@ public static class ScriptService
                 break;
 
             case "Python":
+            {
+                // Prepend API import
+                string apiImport = $"import sys; sys.path.insert(0, r'{apiDir}')\nimport zyntra_api as zyntra\n\n";
                 tempFile = Path.Combine(Path.GetTempPath(), $"zyntra_{script.Id}.py");
-                File.WriteAllText(tempFile, script.Content);
+                File.WriteAllText(tempFile, apiImport + script.Content);
                 psi = new ProcessStartInfo
                 {
                     FileName = "python",
@@ -64,10 +73,15 @@ public static class ScriptService
                     CreateNoWindow = true,
                 };
                 break;
+            }
 
             default: // PowerShell
+            {
+                string apiModule = Path.Combine(apiDir, "ZyntraAPI.psm1");
+                // Prepend module import
+                string psImport = $"Import-Module '{apiModule}' -Force\n\n";
                 tempFile = Path.Combine(Path.GetTempPath(), $"zyntra_{script.Id}.ps1");
-                File.WriteAllText(tempFile, script.Content);
+                File.WriteAllText(tempFile, psImport + script.Content);
                 psi = new ProcessStartInfo
                 {
                     FileName = "powershell.exe",
@@ -78,7 +92,11 @@ public static class ScriptService
                     CreateNoWindow = true,
                 };
                 break;
+            }
         }
+
+        // Set ZYNTRA_CONTEXT env var
+        psi.EnvironmentVariables["ZYNTRA_CONTEXT"] = contextPath;
 
         try
         {
@@ -91,6 +109,9 @@ public static class ScriptService
 
             script.LastRunAt = DateTime.UtcNow;
 
+            // Process response file (notifications, clipboard, etc.)
+            ScriptContextService.ProcessResponse();
+
             return string.IsNullOrEmpty(error) ? output : $"{output}\n[STDERR]\n{error}";
         }
         catch (Exception ex)
@@ -101,5 +122,24 @@ public static class ScriptService
         {
             try { File.Delete(tempFile); } catch { }
         }
+    }
+
+    private static void ExtractApiModules(string apiDir)
+    {
+        ExtractResource("Zyntra.Resources.ZyntraAPI.psm1", Path.Combine(apiDir, "ZyntraAPI.psm1"));
+        ExtractResource("Zyntra.Resources.zyntra_api.py", Path.Combine(apiDir, "zyntra_api.py"));
+    }
+
+    private static void ExtractResource(string resourceName, string outputPath)
+    {
+        try
+        {
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+            if (stream == null) return;
+
+            using var fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
+            stream.CopyTo(fs);
+        }
+        catch { }
     }
 }

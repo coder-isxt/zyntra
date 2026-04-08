@@ -169,6 +169,7 @@ public partial class MainWindow : Window
             BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
             BtnPlugins.Style = tag == "Plugins" ? activeStyle : normalStyle;
             BtnScripts.Style = tag == "Scripts" ? activeStyle : normalStyle;
+            BtnDocs.Style = tag == "Docs" ? activeStyle : normalStyle;
             BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;
         }
     }

@@ -1,3 +1,5 @@
+- Added Zyntra Scripting API (PowerShell module, Python module, context injection)
+- Added API Docs tab with full reference for PowerShell, Python, and Batch
 - Added Dashboard home page with stats cards and quick actions
 - Added Plugin system (install, enable/disable, remove DLL plugins)
 - Added Scripting / automation tab (create, edit, run PowerShell/Batch/Python scripts)
