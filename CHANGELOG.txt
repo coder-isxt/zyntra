@@ -1,0 +1,8 @@
+- Added auto-updater (check GitHub releases)
+- Added theme system with 9 accent color presets
+- Added import/export accounts (encrypted .zyntra files)
+- Added Settings page (launch on startup, minimize to tray, accent picker)
+- Added system tray with quick-launch accounts
+- Added app settings dialog (edit name, description, icon, exe path)
+- Added splash screen on startup
+- Added CI/CD with GitHub Actions

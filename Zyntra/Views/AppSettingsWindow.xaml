@@ -1,0 +1,105 @@
+<Window x:Class="Zyntra.Views.AppSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Zyntra — App Settings" Height="500" Width="460"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent" ResizeMode="NoResize">
+
+    <Border Background="{StaticResource MainBrush}" CornerRadius="10"
+            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="38" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Title Bar -->
+            <Border Grid.Row="0" Background="{StaticResource TopBrush}"
+                    CornerRadius="10,10,0,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" Margin="14,0" VerticalAlignment="Center">
+                        <TextBlock Text="◆" Foreground="{StaticResource AccentBrush}" FontSize="14" Margin="0,0,8,0" />
+                        <TextBlock x:Name="TitleText" Text="App Settings" Foreground="{StaticResource TextBrush}"
+                                   FontSize="13" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <Button Content="✕" HorizontalAlignment="Right"
+                            Style="{StaticResource CloseButtonStyle}" Click="OnCancelClick" />
+                </Grid>
+            </Border>
+
+            <!-- Form -->
+            <Grid Grid.Row="1" Margin="20,16,20,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Name -->
+                <TextBlock Grid.Row="0" Text="Name" FontSize="12" FontWeight="SemiBold"
+                           Foreground="{StaticResource SubTextBrush}" Margin="0,0,0,4" />
+                <TextBox x:Name="NameInput" Grid.Row="0" Margin="0,20,0,0"
+                         Style="{StaticResource DarkTextBoxStyle}" Tag="Application name" />
+
+                <!-- Description -->
+                <TextBlock Grid.Row="2" Text="Description" FontSize="12" FontWeight="SemiBold"
+                           Foreground="{StaticResource SubTextBrush}" Margin="0,0,0,4" />
+                <TextBox x:Name="DescInput" Grid.Row="2" Margin="0,20,0,0"
+                         Style="{StaticResource DarkTextBoxStyle}" Tag="Short description (optional)" />
+
+                <!-- Exe Path -->
+                <TextBlock Grid.Row="4" Text="Executable Path" FontSize="12" FontWeight="SemiBold"
+                           Foreground="{StaticResource SubTextBrush}" Margin="0,0,0,4" />
+                <Grid Grid.Row="4" Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="ExePathInput" Grid.Column="0"
+                             Style="{StaticResource DarkTextBoxStyle}" Tag="Path to .exe"
+                             FontFamily="Consolas" FontSize="12" />
+                    <Button Grid.Column="2" Content="Browse" Style="{StaticResource ControlButtonStyle}"
+                            Click="OnBrowseExeClick" />
+                </Grid>
+
+                <!-- Custom Icon -->
+                <TextBlock Grid.Row="6" Text="Custom Icon (optional)" FontSize="12" FontWeight="SemiBold"
+                           Foreground="{StaticResource SubTextBrush}" Margin="0,0,0,4" />
+                <Grid Grid.Row="6" Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="IconPathInput" Grid.Column="0"
+                             Style="{StaticResource DarkTextBoxStyle}" Tag="Path to icon (.ico, .png, .exe)"
+                             FontFamily="Consolas" FontSize="12" />
+                    <Button Grid.Column="2" Content="Browse" Style="{StaticResource ControlButtonStyle}"
+                            Click="OnBrowseIconClick" />
+                    <Button Grid.Column="4" Content="Clear" Style="{StaticResource ControlButtonStyle}"
+                            Click="OnClearIconClick" />
+                </Grid>
+
+                <!-- Buttons -->
+                <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Cancel" Style="{StaticResource ControlButtonStyle}"
+                            Click="OnCancelClick" Padding="18,10" Margin="0,0,10,0" />
+                    <Button Content="Save" Style="{StaticResource AccentButtonStyle}"
+                            Click="OnSaveClick" Padding="24,10" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

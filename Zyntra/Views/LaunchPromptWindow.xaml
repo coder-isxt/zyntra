@@ -1,0 +1,57 @@
+<Window x:Class="Zyntra.Views.LaunchPromptWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Zyntra — Launch Roblox" Height="220" Width="400"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent" ResizeMode="NoResize">
+
+    <Border Background="{StaticResource MainBrush}" CornerRadius="10"
+            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="16" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Title -->
+            <TextBlock Grid.Row="0" FontSize="16" FontWeight="Bold"
+                       Foreground="{StaticResource TextBrush}">
+                <Run Text="Launch Roblox as " />
+                <Run x:Name="AccountNameRun" Foreground="{StaticResource AccentBrush}" />
+            </TextBlock>
+
+            <!-- Label -->
+            <TextBlock Grid.Row="2" Text="Enter a Place ID to join a specific game, or just launch Roblox."
+                       FontSize="12" Foreground="{StaticResource SubTextBrush}" TextWrapping="Wrap" />
+
+            <!-- Place ID Input -->
+            <TextBox x:Name="PlaceIdInput" Grid.Row="4"
+                     Style="{StaticResource DarkTextBoxStyle}"
+                     Tag="Place ID (e.g. 4483381587)" FontSize="13" />
+
+            <!-- Buttons -->
+            <Grid Grid.Row="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="▶ Join Game" Style="{StaticResource AccentButtonStyle}"
+                        Click="OnJoinGameClick" />
+                <Button Grid.Column="2" Content="Just Launch" Style="{StaticResource ControlButtonStyle}"
+                        Click="OnJustLaunchClick" />
+                <Button Grid.Column="4" Content="Cancel" Style="{StaticResource ControlButtonStyle}"
+                        Click="OnCancelClick" Padding="16,10" />
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
