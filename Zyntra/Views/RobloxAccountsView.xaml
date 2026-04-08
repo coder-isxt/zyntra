@@ -7,7 +7,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="16" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="16" />
+            <RowDefinition Height="12" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -58,7 +60,7 @@
         </Border>
 
         <!-- Tag Filter & Health Check Bar -->
-        <Border Grid.Row="4" Margin="0,0,0,10">
+        <Border Grid.Row="4">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -80,7 +82,7 @@
         </Border>
 
         <!-- Account List -->
-        <ListBox Grid.Row="4" Margin="0,36,0,0" ItemsSource="{Binding FilteredAccounts}"
+        <ListBox Grid.Row="6" ItemsSource="{Binding FilteredAccounts}"
                  SelectedItem="{Binding SelectedAccount}"
                  Style="{StaticResource DarkListBoxStyle}"
                  ItemContainerStyle="{StaticResource DarkListBoxItemStyle}"
@@ -186,13 +188,13 @@
         </ListBox>
 
         <!-- Empty state -->
-        <TextBlock Grid.Row="4" Margin="0,36,0,0" Text="No accounts added yet. Paste a .ROBLOSECURITY cookie above to add one."
+        <TextBlock Grid.Row="6" Text="No accounts added yet. Paste a .ROBLOSECURITY cookie above to add one."
                    Foreground="{StaticResource SubTextBrush}" FontSize="14"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    Visibility="{Binding FilteredAccounts.Count, Converter={StaticResource ZeroToVisConverter}}" />
 
         <!-- Status Bar -->
-        <Border Grid.Row="5" Margin="0,12,0,0" Padding="0,8,0,0"
+        <Border Grid.Row="7" Margin="0,12,0,0" Padding="0,8,0,0"
                 BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,1,0,0">
             <Grid>
                 <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource SubTextBrush}" FontSize="12" />

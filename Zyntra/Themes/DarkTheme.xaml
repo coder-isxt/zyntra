@@ -177,17 +177,21 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="CaretBrush" Value="{StaticResource TextBrush}" />
         <Setter Property="SelectionBrush" Value="{StaticResource AccentBrush}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
                     <Border x:Name="Bd" Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="6" Padding="{TemplateBinding Padding}">
-                        <Grid>
-                            <ScrollViewer x:Name="PART_ContentHost" />
+                            CornerRadius="6">
+                        <Grid Margin="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Margin="0" Padding="0" />
                             <TextBlock x:Name="Placeholder" Text="{TemplateBinding Tag}"
                                        Foreground="{StaticResource SubTextBrush}" Opacity="0.5"
-                                       IsHitTestVisible="False" VerticalAlignment="Center"
+                                       IsHitTestVisible="False"
+                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                        Visibility="Collapsed" />
                         </Grid>
                     </Border>
