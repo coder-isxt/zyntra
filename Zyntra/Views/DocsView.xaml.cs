@@ -41,9 +41,11 @@ public partial class DocsView : UserControl
     private Brush Fg => (Brush)FindResource("TextBrush");
     private Brush Sub => (Brush)FindResource("SubTextBrush");
     private Brush Accent => (Brush)FindResource("AccentBrush");
-    private Brush Inset => (Brush)FindResource("PanelInsetBrush");
+    private Brush Panel => (Brush)FindResource("PanelBrush");
     private Brush Stroke => (Brush)FindResource("StrokeBrush");
+    private Brush Control => (Brush)FindResource("ControlBrush");
     private Brush CodeBg => new SolidColorBrush(Color.FromRgb(13, 17, 23));
+    private Brush CodeFg => new SolidColorBrush(Color.FromRgb(201, 209, 217));
 
     private void Clear() => DocPanel.Children.Clear();
 
@@ -51,8 +53,8 @@ public partial class DocsView : UserControl
     {
         DocPanel.Children.Add(new TextBlock
         {
-            Text = text, FontSize = 22, FontWeight = FontWeights.Bold,
-            Foreground = Fg, Margin = new Thickness(0, 0, 0, 4),
+            Text = text, FontSize = 24, FontWeight = FontWeights.Bold,
+            Foreground = Fg, Margin = new Thickness(0, 0, 0, 6),
         });
     }
 
@@ -60,17 +62,19 @@ public partial class DocsView : UserControl
     {
         DocPanel.Children.Add(new TextBlock
         {
-            Text = text, FontSize = 13, Foreground = Sub,
-            Margin = new Thickness(0, 0, 0, 16), TextWrapping = TextWrapping.Wrap,
+            Text = text, FontSize = 14, Foreground = Sub,
+            Margin = new Thickness(0, 0, 0, 20), TextWrapping = TextWrapping.Wrap,
+            LineHeight = 22,
         });
     }
 
     private void AddHeading(string text)
     {
+        DocPanel.Children.Add(new Border { Height = 12 }); // spacer above
         DocPanel.Children.Add(new TextBlock
         {
-            Text = text, FontSize = 15, FontWeight = FontWeights.SemiBold,
-            Foreground = Accent, Margin = new Thickness(0, 18, 0, 8),
+            Text = text, FontSize = 16, FontWeight = FontWeights.SemiBold,
+            Foreground = Fg, Margin = new Thickness(0, 0, 0, 10),
         });
     }
 
@@ -78,9 +82,9 @@ public partial class DocsView : UserControl
     {
         DocPanel.Children.Add(new TextBlock
         {
-            Text = text, FontSize = 13, Foreground = Fg,
-            TextWrapping = TextWrapping.Wrap, LineHeight = 21,
-            Margin = new Thickness(0, 0, 0, 8),
+            Text = text, FontSize = 13, Foreground = Sub,
+            TextWrapping = TextWrapping.Wrap, LineHeight = 22,
+            Margin = new Thickness(0, 0, 0, 10),
         });
     }
 
@@ -88,22 +92,22 @@ public partial class DocsView : UserControl
     {
         var row = new Border
         {
-            Background = Inset, CornerRadius = new CornerRadius(6),
+            Background = Panel, CornerRadius = new CornerRadius(6),
             BorderBrush = Stroke, BorderThickness = new Thickness(1),
-            Padding = new Thickness(12, 8, 12, 8),
-            Margin = new Thickness(0, 0, 0, 4),
+            Padding = new Thickness(14, 10, 14, 10),
+            Margin = new Thickness(0, 0, 0, 6),
         };
 
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(12) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(16) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
         var fnText = new TextBlock
         {
-            Text = name, FontFamily = new FontFamily("Consolas"), FontSize = 12,
+            Text = name, FontFamily = new FontFamily("Consolas"), FontSize = 12.5,
             Foreground = Accent, VerticalAlignment = VerticalAlignment.Center,
         };
         Grid.SetColumn(fnText, 0);
@@ -112,12 +116,13 @@ public partial class DocsView : UserControl
         var descText = new TextBlock
         {
             Text = desc, FontSize = 12, Foreground = Sub,
-            VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis,
+            VerticalAlignment = VerticalAlignment.Center,
+            TextWrapping = TextWrapping.Wrap,
         };
         Grid.SetColumn(descText, 2);
         grid.Children.Add(descText);
 
-        var copyBtn = MakeCopyButton(name);
+        var copyBtn = MakeCopyButton(name, "Copy");
         Grid.SetColumn(copyBtn, 4);
         grid.Children.Add(copyBtn);
 
@@ -125,14 +130,14 @@ public partial class DocsView : UserControl
         DocPanel.Children.Add(row);
     }
 
-    private void AddCodeBlock(string title, string code)
+    private void AddCodeBlock(string title, string code, string lang = "")
     {
         if (!string.IsNullOrEmpty(title))
         {
             DocPanel.Children.Add(new TextBlock
             {
                 Text = title, FontSize = 13, FontWeight = FontWeights.SemiBold,
-                Foreground = Fg, Margin = new Thickness(0, 14, 0, 6),
+                Foreground = Fg, Margin = new Thickness(0, 16, 0, 8),
             });
         }
 
@@ -140,30 +145,47 @@ public partial class DocsView : UserControl
         {
             Background = CodeBg, CornerRadius = new CornerRadius(8),
             BorderBrush = Stroke, BorderThickness = new Thickness(1),
-            Padding = new Thickness(14, 12, 14, 12),
-            Margin = new Thickness(0, 0, 0, 8),
+            Padding = new Thickness(16, 14, 16, 14),
+            Margin = new Thickness(0, 0, 0, 12),
         };
 
-        var grid = new Grid();
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        var outerGrid = new Grid();
+        outerGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        outerGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(8) });
+        outerGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-        var copyBtn = MakeCopyButton(code.Trim());
-        copyBtn.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
-        copyBtn.Margin = new Thickness(0, 0, 0, 6);
-        Grid.SetRow(copyBtn, 0);
-        grid.Children.Add(copyBtn);
+        // Header row: language label + copy button
+        var headerGrid = new Grid();
+        headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        if (!string.IsNullOrEmpty(lang))
+        {
+            var langLabel = new TextBlock
+            {
+                Text = lang, FontSize = 10, FontWeight = FontWeights.SemiBold,
+                Foreground = Sub, Opacity = 0.6, VerticalAlignment = VerticalAlignment.Center,
+            };
+            Grid.SetColumn(langLabel, 0);
+            headerGrid.Children.Add(langLabel);
+        }
+
+        var copyBtn = MakeCopyButton(code.Trim(), "Copy code");
+        Grid.SetColumn(copyBtn, 1);
+        headerGrid.Children.Add(copyBtn);
+
+        Grid.SetRow(headerGrid, 0);
+        outerGrid.Children.Add(headerGrid);
 
         var codeText = new TextBlock
         {
-            Text = code.Trim(), FontFamily = new FontFamily("Consolas"), FontSize = 12,
-            Foreground = new SolidColorBrush(Color.FromRgb(201, 209, 217)),
-            TextWrapping = TextWrapping.Wrap, LineHeight = 20,
+            Text = code.Trim(), FontFamily = new FontFamily("Consolas"), FontSize = 12.5,
+            Foreground = CodeFg, TextWrapping = TextWrapping.Wrap, LineHeight = 21,
         };
-        Grid.SetRow(codeText, 1);
-        grid.Children.Add(codeText);
+        Grid.SetRow(codeText, 2);
+        outerGrid.Children.Add(codeText);
 
-        border.Child = grid;
+        border.Child = outerGrid;
         DocPanel.Children.Add(border);
     }
 
@@ -171,42 +193,53 @@ public partial class DocsView : UserControl
     {
         var border = new Border
         {
-            Background = Inset, CornerRadius = new CornerRadius(6),
-            BorderBrush = Accent, BorderThickness = new Thickness(2, 0, 0, 0),
-            Padding = new Thickness(14, 10, 14, 10),
-            Margin = new Thickness(0, 6, 0, 10),
+            Background = Panel, CornerRadius = new CornerRadius(0, 6, 6, 0),
+            BorderBrush = Accent, BorderThickness = new Thickness(3, 0, 0, 0),
+            Padding = new Thickness(16, 12, 16, 12),
+            Margin = new Thickness(0, 8, 0, 12),
         };
         border.Child = new TextBlock
         {
-            Text = text, FontSize = 12, Foreground = Sub,
-            TextWrapping = TextWrapping.Wrap, LineHeight = 20,
+            Text = text, FontSize = 12.5, Foreground = Sub,
+            TextWrapping = TextWrapping.Wrap, LineHeight = 21,
         };
         DocPanel.Children.Add(border);
     }
 
-    private Button MakeCopyButton(string textToCopy)
+    private void AddDivider()
+    {
+        DocPanel.Children.Add(new Border
+        {
+            BorderBrush = Stroke, BorderThickness = new Thickness(0, 0, 0, 1),
+            Margin = new Thickness(0, 16, 0, 8),
+        });
+    }
+
+    private Button MakeCopyButton(string textToCopy, string label = "Copy")
     {
         var btn = new Button
         {
-            Content = "Copy", FontSize = 10, Padding = new Thickness(10, 3, 10, 3),
+            Content = label, FontSize = 10, Padding = new Thickness(12, 4, 12, 4),
             Style = (Style)FindResource("ControlButtonStyle"),
             VerticalAlignment = VerticalAlignment.Center, Cursor = System.Windows.Input.Cursors.Hand,
         };
+        string origLabel = label;
         btn.Click += (_, _) =>
         {
             System.Windows.Clipboard.SetText(textToCopy);
             btn.Content = "Copied!";
+            btn.Foreground = Accent;
             var timer = new System.Windows.Threading.DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1.5)
             };
-            timer.Tick += (_, _) => { btn.Content = "Copy"; timer.Stop(); };
+            timer.Tick += (_, _) => { btn.Content = origLabel; btn.ClearValue(System.Windows.Controls.Control.ForegroundProperty); timer.Stop(); };
             timer.Start();
         };
         return btn;
     }
 
-    private void AddSpacer(double height = 6)
+    private void AddSpacer(double height = 8)
     {
         DocPanel.Children.Add(new Border { Height = height });
     }
@@ -226,23 +259,24 @@ public partial class DocsView : UserControl
 
         AddHeading("How It Works");
         AddParagraph("1.  When you run a script, Zyntra exports a context JSON with your accounts, apps, and settings.");
-        AddParagraph("2.  The API module is automatically injected into your script.");
+        AddParagraph("2.  The API module is automatically injected into your script — no setup needed.");
         AddParagraph("3.  After execution, Zyntra reads a response file for notifications or clipboard actions.");
 
-        AddNote("Tip: Use the PowerShell or Python tabs for the full API reference with copyable examples.");
+        AddNote("Select PowerShell API or Python API from the sidebar for the full function reference with copyable examples.");
 
-        AddHeading("Quick Example (PowerShell)");
+        AddDivider();
+        AddHeading("Quick Example — PowerShell");
         AddCodeBlock("", @"$accounts = Get-ZyntraAccounts
 foreach ($acc in $accounts) {
     Write-ZyntraLog ""$($acc.DisplayName) [$($acc.Tag)]""
 }
-Send-ZyntraNotification -Title 'Done' -Message 'Finished!' -Type Success");
+Send-ZyntraNotification -Title 'Done' -Message 'Finished!' -Type Success", "POWERSHELL");
 
-        AddHeading("Quick Example (Python)");
+        AddHeading("Quick Example — Python");
         AddCodeBlock("", @"for acc in zyntra.get_accounts():
     zyntra.log(f""{acc['DisplayName']} [{acc.get('Tag', 'none')}]"")
 
-zyntra.send_notification('Done', 'Finished!', 'Success')");
+zyntra.send_notification('Done', 'Finished!', 'Success')", "PYTHON");
     }
 
     private void ShowPowerShell()
@@ -278,18 +312,20 @@ zyntra.send_notification('Done', 'Finished!', 'Success')");
         AddHeading("Utilities");
         AddFunctionRow("Write-ZyntraLog -Message X", "Writes a timestamped log line to output");
 
+        AddDivider();
         AddHeading("Examples");
+
         AddCodeBlock("List all accounts with tags", @"$accounts = Get-ZyntraAccounts
 foreach ($acc in $accounts) {
     Write-ZyntraLog ""$($acc.DisplayName) [$($acc.Tag)]""
 }
 Send-ZyntraNotification -Title 'Done' `
     -Message ""Listed $($accounts.Count) accounts"" `
-    -Type Success");
+    -Type Success", "POWERSHELL");
 
         AddCodeBlock("Copy account names to clipboard", @"$names = (Get-ZyntraAccounts).DisplayName -join ', '
 Set-ZyntraClipboard -Text $names
-Write-ZyntraLog ""Copied $((Get-ZyntraAccounts).Count) names to clipboard""");
+Write-ZyntraLog ""Copied $((Get-ZyntraAccounts).Count) names to clipboard""", "POWERSHELL");
 
         AddCodeBlock("Check which accounts have valid cookies", @"$accounts = Get-ZyntraAccounts
 $valid = ($accounts | Where-Object { $_.CookieValid -eq $true }).Count
@@ -297,7 +333,7 @@ $invalid = ($accounts | Where-Object { $_.CookieValid -eq $false }).Count
 Write-ZyntraLog ""Valid: $valid | Invalid: $invalid""
 Send-ZyntraNotification -Title 'Health Check' `
     -Message ""$valid valid, $invalid invalid cookies"" `
-    -Type $(if ($invalid -gt 0) { 'Warning' } else { 'Success' })");
+    -Type $(if ($invalid -gt 0) { 'Warning' } else { 'Success' })", "POWERSHELL");
 
         AddCodeBlock("Launch an app by name", @"$app = Get-ZyntraApp -Name 'Potassium'
 if ($app) {
@@ -305,7 +341,7 @@ if ($app) {
     Write-ZyntraLog ""Launched $($app.Name)""
 } else {
     Write-ZyntraLog 'App not found'
-}");
+}", "POWERSHELL");
     }
 
     private void ShowPython()
@@ -341,7 +377,9 @@ if ($app) {
         AddHeading("Utilities");
         AddFunctionRow("zyntra.log(message)", "Writes a timestamped log line to output");
 
+        AddDivider();
         AddHeading("Examples");
+
         AddCodeBlock("List all accounts", @"for acc in zyntra.get_accounts():
     zyntra.log(f""{acc['DisplayName']} [{acc.get('Tag', 'none')}]"")
 
@@ -349,16 +387,16 @@ zyntra.send_notification(
     'Done',
     f'Listed {zyntra.get_account_count()} accounts',
     'Success'
-)");
+)", "PYTHON");
 
         AddCodeBlock("Export app names to clipboard", @"names = ', '.join(a['Name'] for a in zyntra.get_apps())
 zyntra.set_clipboard(names)
-zyntra.log(f'Copied {zyntra.get_app_count()} app names')");
+zyntra.log(f'Copied {zyntra.get_app_count()} app names')", "PYTHON");
 
         AddCodeBlock("Filter accounts by tag", @"alts = zyntra.get_accounts_by_tag('alt')
 zyntra.log(f'Found {len(alts)} alt accounts:')
 for acc in alts:
-    zyntra.log(f'  - {acc[""DisplayName""]}')");
+    zyntra.log(f'  - {acc[""DisplayName""]}' )", "PYTHON");
 
         AddCodeBlock("Launch an app by name", @"import subprocess
 app = zyntra.get_app('Potassium')
@@ -366,7 +404,7 @@ if app:
     subprocess.Popen(app['ExePath'])
     zyntra.log(f""Launched {app['Name']}"")
 else:
-    zyntra.log('App not found')");
+    zyntra.log('App not found')", "PYTHON");
     }
 
     private void ShowBatch()
@@ -383,17 +421,19 @@ else:
         AddCodeBlock("Read Zyntra version", @"for /f ""delims="" %%v in ('powershell -NoProfile -Command ^
     ""(Get-Content '%ZYNTRA_CONTEXT%' | ConvertFrom-Json).Version""') do (
     echo Zyntra version: %%v
-)");
+)", "BATCH");
 
         AddCodeBlock("Count accounts", @"for /f ""delims="" %%c in ('powershell -NoProfile -Command ^
     ""(Get-Content '%ZYNTRA_CONTEXT%' | ConvertFrom-Json).Accounts.Count""') do (
     echo Accounts: %%c
-)");
+)", "BATCH");
 
         AddHeading("Environment Variable");
         AddFunctionRow("%ZYNTRA_CONTEXT%", "Full path to the context JSON file");
 
+        AddDivider();
         AddHeading("Context JSON Structure");
+        AddParagraph("The context file contains your Zyntra data in this format:");
         AddCodeBlock("", @"{
   ""Version"": ""1.0.7"",
   ""DataDir"": ""C:\\Users\\...\\AppData\\Roaming\\Zyntra"",
@@ -404,6 +444,6 @@ else:
   ""Apps"": [
     { ""Id"": ""..."", ""Name"": ""MyApp"", ""ExePath"": ""C:\\..."" }
   ]
-}");
+}", "JSON");
     }
 }

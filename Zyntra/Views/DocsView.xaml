@@ -32,9 +32,12 @@
         </Border>
 
         <!-- Content -->
-        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled">
-            <StackPanel x:Name="DocPanel" Margin="0,0,4,0" />
-        </ScrollViewer>
+        <Border Grid.Column="2" Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
+                BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled" Padding="0">
+                <StackPanel x:Name="DocPanel" Margin="28,24,28,28" />
+            </ScrollViewer>
+        </Border>
     </Grid>
 </UserControl>
