@@ -33,16 +33,22 @@
                  FontSize="13" />
 
         <!-- App List -->
-        <ListBox Grid.Row="4" ItemsSource="{Binding FilteredApps}"
+        <ListBox x:Name="AppListBox" Grid.Row="4" ItemsSource="{Binding FilteredApps}"
                  SelectedItem="{Binding SelectedApp}"
                  Style="{StaticResource DarkListBoxStyle}"
                  ItemContainerStyle="{StaticResource DarkListBoxItemStyle}"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 HorizontalContentAlignment="Stretch">
+                 HorizontalContentAlignment="Stretch"
+                 AllowDrop="True"
+                 PreviewMouseLeftButtonDown="AppList_PreviewMouseLeftButtonDown"
+                 PreviewMouseMove="AppList_PreviewMouseMove"
+                 Drop="AppList_Drop"
+                 DragOver="AppList_DragOver">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="44" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -50,14 +56,15 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="8" />
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="4" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="8" />
-                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
+                        <!-- Drag Grip -->
+                        <TextBlock Grid.Column="0" Text="⠿" FontSize="16"
+                                   Foreground="{StaticResource SubTextBrush}" Opacity="0.4"
+                                   VerticalAlignment="Center" Margin="0,0,6,0" Cursor="SizeAll" />
+
                         <!-- Icon -->
-                        <Grid Grid.Column="0" Width="36" Height="36" VerticalAlignment="Center">
+                        <Grid Grid.Column="1" Width="36" Height="36" VerticalAlignment="Center">
                             <!-- Fallback letter -->
                             <Border Width="36" Height="36" CornerRadius="18"
                                     Background="{StaticResource ControlBrush}">
@@ -91,7 +98,7 @@
                         </Grid>
 
                         <!-- Name + Description -->
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0">
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="8,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextBrush}" />
@@ -107,34 +114,20 @@
                         </StackPanel>
 
                         <!-- Launch -->
-                        <Button Grid.Column="2" Content="Launch"
+                        <Button Grid.Column="3" Content="Launch"
                                 Style="{StaticResource AccentButtonStyle}" Padding="14,7"
                                 Command="{Binding DataContext.LaunchAppCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                 CommandParameter="{Binding}" VerticalAlignment="Center" />
 
                         <!-- Settings -->
-                        <Button Grid.Column="4" Content="⚙" FontSize="15" Padding="8,5"
+                        <Button Grid.Column="5" Content="⚙" FontSize="15" Padding="8,5"
                                 Style="{StaticResource ControlButtonStyle}" VerticalAlignment="Center"
                                 ToolTip="App settings"
                                 Command="{Binding DataContext.EditAppCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                 CommandParameter="{Binding}" />
 
-                        <!-- Move Up -->
-                        <Button Grid.Column="6" Content="▲" FontSize="10" Padding="6,4"
-                                Style="{StaticResource ControlButtonStyle}" VerticalAlignment="Center"
-                                ToolTip="Move up"
-                                Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                CommandParameter="{Binding}" />
-
-                        <!-- Move Down -->
-                        <Button Grid.Column="8" Content="▼" FontSize="10" Padding="6,4"
-                                Style="{StaticResource ControlButtonStyle}" VerticalAlignment="Center"
-                                ToolTip="Move down"
-                                Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                CommandParameter="{Binding}" />
-
                         <!-- Remove -->
-                        <Button Grid.Column="10"
+                        <Button Grid.Column="7"
                                 Content="✕" FontSize="14" Padding="8,4"
                                 Style="{StaticResource DangerButtonStyle}" VerticalAlignment="Center"
                                 ToolTip="Remove app"

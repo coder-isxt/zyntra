@@ -33,6 +33,9 @@ public partial class DashboardView : UserControl
     private void OnNavScripts(object sender, MouseButtonEventArgs e)
         => GetMain()?.NavigateCommand.Execute("Scripts");
 
+    private void OnNavServers(object sender, MouseButtonEventArgs e)
+        => GetMain()?.NavigateCommand.Execute("Servers");
+
     private void OnQuickAddApp(object sender, RoutedEventArgs e)
     {
         var main = GetMain();

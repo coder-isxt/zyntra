@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using Zyntra.Services;
 using Zyntra.ViewModels;
 
@@ -18,6 +19,34 @@ public partial class MainWindow : Window
         InitializeComponent();
         InitializeTrayIcon();
         VersionText.Text = $"Zyntra v{UpdateService.CurrentVersion}";
+
+        // Animate page transitions
+        if (DataContext is MainViewModel vm)
+        {
+            vm.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(MainViewModel.CurrentPage))
+                    AnimatePageTransition();
+            };
+        }
+    }
+
+    private void AnimatePageTransition()
+    {
+        PageHost.RenderTransform = new System.Windows.Media.TranslateTransform(0, 0);
+        PageHost.Opacity = 0;
+
+        var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(200))
+        {
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        };
+        var slideIn = new DoubleAnimation(18, 0, TimeSpan.FromMilliseconds(250))
+        {
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        };
+
+        PageHost.BeginAnimation(OpacityProperty, fadeIn);
+        PageHost.RenderTransform.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty, slideIn);
     }
 
     private void InitializeTrayIcon()
@@ -167,6 +196,8 @@ public partial class MainWindow : Window
             BtnDashboard.Style = tag == "Dashboard" ? activeStyle : normalStyle;
             BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
             BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
+            BtnServers.Style = tag == "Servers" ? activeStyle : normalStyle;
+            BtnActivityLog.Style = tag == "ActivityLog" ? activeStyle : normalStyle;
             BtnPlugins.Style = tag == "Plugins" ? activeStyle : normalStyle;
             BtnScripts.Style = tag == "Scripts" ? activeStyle : normalStyle;
             BtnDocs.Style = tag == "Docs" ? activeStyle : normalStyle;

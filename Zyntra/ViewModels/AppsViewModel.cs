@@ -34,8 +34,6 @@ public class AppsViewModel : BaseViewModel
     public ICommand RemoveAppCommand { get; }
     public ICommand AddAppCommand { get; }
     public ICommand EditAppCommand { get; }
-    public ICommand MoveUpCommand { get; }
-    public ICommand MoveDownCommand { get; }
 
     public AppsViewModel()
     {
@@ -43,9 +41,6 @@ public class AppsViewModel : BaseViewModel
         RemoveAppCommand = new RelayCommand(RemoveApp);
         AddAppCommand = new RelayCommand(_ => AddApp());
         EditAppCommand = new RelayCommand(EditApp);
-        MoveUpCommand = new RelayCommand(MoveUp);
-        MoveDownCommand = new RelayCommand(MoveDown);
-
         LoadApps();
     }
 
@@ -73,24 +68,12 @@ public class AppsViewModel : BaseViewModel
             FilteredApps.Add(app);
     }
 
-    private void MoveUp(object? param)
+    public void ReorderApp(AppEntry source, AppEntry target)
     {
-        var app = param as AppEntry ?? SelectedApp;
-        if (app == null) return;
-        int idx = Apps.IndexOf(app);
-        if (idx <= 0) return;
-        Apps.Move(idx, idx - 1);
-        SaveCustomApps();
-        ApplyFilter();
-    }
-
-    private void MoveDown(object? param)
-    {
-        var app = param as AppEntry ?? SelectedApp;
-        if (app == null) return;
-        int idx = Apps.IndexOf(app);
-        if (idx < 0 || idx >= Apps.Count - 1) return;
-        Apps.Move(idx, idx + 1);
+        int srcIdx = Apps.IndexOf(source);
+        int tgtIdx = Apps.IndexOf(target);
+        if (srcIdx < 0 || tgtIdx < 0 || srcIdx == tgtIdx) return;
+        Apps.Move(srcIdx, tgtIdx);
         SaveCustomApps();
         ApplyFilter();
     }
@@ -130,9 +113,11 @@ public class AppsViewModel : BaseViewModel
             }
 
             Process.Start(psi);
+            ActivityLogService.Log("App Launch", $"Launched {app.Name}", placeName: app.Name);
         }
         catch (Exception ex)
         {
+            ActivityLogService.Log("App Launch Failed", $"Failed to launch {app.Name}: {ex.Message}", placeName: app.Name);
             MessageBox.Show($"Failed to launch {app.Name}: {ex.Message}", "Zyntra", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }

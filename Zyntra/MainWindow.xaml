@@ -113,6 +113,22 @@
                                 </Button.Style>
                             </Button>
 
+                            <Button x:Name="BtnServers" Content="☰  Server Browser"
+                                    Command="{Binding NavigateCommand}" CommandParameter="Servers"
+                                    Click="SidebarNav_Click" Tag="Servers">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
+                                </Button.Style>
+                            </Button>
+
+                            <Button x:Name="BtnActivityLog" Content="▤  Activity Log"
+                                    Command="{Binding NavigateCommand}" CommandParameter="ActivityLog"
+                                    Click="SidebarNav_Click" Tag="ActivityLog">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
+                                </Button.Style>
+                            </Button>
+
                             <TextBlock Text="TOOLS" FontSize="10" FontWeight="Bold"
                                        Foreground="{StaticResource SubTextBrush}"
                                        Margin="18,12,0,8" Opacity="0.6" />
@@ -164,9 +180,9 @@
                 </Border>
 
                 <!-- Page Content -->
-                <Grid Grid.Column="1">
+                <Grid Grid.Column="1" ClipToBounds="True">
                     <Border Background="{StaticResource PanelBrush}">
-                        <ContentControl Content="{Binding CurrentPage}">
+                        <ContentControl x:Name="PageHost" Content="{Binding CurrentPage}">
                             <ContentControl.Resources>
                                 <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
                                     <views:DashboardView />
@@ -185,6 +201,12 @@
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:DocsViewModel}">
                                     <views:DocsView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:ServerBrowserViewModel}">
+                                    <views:ServerBrowserView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:ActivityLogViewModel}">
+                                    <views:ActivityLogView />
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                                     <views:SettingsView />

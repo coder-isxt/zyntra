@@ -1,0 +1,156 @@
+<UserControl x:Class="Zyntra.Views.ServerBrowserView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="24,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="14" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="14" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="Server Browser" FontSize="22" FontWeight="Bold"
+                       Foreground="{StaticResource TextBrush}" />
+            <TextBlock Text="Save and quickly join your favorite Roblox servers" FontSize="13"
+                       Foreground="{StaticResource SubTextBrush}" Margin="0,4,0,0" />
+        </StackPanel>
+
+        <!-- Add Favorite Form -->
+        <Border Grid.Row="2" Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
+                BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1" Padding="16,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="ADD SERVER" FontSize="10" FontWeight="Bold"
+                           Foreground="{StaticResource SubTextBrush}" Opacity="0.6" />
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding PlaceIdText, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource DarkTextBoxStyle}" Tag="Place ID" />
+                    <TextBox Grid.Column="2" Text="{Binding PlaceName, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource DarkTextBoxStyle}" Tag="Name (optional)" />
+                    <TextBox Grid.Column="4" Text="{Binding JobId, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource DarkTextBoxStyle}" Tag="Job ID (optional)" />
+                </Grid>
+
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource DarkTextBoxStyle}" Tag="Notes (optional)" />
+                    <Button Grid.Column="2" Content="★  Add to Favorites" Padding="18,8"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Command="{Binding AddFavoriteCommand}" />
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Favorites List -->
+        <ListBox Grid.Row="4" ItemsSource="{Binding Favorites}"
+                 SelectedItem="{Binding SelectedFavorite}"
+                 Style="{StaticResource DarkListBoxStyle}"
+                 ItemContainerStyle="{StaticResource DarkListBoxItemStyle}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Star -->
+                        <TextBlock Grid.Column="0" Text="★" FontSize="18"
+                                   Foreground="{StaticResource AccentBrush}"
+                                   VerticalAlignment="Center" />
+
+                        <!-- Info -->
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding PlaceName}" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextBrush}" />
+                                <TextBlock FontSize="11" Foreground="{StaticResource SubTextBrush}"
+                                           VerticalAlignment="Center" Margin="8,0,0,0">
+                                    <Run Text="Place:" />
+                                    <Run Text="{Binding PlaceId, Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+                            <TextBlock FontSize="11" Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Notes}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                                <Run Text="{Binding Notes, Mode=OneWay}" />
+                            </TextBlock>
+                        </StackPanel>
+
+                        <!-- Join -->
+                        <Button Grid.Column="4" Content="Join" Padding="14,6"
+                                Style="{StaticResource AccentButtonStyle}"
+                                Command="{Binding DataContext.JoinServerCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                CommandParameter="{Binding}" VerticalAlignment="Center" />
+
+                        <!-- Copy JobId -->
+                        <Button Grid.Column="6" Content="Copy ID" Padding="10,6" FontSize="11"
+                                Style="{StaticResource ControlButtonStyle}" VerticalAlignment="Center"
+                                Visibility="{Binding JobId, Converter={StaticResource NonEmptyStringToVisConverter}}"
+                                Command="{Binding DataContext.CopyJobIdCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                CommandParameter="{Binding}" />
+
+                        <!-- Remove -->
+                        <Button Grid.Column="8" Content="✕" FontSize="14" Padding="8,4"
+                                Style="{StaticResource DangerButtonStyle}" VerticalAlignment="Center"
+                                Command="{Binding DataContext.RemoveFavoriteCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                CommandParameter="{Binding}" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Empty state -->
+        <TextBlock Grid.Row="4" Text="No favorites yet. Add a Place ID above to save your first server."
+                   Foreground="{StaticResource SubTextBrush}" FontSize="14"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Visibility="{Binding Favorites.Count, Converter={StaticResource ZeroToVisConverter}}" />
+
+        <!-- Status -->
+        <Border Grid.Row="5" Margin="0,10,0,0" Padding="0,8,0,0"
+                BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,1,0,0">
+            <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource SubTextBrush}" FontSize="12" />
+        </Border>
+    </Grid>
+</UserControl>

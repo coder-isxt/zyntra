@@ -42,6 +42,8 @@ public class MainViewModel : BaseViewModel
     public PluginsViewModel PluginsVM { get; }
     public ScriptsViewModel ScriptsVM { get; }
     public DocsViewModel DocsVM { get; }
+    public ServerBrowserViewModel ServerBrowserVM { get; }
+    public ActivityLogViewModel ActivityLogVM { get; }
     public SettingsViewModel SettingsVM { get; }
 
     public ICommand NavigateCommand { get; }
@@ -57,6 +59,8 @@ public class MainViewModel : BaseViewModel
         PluginsVM = new PluginsViewModel();
         ScriptsVM = new ScriptsViewModel();
         DocsVM = new DocsViewModel();
+        ServerBrowserVM = new ServerBrowserViewModel();
+        ActivityLogVM = new ActivityLogViewModel();
         SettingsVM = new SettingsViewModel();
         _currentPage = DashboardVM;
 
@@ -120,6 +124,15 @@ public class MainViewModel : BaseViewModel
             case "Docs":
                 CurrentPage = DocsVM;
                 CurrentPageName = "API Docs";
+                break;
+            case "Servers":
+                CurrentPage = ServerBrowserVM;
+                CurrentPageName = "Server Browser";
+                break;
+            case "ActivityLog":
+                ActivityLogVM.RefreshCommand.Execute(null);
+                CurrentPage = ActivityLogVM;
+                CurrentPageName = "Activity Log";
                 break;
             case "Settings":
                 CurrentPage = SettingsVM;

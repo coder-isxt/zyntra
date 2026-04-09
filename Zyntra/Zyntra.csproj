@@ -11,6 +11,10 @@
     <AssemblyName>Zyntra</AssemblyName>
     <RootNamespace>Zyntra</RootNamespace>
     <ApplicationIcon>..\logo.ico</ApplicationIcon>
+
+    <Version>1.0.7</Version>
+    <AssemblyVersion>1.0.7.0</AssemblyVersion>
+    <FileVersion>1.0.7.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
