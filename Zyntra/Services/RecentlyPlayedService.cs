@@ -59,17 +59,27 @@ public static class RecentlyPlayedService
     {
         try
         {
-            string url = $"https://games.roblox.com/v1/games/multiget-place-details?placeIds={placeId}";
-            var response = await _http.GetAsync(url);
-            if (!response.IsSuccessStatusCode)
+            // Step 1: Get universe ID from place ID
+            var uniResponse = await _http.GetAsync($"https://apis.roblox.com/universes/v1/places/{placeId}/universe");
+            if (!uniResponse.IsSuccessStatusCode)
                 return $"Place {placeId}";
 
-            string json = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
-            if (root.GetArrayLength() > 0)
+            string uniJson = await uniResponse.Content.ReadAsStringAsync();
+            using var uniDoc = JsonDocument.Parse(uniJson);
+            if (!uniDoc.RootElement.TryGetProperty("universeId", out var universeIdProp))
+                return $"Place {placeId}";
+            long universeId = universeIdProp.GetInt64();
+
+            // Step 2: Get game name from universe ID
+            var gameResponse = await _http.GetAsync($"https://games.roblox.com/v1/games?universeIds={universeId}");
+            if (!gameResponse.IsSuccessStatusCode)
+                return $"Place {placeId}";
+
+            string gameJson = await gameResponse.Content.ReadAsStringAsync();
+            using var gameDoc = JsonDocument.Parse(gameJson);
+            if (gameDoc.RootElement.TryGetProperty("data", out var data) && data.GetArrayLength() > 0)
             {
-                var item = root[0];
+                var item = data[0];
                 if (item.TryGetProperty("name", out var nameProp))
                     return nameProp.GetString() ?? $"Place {placeId}";
             }

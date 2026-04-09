@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
+using Zyntra.Models;
+using Zyntra.Services;
 
 namespace Zyntra.Views;
 
@@ -16,6 +18,28 @@ public partial class LaunchPromptWindow : Window
     public LaunchPromptWindow()
     {
         InitializeComponent();
+        LoadRecentGames();
+    }
+
+    private void LoadRecentGames()
+    {
+        var recent = RecentlyPlayedService.Games.Take(5).ToList();
+        if (recent.Count > 0)
+        {
+            RecentList.ItemsSource = recent;
+            RecentPanel.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void OnRecentGameClick(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.DataContext is RecentGame game)
+        {
+            PlaceId = game.PlaceId;
+            JustLaunch = false;
+            DialogResult = true;
+            Close();
+        }
     }
 
     private void OnJoinGameClick(object sender, RoutedEventArgs e)
