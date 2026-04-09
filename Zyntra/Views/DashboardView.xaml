@@ -23,7 +23,7 @@
         </StackPanel>
 
         <!-- Stat Cards -->
-        <UniformGrid Grid.Row="2" Columns="5" Rows="1">
+        <UniformGrid Grid.Row="2" Columns="4" Rows="1">
             <!-- Apps -->
             <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="10"
                     BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
@@ -69,27 +69,13 @@
             <!-- Scripts -->
             <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="10"
                     BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
-                    Padding="20,16" Margin="0,0,10,0" Cursor="Hand"
+                    Padding="20,16" Cursor="Hand"
                     MouseLeftButtonUp="OnNavScripts">
                 <StackPanel>
                     <TextBlock Text="⟐" FontSize="22" Foreground="{StaticResource AccentBrush}" />
                     <TextBlock Text="{Binding ScriptCount}" FontSize="28" FontWeight="Bold"
                                Foreground="{StaticResource TextBrush}" Margin="0,6,0,2" />
                     <TextBlock Text="Scripts" FontSize="12"
-                               Foreground="{StaticResource SubTextBrush}" />
-                </StackPanel>
-            </Border>
-
-            <!-- Favorites -->
-            <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="10"
-                    BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
-                    Padding="20,16" Cursor="Hand"
-                    MouseLeftButtonUp="OnNavServers">
-                <StackPanel>
-                    <TextBlock Text="★" FontSize="22" Foreground="{StaticResource AccentBrush}" />
-                    <TextBlock Text="{Binding FavoriteCount}" FontSize="28" FontWeight="Bold"
-                               Foreground="{StaticResource TextBrush}" Margin="0,6,0,2" />
-                    <TextBlock Text="Favorites" FontSize="12"
                                Foreground="{StaticResource SubTextBrush}" />
                 </StackPanel>
             </Border>

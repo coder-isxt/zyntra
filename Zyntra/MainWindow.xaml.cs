@@ -103,6 +103,8 @@ public partial class MainWindow : Window
                             {
                                 string cookie = CryptoService.Decrypt(acc.EncryptedCookie);
                                 await RobloxService.LaunchRobloxAsync(cookie, prompt.PlaceId);
+                                if (!prompt.JustLaunch && prompt.PlaceId.HasValue)
+                                    await RecentlyPlayedService.AddGameAsync(prompt.PlaceId.Value, acc.DisplayName);
                             }
                             catch (Exception ex)
                             {
@@ -196,8 +198,6 @@ public partial class MainWindow : Window
             BtnDashboard.Style = tag == "Dashboard" ? activeStyle : normalStyle;
             BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
             BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
-            BtnServers.Style = tag == "Servers" ? activeStyle : normalStyle;
-            BtnActivityLog.Style = tag == "ActivityLog" ? activeStyle : normalStyle;
             BtnPlugins.Style = tag == "Plugins" ? activeStyle : normalStyle;
             BtnScripts.Style = tag == "Scripts" ? activeStyle : normalStyle;
             BtnDocs.Style = tag == "Docs" ? activeStyle : normalStyle;

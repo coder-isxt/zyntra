@@ -33,13 +33,6 @@ public class DashboardViewModel : BaseViewModel
         set => SetProperty(ref _scriptCount, value);
     }
 
-    private int _favoriteCount;
-    public int FavoriteCount
-    {
-        get => _favoriteCount;
-        set => SetProperty(ref _favoriteCount, value);
-    }
-
     private string _greeting = string.Empty;
     public string Greeting
     {
@@ -68,7 +61,6 @@ public class DashboardViewModel : BaseViewModel
         AccountCount = AccountStorageService.Load().Count;
         PluginCount = PluginService.LoadIndex().Count;
         ScriptCount = ScriptService.Load().Count;
-        FavoriteCount = ServerBrowserService.LoadFavorites().Count;
         UpdateGreeting();
     }
 

@@ -1,8 +1,6 @@
-- Added Server Browser with favorites (save Place IDs, join servers, copy Job IDs)
-- Added Game Activity Log (tracks app launches, server joins, with search/filter)
+- Added Recently Played games on Roblox Accounts page (resolves game name from Place ID via Roblox API)
 - Added animated page transitions (fade + slide on navigation)
 - Added drag-and-drop reorder for apps list (replaces move up/down buttons)
-- Added Favorites stat card on Dashboard
 - Added unified versioning (csproj Version/AssemblyVersion/FileVersion match UpdateService.CurrentVersion)
 - Added Zyntra Scripting API (PowerShell module, Python module, context injection)
 - Added API Docs tab with full reference for PowerShell, Python, and Batch

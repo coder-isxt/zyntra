@@ -12,6 +12,8 @@ public class RobloxAccountsViewModel : BaseViewModel
     public ObservableCollection<RobloxAccount> FilteredAccounts { get; } = new();
     public ObservableCollection<string> AvailableTags { get; } = new();
 
+    public ObservableCollection<Models.RecentGame> RecentGames => RecentlyPlayedService.Games;
+
     private RobloxAccount? _selectedAccount;
     public RobloxAccount? SelectedAccount
     {
@@ -61,6 +63,7 @@ public class RobloxAccountsViewModel : BaseViewModel
         SetTagCommand = new RelayCommand(SetTag);
 
         LoadAccounts();
+        RecentlyPlayedService.Load();
     }
 
     private void LoadAccounts()
@@ -242,9 +245,21 @@ public class RobloxAccountsViewModel : BaseViewModel
         {
             string cookie = CryptoService.Decrypt(account.EncryptedCookie);
             await RobloxService.LaunchRobloxAsync(cookie, prompt.PlaceId);
-            StatusText = prompt.JustLaunch
-                ? $"Roblox launched as {account.Username}"
-                : $"Roblox launched as {account.Username} (Place {prompt.PlaceId})";
+
+            if (!prompt.JustLaunch && prompt.PlaceId.HasValue)
+            {
+                StatusText = $"Resolving game name...";
+                await RecentlyPlayedService.AddGameAsync(prompt.PlaceId.Value, account.DisplayName);
+                var latest = RecentlyPlayedService.Games.FirstOrDefault();
+                StatusText = latest != null
+                    ? $"Launched {latest.GameName} as {account.Username}"
+                    : $"Roblox launched as {account.Username} (Place {prompt.PlaceId})";
+                OnPropertyChanged(nameof(RecentGames));
+            }
+            else
+            {
+                StatusText = $"Roblox launched as {account.Username}";
+            }
         }
         catch (Exception ex)
         {

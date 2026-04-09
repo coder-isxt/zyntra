@@ -12,6 +12,7 @@
             <RowDefinition Height="8" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Header -->
@@ -202,6 +203,51 @@
                            HorizontalAlignment="Right"
                            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisConverter}}" />
             </Grid>
+        </Border>
+
+        <!-- Recently Played -->
+        <Border Grid.Row="8" Margin="0,12,0,0" Padding="0,10,0,0"
+                BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,1,0,0"
+                Visibility="{Binding RecentGames.Count, Converter={StaticResource NonZeroToVisConverter}}">
+            <StackPanel>
+                <TextBlock Text="RECENTLY PLAYED" FontSize="10" FontWeight="Bold"
+                           Foreground="{StaticResource SubTextBrush}" Opacity="0.6" Margin="0,0,0,6" />
+                <ItemsControl ItemsSource="{Binding RecentGames}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="6"
+                                    Padding="10,7" Margin="0,2">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="🎮" FontSize="14" VerticalAlignment="Center" />
+
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding GameName}" FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock FontSize="11" Foreground="{StaticResource SubTextBrush}">
+                                            <Run Text="{Binding AccountName, Mode=OneWay}" />
+                                            <Run Text=" · Place " />
+                                            <Run Text="{Binding PlaceId, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="3" FontSize="10"
+                                               Foreground="{StaticResource SubTextBrush}" Opacity="0.6"
+                                               VerticalAlignment="Center">
+                                        <Run Text="{Binding PlayedAt, StringFormat='{}{0:MMM dd HH:mm}', Mode=OneWay}" />
+                                    </TextBlock>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
         </Border>
     </Grid>
 </UserControl>

@@ -113,11 +113,9 @@ public class AppsViewModel : BaseViewModel
             }
 
             Process.Start(psi);
-            ActivityLogService.Log("App Launch", $"Launched {app.Name}", placeName: app.Name);
         }
         catch (Exception ex)
         {
-            ActivityLogService.Log("App Launch Failed", $"Failed to launch {app.Name}: {ex.Message}", placeName: app.Name);
             MessageBox.Show($"Failed to launch {app.Name}: {ex.Message}", "Zyntra", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
