@@ -22,11 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ZyntraAPI.psm1" />
-    <EmbeddedResource Include="Resources\zyntra_api.py" />
+    <EmbeddedResource Include="Resources\zyntra_api.lua" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MoonSharp" Version="2.0.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />

@@ -40,7 +40,7 @@ public class ScriptsViewModel : BaseViewModel
 
     public string EditorType
     {
-        get => _selectedScript?.ScriptType ?? "PowerShell";
+        get => _selectedScript?.ScriptType ?? "Lua";
         set { if (_selectedScript != null) { _selectedScript.ScriptType = value; OnPropertyChanged(); } }
     }
 
@@ -72,7 +72,7 @@ public class ScriptsViewModel : BaseViewModel
     public ICommand RunScriptCommand { get; }
     public ICommand SaveScriptsCommand { get; }
 
-    public static string[] ScriptTypes => new[] { "PowerShell", "Batch", "Python" };
+    public static string[] ScriptTypes => new[] { "Lua" };
 
     public ScriptsViewModel()
     {
@@ -97,8 +97,8 @@ public class ScriptsViewModel : BaseViewModel
         var script = new ScriptEntry
         {
             Name = "New Script",
-            ScriptType = "PowerShell",
-            Content = "# Your script here\nWrite-Host \"Hello from Zyntra!\"",
+            ScriptType = "Lua",
+            Content = "-- Your script here\nzyntra.log(\"Hello from Zyntra!\")\n\nfor _, acc in ipairs(zyntra.get_accounts()) do\n    zyntra.log(acc.DisplayName)\nend",
         };
         Scripts.Add(script);
         SelectedScript = script;

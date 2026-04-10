@@ -1,7 +1,8 @@
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
+using MoonSharp.Interpreter;
 using Zyntra.Models;
 
 namespace Zyntra.Services;
@@ -33,113 +34,201 @@ public static class ScriptService
 
     public static async Task<string> RunAsync(ScriptEntry script)
     {
-        // Export context + extract API modules
-        string contextPath = ScriptContextService.ExportContext();
-        string apiDir = ScriptContextService.GetApiDir();
-        ExtractApiModules(apiDir);
-
-        string tempFile;
-        ProcessStartInfo psi;
-
-        switch (script.ScriptType)
+        return await Task.Run(() =>
         {
-            case "Batch":
-                tempFile = Path.Combine(Path.GetTempPath(), $"zyntra_{script.Id}.bat");
-                File.WriteAllText(tempFile, script.Content);
-                psi = new ProcessStartInfo
-                {
-                    FileName = "cmd.exe",
-                    Arguments = $"/c \"{tempFile}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                };
-                break;
+            var output = new StringBuilder();
+            var notifications = new List<ScriptResponseNotification>();
+            string? clipboard = null;
+            var launches = new List<ScriptResponseLaunch>();
 
-            case "Python":
+            try
             {
-                // Prepend API import
-                string apiImport = $"import sys; sys.path.insert(0, r'{apiDir}')\nimport zyntra_api as zyntra\n\n";
-                tempFile = Path.Combine(Path.GetTempPath(), $"zyntra_{script.Id}.py");
-                File.WriteAllText(tempFile, apiImport + script.Content);
-                psi = new ProcessStartInfo
+                var luaScript = new Script(CoreModules.Preset_SoftSandbox | CoreModules.Metatables |
+                                           CoreModules.String | CoreModules.Table | CoreModules.Math |
+                                           CoreModules.OS_Time);
+
+                // Build context table
+                var context = BuildContextTable(luaScript);
+                luaScript.Globals["_zyntra_context"] = context;
+
+                // Register C# callbacks
+                luaScript.Globals["_zyntra_log"] = (Action<string>)(msg =>
                 {
-                    FileName = "python",
-                    Arguments = $"\"{tempFile}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                };
-                break;
+                    string ts = DateTime.Now.ToString("HH:mm:ss");
+                    output.AppendLine($"[{ts}] {msg}");
+                });
+
+                luaScript.Globals["_zyntra_notify"] = (Action<string, string, string>)((title, message, type) =>
+                {
+                    notifications.Add(new ScriptResponseNotification
+                    {
+                        Title = title, Message = message, Type = type
+                    });
+                });
+
+                luaScript.Globals["_zyntra_set_clipboard"] = (Action<string>)(text =>
+                {
+                    clipboard = text;
+                });
+
+                luaScript.Globals["_zyntra_launch_game"] = (Action<string, long>)((accountName, placeId) =>
+                {
+                    launches.Add(new ScriptResponseLaunch
+                    {
+                        AccountName = accountName, PlaceId = placeId
+                    });
+                });
+
+                luaScript.Globals["_zyntra_sleep"] = (Action<int>)(ms =>
+                {
+                    Thread.Sleep(ms);
+                });
+
+                // Override print to capture output
+                luaScript.Globals["print"] = (Action<DynValue[]>)(args =>
+                {
+                    var line = string.Join("\t", args.Select(a => a.ToPrintString()));
+                    output.AppendLine(line);
+                });
+
+                // Load the Lua API module
+                string apiLua = LoadEmbeddedLuaApi();
+                luaScript.DoString(apiLua, null, "zyntra_api");
+
+                // Execute user script
+                luaScript.DoString(script.Content, null, script.Name);
+                script.LastRunAt = DateTime.UtcNow;
+            }
+            catch (InterpreterException ex)
+            {
+                output.AppendLine($"[ERROR] {ex.DecoratedMessage}");
+            }
+            catch (Exception ex)
+            {
+                output.AppendLine($"[ERROR] {ex.Message}");
             }
 
-            default: // PowerShell
+            // Process actions
+            foreach (var n in notifications)
             {
-                string apiModule = Path.Combine(apiDir, "ZyntraAPI.psm1");
-                // Prepend module import
-                string psImport = $"Import-Module '{apiModule}' -Force\n\n";
-                tempFile = Path.Combine(Path.GetTempPath(), $"zyntra_{script.Id}.ps1");
-                File.WriteAllText(tempFile, psImport + script.Content);
-                psi = new ProcessStartInfo
+                var type = n.Type?.ToLower() switch
                 {
-                    FileName = "powershell.exe",
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{tempFile}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
+                    "success" => NotificationType.Success,
+                    "warning" => NotificationType.Warning,
+                    "error" => NotificationType.Error,
+                    _ => NotificationType.Info,
                 };
-                break;
+                NotificationService.Push(n.Title, n.Message, type);
             }
+
+            if (!string.IsNullOrEmpty(clipboard))
+            {
+                System.Windows.Application.Current?.Dispatcher.Invoke(() =>
+                    System.Windows.Clipboard.SetText(clipboard));
+            }
+
+            foreach (var launch in launches)
+            {
+                _ = ProcessLaunchAsync(launch);
+            }
+
+            return output.ToString();
+        });
+    }
+
+    private static Table BuildContextTable(Script luaScript)
+    {
+        var accounts = AccountStorageService.Load();
+        var apps = AppStorageService.Load();
+        var recentGames = RecentlyPlayedService.Games.ToList();
+
+        var ctx = new Table(luaScript);
+        ctx["Version"] = UpdateService.CurrentVersion;
+        ctx["DataDir"] = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Zyntra");
+
+        // Accounts
+        var accsTable = new Table(luaScript);
+        for (int i = 0; i < accounts.Count; i++)
+        {
+            var a = accounts[i];
+            var t = new Table(luaScript);
+            t["UserId"] = a.UserId.ToString();
+            t["Username"] = a.Username;
+            t["DisplayName"] = a.DisplayName;
+            t["Tag"] = a.Tag ?? "";
+            t["CookieValid"] = a.CookieValid ?? false;
+            accsTable[i + 1] = t;
         }
+        ctx["Accounts"] = accsTable;
 
-        // Set ZYNTRA_CONTEXT env var
-        psi.EnvironmentVariables["ZYNTRA_CONTEXT"] = contextPath;
+        // Apps
+        var appsTable = new Table(luaScript);
+        for (int i = 0; i < apps.Count; i++)
+        {
+            var a = apps[i];
+            var t = new Table(luaScript);
+            t["Id"] = a.Id;
+            t["Name"] = a.Name;
+            t["ExePath"] = a.ExePath;
+            t["Description"] = a.Description ?? "";
+            t["IsGameModule"] = a.IsGameModule;
+            appsTable[i + 1] = t;
+        }
+        ctx["Apps"] = appsTable;
 
+        // Recent Games
+        var gamesTable = new Table(luaScript);
+        for (int i = 0; i < recentGames.Count; i++)
+        {
+            var g = recentGames[i];
+            var t = new Table(luaScript);
+            t["PlaceId"] = (double)g.PlaceId;
+            t["GameName"] = g.GameName;
+            t["AccountName"] = g.AccountName ?? "";
+            t["PlayedAt"] = g.PlayedAt.ToString("yyyy-MM-dd HH:mm:ss");
+            gamesTable[i + 1] = t;
+        }
+        ctx["RecentGames"] = gamesTable;
+
+        return ctx;
+    }
+
+    private static string LoadEmbeddedLuaApi()
+    {
+        using var stream = Assembly.GetExecutingAssembly()
+            .GetManifestResourceStream("Zyntra.Resources.zyntra_api.lua");
+        if (stream == null) return "";
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
+
+    private static async Task ProcessLaunchAsync(ScriptResponseLaunch launch)
+    {
         try
         {
-            using var process = Process.Start(psi);
-            if (process == null) return "Failed to start process.";
+            var accounts = AccountStorageService.Load();
+            var account = accounts.FirstOrDefault(a =>
+                a.Username.Equals(launch.AccountName, StringComparison.OrdinalIgnoreCase) ||
+                a.DisplayName.Equals(launch.AccountName, StringComparison.OrdinalIgnoreCase));
 
-            string output = await process.StandardOutput.ReadToEndAsync();
-            string error = await process.StandardError.ReadToEndAsync();
-            await process.WaitForExitAsync();
+            if (account == null)
+            {
+                NotificationService.Push("Launch Failed",
+                    $"Account '{launch.AccountName}' not found.", NotificationType.Error);
+                return;
+            }
 
-            script.LastRunAt = DateTime.UtcNow;
+            string cookie = CryptoService.Decrypt(account.EncryptedCookie);
+            await RobloxService.LaunchRobloxAsync(cookie, launch.PlaceId);
+            await RecentlyPlayedService.AddGameAsync(launch.PlaceId, account.DisplayName);
 
-            // Process response file (notifications, clipboard, etc.)
-            ScriptContextService.ProcessResponse();
-
-            return string.IsNullOrEmpty(error) ? output : $"{output}\n[STDERR]\n{error}";
+            NotificationService.Push("Game Launched",
+                $"Launched Place {launch.PlaceId} as {account.DisplayName}", NotificationType.Success);
         }
         catch (Exception ex)
         {
-            return $"Error: {ex.Message}";
+            NotificationService.Push("Launch Failed",
+                $"Failed to launch Place {launch.PlaceId}: {ex.Message}", NotificationType.Error);
         }
-        finally
-        {
-            try { File.Delete(tempFile); } catch { }
-        }
-    }
-
-    private static void ExtractApiModules(string apiDir)
-    {
-        ExtractResource("Zyntra.Resources.ZyntraAPI.psm1", Path.Combine(apiDir, "ZyntraAPI.psm1"));
-        ExtractResource("Zyntra.Resources.zyntra_api.py", Path.Combine(apiDir, "zyntra_api.py"));
-    }
-
-    private static void ExtractResource(string resourceName, string outputPath)
-    {
-        try
-        {
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
-            if (stream == null) return;
-
-            using var fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
-            stream.CopyTo(fs);
-        }
-        catch { }
     }
 }

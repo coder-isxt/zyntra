@@ -19,15 +19,9 @@
                 <Button x:Name="BtnOverview" Content="Overview" Padding="10,7"
                         Style="{StaticResource SidebarActiveButtonStyle}"
                         Click="OnDocNav" Tag="overview" />
-                <Button x:Name="BtnPowerShell" Content="PowerShell API" Padding="10,7"
+                <Button x:Name="BtnLuaApi" Content="Lua API" Padding="10,7"
                         Style="{StaticResource SidebarButtonStyle}"
-                        Click="OnDocNav" Tag="powershell" />
-                <Button x:Name="BtnPython" Content="Python API" Padding="10,7"
-                        Style="{StaticResource SidebarButtonStyle}"
-                        Click="OnDocNav" Tag="python" />
-                <Button x:Name="BtnBatch" Content="Batch Notes" Padding="10,7"
-                        Style="{StaticResource SidebarButtonStyle}"
-                        Click="OnDocNav" Tag="batch" />
+                        Click="OnDocNav" Tag="lua" />
 
                 <TextBlock Text="EXTENSIONS" FontSize="10" FontWeight="Bold"
                            Foreground="{StaticResource SubTextBrush}" Opacity="0.6"

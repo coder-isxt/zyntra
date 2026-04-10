@@ -23,16 +23,12 @@ public partial class DocsView : UserControl
         var normalStyle = (Style)FindResource("SidebarButtonStyle");
 
         BtnOverview.Style = tag == "overview" ? activeStyle : normalStyle;
-        BtnPowerShell.Style = tag == "powershell" ? activeStyle : normalStyle;
-        BtnPython.Style = tag == "python" ? activeStyle : normalStyle;
-        BtnBatch.Style = tag == "batch" ? activeStyle : normalStyle;
+        BtnLuaApi.Style = tag == "lua" ? activeStyle : normalStyle;
         BtnPlugins.Style = tag == "plugins" ? activeStyle : normalStyle;
 
         switch (tag)
         {
-            case "powershell": ShowPowerShell(); break;
-            case "python": ShowPython(); break;
-            case "batch": ShowBatch(); break;
+            case "lua": ShowLuaApi(); break;
             case "plugins": ShowPlugins(); break;
             default: ShowOverview(); break;
         }
@@ -252,229 +248,113 @@ public partial class DocsView : UserControl
     {
         Clear();
         AddTitle("Zyntra Scripting API");
-        AddSubtitle("Zyntra injects a scripting API into every script you run, giving your scripts access to accounts, apps, notifications, and more.");
-
-        AddHeading("Supported Languages");
-        AddFunctionRow("PowerShell", "API module auto-imported as ZyntraAPI");
-        AddFunctionRow("Python", "API module auto-imported as 'zyntra'");
-        AddFunctionRow("Batch", "Context JSON path via %ZYNTRA_CONTEXT%");
+        AddSubtitle("Zyntra uses Lua as its scripting language. The zyntra API is auto-injected into every script, giving you access to accounts, apps, game launching, and more.");
 
         AddHeading("How It Works");
-        AddParagraph("1.  When you run a script, Zyntra exports a context JSON with your accounts, apps, and settings.");
-        AddParagraph("2.  The API module is automatically injected into your script — no setup needed.");
-        AddParagraph("3.  After execution, Zyntra reads a response file for notifications or clipboard actions.");
+        AddParagraph("1.  When you run a script, Zyntra injects your accounts, apps, and recent games as native Lua tables.");
+        AddParagraph("2.  The zyntra API module is loaded automatically — no setup needed.");
+        AddParagraph("3.  Actions like game launches, notifications, and clipboard are executed after your script finishes.");
 
-        AddNote("Select PowerShell API or Python API from the sidebar for the full function reference with copyable examples.");
+        AddNote("Select Lua API from the sidebar for the full function reference with copyable examples.");
 
         AddDivider();
         AddHeading("Quick Example — Launch a Game");
-        AddCodeBlock("", @"# PowerShell: launch a game with a specific account
-Launch-ZyntraGame -AccountName 'MyAccount' -PlaceId 4483381587
-Send-ZyntraNotification -Title 'Launched' -Message 'Joining game!' -Type Success", "POWERSHELL");
-
-        AddCodeBlock("", @"# Python: launch a game for all accounts tagged 'alt'
-zyntra.launch_game_all(4483381587, tag='alt')
-zyntra.send_notification('Mass Launch', f'{len(zyntra.get_accounts_by_tag(""alt""))} accounts joining')", "PYTHON");
+        AddCodeBlock("", @"-- Launch a game with a specific account
+zyntra.launch_game(""MyAccount"", 4483381587)
+zyntra.notify(""Launched"", ""Joining game!"", ""Success"")", "LUA");
 
         AddHeading("Quick Example — List Accounts");
-        AddCodeBlock("", @"$accounts = Get-ZyntraAccounts
-foreach ($acc in $accounts) {
-    Write-ZyntraLog ""$($acc.DisplayName) [$($acc.Tag)]""
-}
-Send-ZyntraNotification -Title 'Done' -Message 'Finished!' -Type Success", "POWERSHELL");
+        AddCodeBlock("", @"for _, acc in ipairs(zyntra.get_accounts()) do
+    zyntra.log(acc.DisplayName .. "" ["" .. acc.Tag .. ""]"")
+end
+zyntra.notify(""Done"", ""Finished!"", ""Success"")", "LUA");
+
+        AddHeading("Quick Example — Mass Launch");
+        AddCodeBlock("", @"-- Launch a game for all accounts tagged 'alt'
+zyntra.launch_game_all(4483381587, ""alt"")
+zyntra.notify(""Mass Launch"", ""All alts joining!"", ""Success"")", "LUA");
     }
 
-    private void ShowPowerShell()
+    private void ShowLuaApi()
     {
         Clear();
-        AddTitle("PowerShell API Reference");
-        AddSubtitle("The ZyntraAPI module is auto-imported into every PowerShell script. All functions are available immediately.");
-
-        AddHeading("Context");
-        AddFunctionRow("Get-ZyntraVersion", "Returns the Zyntra version string");
-        AddFunctionRow("Get-ZyntraDataDir", "Returns the Zyntra AppData directory path");
-
-        AddHeading("Accounts");
-        AddFunctionRow("Get-ZyntraAccounts", "Returns all Roblox accounts");
-        AddFunctionRow("Get-ZyntraAccount -Name X", "Find account by username or display name");
-        AddFunctionRow("Get-ZyntraAccountsByTag -Tag X", "Filter accounts by tag");
-        AddFunctionRow("Get-ZyntraAccountCount", "Returns the number of accounts");
-        AddNote("Account properties: UserId, Username, DisplayName, Tag, CookieValid");
-
-        AddHeading("Apps");
-        AddFunctionRow("Get-ZyntraApps", "Returns all registered applications");
-        AddFunctionRow("Get-ZyntraApp -Name X", "Find an app by name");
-        AddFunctionRow("Get-ZyntraAppCount", "Returns the number of apps");
-        AddNote("App properties: Id, Name, ExePath, Description, IsGameModule");
-
-        AddHeading("Notifications");
-        AddFunctionRow("Send-ZyntraNotification -Title X -Message Y [-Type Z]", "Send a notification to Zyntra");
-        AddNote("Type options: Info (default), Success, Warning, Error");
-
-        AddHeading("Clipboard");
-        AddFunctionRow("Set-ZyntraClipboard -Text X", "Sets the Windows clipboard after script completes");
-
-        AddHeading("Game Launch");
-        AddFunctionRow("Launch-ZyntraGame -AccountName X -PlaceId Y", "Launch a Roblox game with a specific account");
-        AddFunctionRow("Launch-ZyntraGameAll -PlaceId Y [-Tag T]", "Launch a game for all accounts (optionally by tag)");
-        AddNote("Games are launched after the script finishes. Zyntra resolves the account, decrypts the cookie, and launches Roblox automatically.");
-
-        AddHeading("Recently Played");
-        AddFunctionRow("Get-ZyntraRecentGames", "Returns all recently played games");
-        AddFunctionRow("Get-ZyntraLastPlayed", "Returns the most recently played game");
-        AddNote("Recent game properties: PlaceId, GameName, AccountName, PlayedAt");
-
-        AddHeading("Utilities");
-        AddFunctionRow("Write-ZyntraLog -Message X", "Writes a timestamped log line to output");
-
-        AddDivider();
-        AddHeading("Examples");
-
-        AddCodeBlock("Launch a game with a specific account", @"Launch-ZyntraGame -AccountName 'MyAccount' -PlaceId 4483381587
-Send-ZyntraNotification -Title 'Launching' `
-    -Message 'Joining game as MyAccount' -Type Info", "POWERSHELL");
-
-        AddCodeBlock("Launch a game for all alt accounts", @"Launch-ZyntraGameAll -PlaceId 4483381587 -Tag 'alt'
-$count = (Get-ZyntraAccountsByTag -Tag 'alt').Count
-Send-ZyntraNotification -Title 'Mass Launch' `
-    -Message ""Launching $count alt accounts"" -Type Success", "POWERSHELL");
-
-        AddCodeBlock("Rejoin the last played game", @"$last = Get-ZyntraLastPlayed
-if ($last) {
-    Launch-ZyntraGame -AccountName $last.AccountName -PlaceId $last.PlaceId
-    Write-ZyntraLog ""Rejoining $($last.GameName)""
-} else {
-    Write-ZyntraLog 'No recent games'
-}", "POWERSHELL");
-
-        AddCodeBlock("List all accounts with tags", @"$accounts = Get-ZyntraAccounts
-foreach ($acc in $accounts) {
-    Write-ZyntraLog ""$($acc.DisplayName) [$($acc.Tag)]""
-}
-Send-ZyntraNotification -Title 'Done' `
-    -Message ""Listed $($accounts.Count) accounts"" `
-    -Type Success", "POWERSHELL");
-
-        AddCodeBlock("Copy account names to clipboard", @"$names = (Get-ZyntraAccounts).DisplayName -join ', '
-Set-ZyntraClipboard -Text $names
-Write-ZyntraLog ""Copied $((Get-ZyntraAccounts).Count) names to clipboard""", "POWERSHELL");
-    }
-
-    private void ShowPython()
-    {
-        Clear();
-        AddTitle("Python API Reference");
-        AddSubtitle("The zyntra_api module is auto-imported as 'zyntra'. All functions are available via zyntra.function_name().");
+        AddTitle("Lua API Reference");
+        AddSubtitle("The zyntra module is auto-loaded into every Lua script. All functions are available via zyntra.function_name().");
 
         AddHeading("Context");
         AddFunctionRow("zyntra.get_version()", "Returns the Zyntra version string");
         AddFunctionRow("zyntra.get_data_dir()", "Returns the Zyntra AppData directory path");
 
         AddHeading("Accounts");
-        AddFunctionRow("zyntra.get_accounts()", "Returns all accounts as list of dicts");
+        AddFunctionRow("zyntra.get_accounts()", "Returns all Roblox accounts as a table");
         AddFunctionRow("zyntra.get_account(name)", "Find account by username or display name");
         AddFunctionRow("zyntra.get_accounts_by_tag(tag)", "Filter accounts by tag");
         AddFunctionRow("zyntra.get_account_count()", "Returns the number of accounts");
-        AddNote("Dict keys: UserId, Username, DisplayName, Tag, CookieValid");
+        AddNote("Account fields: UserId, Username, DisplayName, Tag, CookieValid");
 
         AddHeading("Apps");
-        AddFunctionRow("zyntra.get_apps()", "Returns all apps as list of dicts");
+        AddFunctionRow("zyntra.get_apps()", "Returns all registered applications");
         AddFunctionRow("zyntra.get_app(name)", "Find an app by name");
         AddFunctionRow("zyntra.get_app_count()", "Returns the number of apps");
-        AddNote("Dict keys: Id, Name, ExePath, Description, IsGameModule");
+        AddNote("App fields: Id, Name, ExePath, Description, IsGameModule");
 
         AddHeading("Notifications");
-        AddFunctionRow("zyntra.send_notification(title, message, type='Info')", "Send a notification to Zyntra");
-        AddNote("type options: 'Info' (default), 'Success', 'Warning', 'Error'");
+        AddFunctionRow(@"zyntra.notify(title, message, type)", "Send a notification to Zyntra");
+        AddNote(@"type options: ""Info"" (default), ""Success"", ""Warning"", ""Error""");
 
         AddHeading("Clipboard");
         AddFunctionRow("zyntra.set_clipboard(text)", "Sets the Windows clipboard after script completes");
 
         AddHeading("Game Launch");
-        AddFunctionRow("zyntra.launch_game(account_name, place_id)", "Launch a Roblox game with a specific account");
-        AddFunctionRow("zyntra.launch_game_all(place_id, tag=None)", "Launch a game for all accounts (optionally by tag)");
-        AddNote("Games are launched after the script finishes. Zyntra resolves the account, decrypts the cookie, and launches Roblox.");
+        AddFunctionRow(@"zyntra.launch_game(account_name, place_id)", "Launch a Roblox game with a specific account");
+        AddFunctionRow(@"zyntra.launch_game_all(place_id, tag)", "Launch a game for all accounts (optionally filtered by tag)");
+        AddNote("Games are launched after the script finishes. Zyntra resolves the account, decrypts the cookie, and launches Roblox automatically.");
 
         AddHeading("Recently Played");
-        AddFunctionRow("zyntra.get_recently_played()", "Returns all recently played games as list of dicts");
-        AddFunctionRow("zyntra.get_last_played()", "Returns the most recently played game, or None");
-        AddNote("Dict keys: PlaceId, GameName, AccountName, PlayedAt");
+        AddFunctionRow("zyntra.get_recently_played()", "Returns all recently played games");
+        AddFunctionRow("zyntra.get_last_played()", "Returns the most recently played game, or nil");
+        AddNote("Game fields: PlaceId, GameName, AccountName, PlayedAt");
 
         AddHeading("Utilities");
         AddFunctionRow("zyntra.log(message)", "Writes a timestamped log line to output");
+        AddFunctionRow("zyntra.sleep(ms)", "Pauses execution for the given milliseconds");
 
         AddDivider();
         AddHeading("Examples");
 
-        AddCodeBlock("Launch a game with a specific account", @"zyntra.launch_game('MyAccount', 4483381587)
-zyntra.send_notification('Launching', 'Joining game as MyAccount')", "PYTHON");
+        AddCodeBlock("Launch a game with one account", @"zyntra.launch_game(""MyAccount"", 4483381587)
+zyntra.notify(""Launching"", ""Joining game as MyAccount"")", "LUA");
 
-        AddCodeBlock("Launch a game for all alt accounts", @"zyntra.launch_game_all(4483381587, tag='alt')
-alts = zyntra.get_accounts_by_tag('alt')
-zyntra.send_notification('Mass Launch', f'Launching {len(alts)} alts', 'Success')", "PYTHON");
+        AddCodeBlock("Launch a game for all alt accounts", @"zyntra.launch_game_all(4483381587, ""alt"")
+local alts = zyntra.get_accounts_by_tag(""alt"")
+zyntra.notify(""Mass Launch"", #alts .. "" alts joining"", ""Success"")", "LUA");
 
-        AddCodeBlock("Rejoin the last played game", @"last = zyntra.get_last_played()
-if last:
-    zyntra.launch_game(last['AccountName'], last['PlaceId'])
-    zyntra.log(f""Rejoining {last['GameName']}"")
-else:
-    zyntra.log('No recent games')", "PYTHON");
+        AddCodeBlock("Rejoin the last played game", @"local last = zyntra.get_last_played()
+if last then
+    zyntra.launch_game(last.AccountName, last.PlaceId)
+    zyntra.log(""Rejoining "" .. last.GameName)
+else
+    zyntra.log(""No recent games"")
+end", "LUA");
 
-        AddCodeBlock("List all accounts", @"for acc in zyntra.get_accounts():
-    zyntra.log(f""{acc['DisplayName']} [{acc.get('Tag', 'none')}]"")
+        AddCodeBlock("List all accounts with tags", @"for _, acc in ipairs(zyntra.get_accounts()) do
+    zyntra.log(acc.DisplayName .. "" ["" .. acc.Tag .. ""]"")
+end
+zyntra.notify(""Done"", ""Listed "" .. zyntra.get_account_count() .. "" accounts"", ""Success"")", "LUA");
 
-zyntra.send_notification(
-    'Done',
-    f'Listed {zyntra.get_account_count()} accounts',
-    'Success'
-)", "PYTHON");
+        AddCodeBlock("Copy account names to clipboard", @"local names = {}
+for _, acc in ipairs(zyntra.get_accounts()) do
+    table.insert(names, acc.DisplayName)
+end
+zyntra.set_clipboard(table.concat(names, "", ""))
+zyntra.log(""Copied "" .. #names .. "" names to clipboard"")", "LUA");
 
-        AddCodeBlock("Export app names to clipboard", @"names = ', '.join(a['Name'] for a in zyntra.get_apps())
-zyntra.set_clipboard(names)
-zyntra.log(f'Copied {zyntra.get_app_count()} app names')", "PYTHON");
-    }
-
-    private void ShowBatch()
-    {
-        Clear();
-        AddTitle("Batch Script Notes");
-        AddSubtitle("Batch scripts have limited API support. The context JSON path is available via the ZYNTRA_CONTEXT environment variable.");
-
-        AddNote("For full API access with functions and response handling, use PowerShell or Python instead.");
-
-        AddHeading("Reading Context from Batch");
-        AddParagraph("You can shell out to PowerShell to read the context JSON:");
-
-        AddCodeBlock("Read Zyntra version", @"for /f ""delims="" %%v in ('powershell -NoProfile -Command ^
-    ""(Get-Content '%ZYNTRA_CONTEXT%' | ConvertFrom-Json).Version""') do (
-    echo Zyntra version: %%v
-)", "BATCH");
-
-        AddCodeBlock("Count accounts", @"for /f ""delims="" %%c in ('powershell -NoProfile -Command ^
-    ""(Get-Content '%ZYNTRA_CONTEXT%' | ConvertFrom-Json).Accounts.Count""') do (
-    echo Accounts: %%c
-)", "BATCH");
-
-        AddHeading("Environment Variable");
-        AddFunctionRow("%ZYNTRA_CONTEXT%", "Full path to the context JSON file");
-
-        AddDivider();
-        AddHeading("Context JSON Structure");
-        AddParagraph("The context file contains your Zyntra data in this format:");
-        AddCodeBlock("", @"{
-  ""Version"": ""<current version>"",
-  ""DataDir"": ""C:\\Users\\...\\AppData\\Roaming\\Zyntra"",
-  ""ResponseFile"": ""C:\\...\\zyntra_response.json"",
-  ""Accounts"": [
-    { ""UserId"": ""123"", ""Username"": ""user"", ""DisplayName"": ""User"", ""Tag"": ""main"" }
-  ],
-  ""Apps"": [
-    { ""Id"": ""..."", ""Name"": ""MyApp"", ""ExePath"": ""C:\\..."" }
-  ],
-  ""RecentGames"": [
-    { ""PlaceId"": 4483381587, ""GameName"": ""Natural Disaster Survival"", ""AccountName"": ""User"", ""PlayedAt"": ""2025-01-01"" }
-  ]
-}", "JSON");
+        AddCodeBlock("Launch with delay between accounts", @"local accounts = zyntra.get_accounts()
+for i, acc in ipairs(accounts) do
+    zyntra.launch_game(acc.Username, 4483381587)
+    zyntra.log(""Queued "" .. acc.DisplayName .. "" ("" .. i .. ""/"" .. #accounts .. "")"")
+end
+zyntra.notify(""Done"", #accounts .. "" accounts queued"", ""Success"")", "LUA");
     }
 
     private void ShowPlugins()

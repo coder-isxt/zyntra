@@ -61,23 +61,9 @@
                                         </Grid.ColumnDefinitions>
                                         <Border Grid.Column="0" Width="28" Height="28" CornerRadius="6"
                                                 Background="{StaticResource ControlBrush}" VerticalAlignment="Center">
-                                            <TextBlock FontSize="11" FontWeight="Bold"
+                                            <TextBlock Text="Lua" FontSize="11" FontWeight="Bold"
                                                        Foreground="{StaticResource AccentBrush}"
-                                                       HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="Text" Value="PS" />
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding ScriptType}" Value="Python">
-                                                                <Setter Property="Text" Value="PY" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding ScriptType}" Value="Batch">
-                                                                <Setter Property="Text" Value="BA" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
                                         <StackPanel Grid.Column="2" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
