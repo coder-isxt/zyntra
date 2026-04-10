@@ -242,90 +242,179 @@ public partial class DocsView : UserControl
         DocPanel.Children.Add(new Border { Height = height });
     }
 
+    private void AddFeatureCard(string icon, string title, string description)
+    {
+        var border = new Border
+        {
+            Background = Panel, CornerRadius = new CornerRadius(8),
+            BorderBrush = Stroke, BorderThickness = new Thickness(1),
+            Padding = new Thickness(16, 14, 16, 14),
+            Margin = new Thickness(0, 0, 0, 8),
+        };
+
+        var grid = new Grid();
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(14) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+        var iconBlock = new TextBlock
+        {
+            Text = icon, FontSize = 20, VerticalAlignment = VerticalAlignment.Center,
+        };
+        Grid.SetColumn(iconBlock, 0);
+        grid.Children.Add(iconBlock);
+
+        var stack = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+        stack.Children.Add(new TextBlock
+        {
+            Text = title, FontSize = 13, FontWeight = FontWeights.SemiBold,
+            Foreground = Fg,
+        });
+        stack.Children.Add(new TextBlock
+        {
+            Text = description, FontSize = 12, Foreground = Sub, Opacity = 0.8,
+            Margin = new Thickness(0, 2, 0, 0), TextWrapping = TextWrapping.Wrap,
+        });
+        Grid.SetColumn(stack, 2);
+        grid.Children.Add(stack);
+
+        border.Child = grid;
+        DocPanel.Children.Add(border);
+    }
+
+    private void AddStepRow(string number, string text)
+    {
+        var grid = new Grid { Margin = new Thickness(0, 0, 0, 8) };
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(12) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+        var badge = new Border
+        {
+            Background = Accent, CornerRadius = new CornerRadius(10),
+            Width = 22, Height = 22, VerticalAlignment = VerticalAlignment.Top,
+            Margin = new Thickness(0, 1, 0, 0),
+        };
+        badge.Child = new TextBlock
+        {
+            Text = number, FontSize = 10, FontWeight = FontWeights.Bold,
+            Foreground = new SolidColorBrush(System.Windows.Media.Colors.White),
+            HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+            VerticalAlignment = System.Windows.VerticalAlignment.Center,
+        };
+        Grid.SetColumn(badge, 0);
+        grid.Children.Add(badge);
+
+        var desc = new TextBlock
+        {
+            Text = text, FontSize = 13, Foreground = Sub,
+            TextWrapping = TextWrapping.Wrap, LineHeight = 21,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        Grid.SetColumn(desc, 2);
+        grid.Children.Add(desc);
+
+        DocPanel.Children.Add(grid);
+    }
+
     // ── Pages ───────────────────────────────────────────────
 
     private void ShowOverview()
     {
         Clear();
         AddTitle("Zyntra Scripting API");
-        AddSubtitle("Zyntra uses Lua as its scripting language. The zyntra API is auto-injected into every script, giving you access to accounts, apps, game launching, and more.");
+        AddSubtitle("Automate everything with Lua. Zyntra injects the full API into every script — launch games, manage accounts, send notifications, and more.");
 
         AddHeading("How It Works");
-        AddParagraph("1.  When you run a script, Zyntra injects your accounts, apps, and recent games as native Lua tables.");
-        AddParagraph("2.  The zyntra API module is loaded automatically — no setup needed.");
-        AddParagraph("3.  Actions like game launches, notifications, and clipboard are executed after your script finishes.");
-
-        AddNote("Select Lua API from the sidebar for the full function reference with copyable examples.");
+        AddStepRow("1", "When you run a script, Zyntra injects your accounts, apps, and recent games as native Lua tables.");
+        AddStepRow("2", "The zyntra API module is loaded automatically — no setup or imports needed.");
+        AddStepRow("3", "Actions like game launches, notifications, and clipboard are executed after your script finishes.");
 
         AddDivider();
-        AddHeading("Quick Example — Launch a Game");
-        AddCodeBlock("", @"-- Launch a game with a specific account
-zyntra.launch_game(""MyAccount"", 4483381587)
+        AddHeading("What You Can Do");
+        AddFeatureCard("\U0001F3AE", "Launch Games", "Join Roblox games with any account, mass-launch for all accounts or by tag.");
+        AddFeatureCard("\U0001F465", "Manage Accounts", "Query accounts, filter by tag, get display names and usernames.");
+        AddFeatureCard("\U0001F514", "Send Notifications", "Push info, success, warning, or error notifications to the Zyntra panel.");
+        AddFeatureCard("\U0001F4CB", "Clipboard", "Copy text to the Windows clipboard after script completes.");
+        AddFeatureCard("\U0001F504", "Recently Played", "Access your recent game history and rejoin with one call.");
+        AddFeatureCard("\U0001F4E6", "App Access", "Query all registered applications and their paths.");
+
+        AddDivider();
+        AddHeading("Quick Start");
+
+        AddCodeBlock("Launch a game", @"zyntra.launch_game(""MyAccount"", 4483381587)
 zyntra.notify(""Launched"", ""Joining game!"", ""Success"")", "LUA");
 
-        AddHeading("Quick Example — List Accounts");
-        AddCodeBlock("", @"for _, acc in ipairs(zyntra.get_accounts()) do
+        AddCodeBlock("List all accounts", @"for _, acc in ipairs(zyntra.get_accounts()) do
     zyntra.log(acc.DisplayName .. "" ["" .. acc.Tag .. ""]"")
-end
-zyntra.notify(""Done"", ""Finished!"", ""Success"")", "LUA");
+end", "LUA");
 
-        AddHeading("Quick Example — Mass Launch");
-        AddCodeBlock("", @"-- Launch a game for all accounts tagged 'alt'
-zyntra.launch_game_all(4483381587, ""alt"")
+        AddCodeBlock("Mass launch all alts", @"zyntra.launch_game_all(4483381587, ""alt"")
 zyntra.notify(""Mass Launch"", ""All alts joining!"", ""Success"")", "LUA");
+
+        AddNote("See the Lua API Reference tab for the complete function list with all parameters and more examples.");
     }
 
     private void ShowLuaApi()
     {
         Clear();
         AddTitle("Lua API Reference");
-        AddSubtitle("The zyntra module is auto-loaded into every Lua script. All functions are available via zyntra.function_name().");
+        AddSubtitle("All functions are available via the global zyntra table. No imports needed.");
 
+        // Context
         AddHeading("Context");
         AddFunctionRow("zyntra.get_version()", "Returns the Zyntra version string");
         AddFunctionRow("zyntra.get_data_dir()", "Returns the Zyntra AppData directory path");
 
+        // Accounts
         AddHeading("Accounts");
         AddFunctionRow("zyntra.get_accounts()", "Returns all Roblox accounts as a table");
         AddFunctionRow("zyntra.get_account(name)", "Find account by username or display name");
         AddFunctionRow("zyntra.get_accounts_by_tag(tag)", "Filter accounts by tag");
         AddFunctionRow("zyntra.get_account_count()", "Returns the number of accounts");
-        AddNote("Account fields: UserId, Username, DisplayName, Tag, CookieValid");
+        AddNote("Fields: UserId, Username, DisplayName, Tag, CookieValid");
 
+        // Apps
         AddHeading("Apps");
         AddFunctionRow("zyntra.get_apps()", "Returns all registered applications");
         AddFunctionRow("zyntra.get_app(name)", "Find an app by name");
         AddFunctionRow("zyntra.get_app_count()", "Returns the number of apps");
-        AddNote("App fields: Id, Name, ExePath, Description, IsGameModule");
+        AddNote("Fields: Id, Name, ExePath, Description, IsGameModule");
 
-        AddHeading("Notifications");
-        AddFunctionRow(@"zyntra.notify(title, message, type)", "Send a notification to Zyntra");
-        AddNote(@"type options: ""Info"" (default), ""Success"", ""Warning"", ""Error""");
-
-        AddHeading("Clipboard");
-        AddFunctionRow("zyntra.set_clipboard(text)", "Sets the Windows clipboard after script completes");
-
+        // Game Launch
         AddHeading("Game Launch");
-        AddFunctionRow(@"zyntra.launch_game(account_name, place_id)", "Launch a Roblox game with a specific account");
-        AddFunctionRow(@"zyntra.launch_game_all(place_id, tag)", "Launch a game for all accounts (optionally filtered by tag)");
-        AddNote("Games are launched after the script finishes. Zyntra resolves the account, decrypts the cookie, and launches Roblox automatically.");
+        AddFunctionRow("zyntra.launch_game(account_name, place_id)", "Launch a Roblox game with a specific account");
+        AddFunctionRow("zyntra.launch_game_all(place_id, tag)", "Launch for all accounts, optionally filtered by tag");
+        AddNote("Launches are queued and executed after the script finishes. Zyntra decrypts the cookie and launches Roblox automatically.");
 
+        // Recently Played
         AddHeading("Recently Played");
         AddFunctionRow("zyntra.get_recently_played()", "Returns all recently played games");
-        AddFunctionRow("zyntra.get_last_played()", "Returns the most recently played game, or nil");
-        AddNote("Game fields: PlaceId, GameName, AccountName, PlayedAt");
+        AddFunctionRow("zyntra.get_last_played()", "Returns the most recent game, or nil");
+        AddNote("Fields: PlaceId, GameName, AccountName, PlayedAt");
 
+        // Notifications
+        AddHeading("Notifications");
+        AddFunctionRow("zyntra.notify(title, message, type)", "Send a notification to Zyntra");
+        AddNote("Type: \"Info\" (default), \"Success\", \"Warning\", \"Error\"");
+
+        // Clipboard
+        AddHeading("Clipboard");
+        AddFunctionRow("zyntra.set_clipboard(text)", "Copy text to the Windows clipboard");
+
+        // Utilities
         AddHeading("Utilities");
-        AddFunctionRow("zyntra.log(message)", "Writes a timestamped log line to output");
+        AddFunctionRow("zyntra.log(message)", "Writes a timestamped log line to the output panel");
         AddFunctionRow("zyntra.sleep(ms)", "Pauses execution for the given milliseconds");
 
+        // Examples
         AddDivider();
         AddHeading("Examples");
 
         AddCodeBlock("Launch a game with one account", @"zyntra.launch_game(""MyAccount"", 4483381587)
 zyntra.notify(""Launching"", ""Joining game as MyAccount"")", "LUA");
 
-        AddCodeBlock("Launch a game for all alt accounts", @"zyntra.launch_game_all(4483381587, ""alt"")
+        AddCodeBlock("Mass launch all alt accounts", @"zyntra.launch_game_all(4483381587, ""alt"")
 local alts = zyntra.get_accounts_by_tag(""alt"")
 zyntra.notify(""Mass Launch"", #alts .. "" alts joining"", ""Success"")", "LUA");
 
@@ -349,7 +438,7 @@ end
 zyntra.set_clipboard(table.concat(names, "", ""))
 zyntra.log(""Copied "" .. #names .. "" names to clipboard"")", "LUA");
 
-        AddCodeBlock("Launch with delay between accounts", @"local accounts = zyntra.get_accounts()
+        AddCodeBlock("Queue all accounts into a game", @"local accounts = zyntra.get_accounts()
 for i, acc in ipairs(accounts) do
     zyntra.launch_game(acc.Username, 4483381587)
     zyntra.log(""Queued "" .. acc.DisplayName .. "" ("" .. i .. ""/"" .. #accounts .. "")"")
@@ -361,14 +450,15 @@ zyntra.notify(""Done"", #accounts .. "" accounts queued"", ""Success"")", "LUA")
     {
         Clear();
         AddTitle("Plugin SDK");
-        AddSubtitle("Extend Zyntra with custom plugins. Plugins are .NET class libraries that implement the IZyntraPlugin interface.");
+        AddSubtitle("Extend Zyntra with .NET class library plugins that implement the IZyntraPlugin interface.");
 
         AddHeading("Getting Started");
-        AddParagraph("1.  Create a .NET class library project targeting the same framework as Zyntra.");
-        AddParagraph("2.  Reference the IZyntraPlugin interface (or copy it into your project).");
-        AddParagraph("3.  Implement the interface in a public class.");
-        AddParagraph("4.  Build and install the DLL via the Plugins tab in Zyntra.");
+        AddStepRow("1", "Create a .NET class library project targeting the same framework as Zyntra.");
+        AddStepRow("2", "Reference the IZyntraPlugin interface (or copy it into your project).");
+        AddStepRow("3", "Implement the interface in a public class.");
+        AddStepRow("4", "Build the DLL and install it via the Plugins tab.");
 
+        AddDivider();
         AddHeading("IZyntraPlugin Interface");
         AddCodeBlock("", @"public interface IZyntraPlugin
 {
@@ -419,20 +509,20 @@ public class MyPlugin : IZyntraPlugin
     }
 }", "C#");
 
+        AddDivider();
         AddHeading("Plugin Lifecycle");
-        AddParagraph("1.  Install — User selects a .DLL file from the Plugins tab. Zyntra copies it to the plugins folder and reads metadata.");
-        AddParagraph("2.  Enable — The plugin is loaded and Initialize() is called on application startup.");
-        AddParagraph("3.  Execute — Execute() can be called by Zyntra when triggered.");
-        AddParagraph("4.  Shutdown — Shutdown() is called when the app closes or the plugin is disabled.");
+        AddStepRow("1", "Install \u2014 User selects a .DLL file from the Plugins tab. Zyntra copies it to the plugins folder.");
+        AddStepRow("2", "Enable \u2014 The plugin is loaded and Initialize() is called on startup.");
+        AddStepRow("3", "Execute \u2014 Execute() is called when the plugin is triggered.");
+        AddStepRow("4", "Shutdown \u2014 Shutdown() is called when the app closes or the plugin is disabled.");
 
-        AddNote("Plugins run in the same process as Zyntra. Be careful with exceptions — unhandled errors will be caught, but may cause the plugin to be marked as failed.");
+        AddNote("Plugins run in the same process as Zyntra. Unhandled errors will be caught, but may mark the plugin as failed.");
 
         AddDivider();
         AddHeading("File Locations");
         AddFunctionRow("Plugin DLLs", "%AppData%\\Zyntra\\plugins\\");
         AddFunctionRow("Plugin index", "%AppData%\\Zyntra\\plugins.json");
 
-        AddHeading("Tips");
-        AddNote("Keep plugins lightweight. Avoid blocking the UI thread in Initialize() or Execute(). Use async patterns or background threads for long-running operations.");
+        AddNote("Keep plugins lightweight. Use async patterns for long-running operations to avoid blocking the UI thread.");
     }
 }
