@@ -87,8 +87,17 @@ public class ScriptsViewModel : BaseViewModel
     private void LoadScripts()
     {
         Scripts.Clear();
+        bool needsSave = false;
         foreach (var s in ScriptService.Load())
+        {
+            if (s.ScriptType != "Lua")
+            {
+                s.ScriptType = "Lua";
+                needsSave = true;
+            }
             Scripts.Add(s);
+        }
+        if (needsSave) SaveScripts();
         StatusText = $"{Scripts.Count} script(s)";
     }
 

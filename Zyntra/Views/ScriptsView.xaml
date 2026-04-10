@@ -65,13 +65,9 @@
                                                        Foreground="{StaticResource AccentBrush}"
                                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
-                                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis" />
-                                            <TextBlock FontSize="10" Foreground="{StaticResource SubTextBrush}" Margin="0,1,0,0">
-                                                <Run Text="{Binding ScriptType, Mode=OneWay}" />
-                                            </TextBlock>
-                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis"
+                                                   VerticalAlignment="Center" />
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -112,8 +108,6 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="10" />
-                                <ColumnDefinition Width="110" />
-                                <ColumnDefinition Width="10" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="6" />
                                 <ColumnDefinition Width="Auto" />
@@ -121,14 +115,10 @@
                             <TextBox Grid.Column="0"
                                      Text="{Binding EditorName, UpdateSourceTrigger=PropertyChanged}"
                                      Style="{StaticResource DarkTextBoxStyle}" Tag="Script name" />
-                            <ComboBox Grid.Column="2"
-                                      ItemsSource="{x:Static vm:ScriptsViewModel.ScriptTypes}"
-                                      SelectedItem="{Binding EditorType}"
-                                      Style="{StaticResource DarkComboBoxStyle}" />
-                            <Button Grid.Column="4" Content="▶  Run" Padding="18,8"
+                            <Button Grid.Column="2" Content="▶  Run" Padding="18,8"
                                     Style="{StaticResource AccentButtonStyle}"
                                     Command="{Binding RunScriptCommand}" />
-                            <Button Grid.Column="6" Content="Delete" Padding="12,8" FontSize="12"
+                            <Button Grid.Column="4" Content="Delete" Padding="12,8" FontSize="12"
                                     Style="{StaticResource DangerButtonStyle}"
                                     Command="{Binding DeleteScriptCommand}" />
                         </Grid>
@@ -149,7 +139,7 @@
                                     BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,0,0,1"
                                     Padding="14,6">
                                 <Grid>
-                                    <TextBlock Text="{Binding EditorType, StringFormat='{}{0}'}"
+                                    <TextBlock Text="Lua"
                                                FontSize="10" FontWeight="SemiBold"
                                                Foreground="{StaticResource SubTextBrush}" Opacity="0.6"
                                                VerticalAlignment="Center" />
