@@ -6,7 +6,7 @@
 
 $script:_ContextPath = $env:ZYNTRA_CONTEXT
 $script:_Context     = $null
-$script:_Response    = @{ Notifications = @(); SetClipboard = $null }
+$script:_Response    = @{ Notifications = @(); SetClipboard = $null; LaunchGame = @() }
 
 function _LoadContext {
     if ($null -eq $script:_Context -and $script:_ContextPath -and (Test-Path $script:_ContextPath)) {
@@ -129,6 +129,59 @@ function Get-ZyntraAppCount {
     <# .SYNOPSIS Returns the number of apps. #>
     _LoadContext
     return $script:_Context.Apps.Count
+}
+
+# ── Game Launch ─────────────────────────────────────────────
+
+function Launch-ZyntraGame {
+    <#
+    .SYNOPSIS Launches a Roblox game with a specific account after script completes.
+    .PARAMETER AccountName  Username or display name of the account.
+    .PARAMETER PlaceId      The Roblox Place ID to join.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$AccountName,
+        [Parameter(Mandatory)][long]$PlaceId
+    )
+    $script:_Response.LaunchGame += @{
+        AccountName = $AccountName
+        PlaceId     = $PlaceId
+    }
+}
+
+function Launch-ZyntraGameAll {
+    <#
+    .SYNOPSIS Launches a game for all accounts, optionally filtered by tag.
+    .PARAMETER PlaceId  The Roblox Place ID to join.
+    .PARAMETER Tag      If set, only launch for accounts with this tag.
+    #>
+    param(
+        [Parameter(Mandatory)][long]$PlaceId,
+        [string]$Tag
+    )
+    _LoadContext
+    $accounts = if ($Tag) {
+        $script:_Context.Accounts | Where-Object { $_.Tag -eq $Tag }
+    } else {
+        $script:_Context.Accounts
+    }
+    foreach ($acc in $accounts) {
+        Launch-ZyntraGame -AccountName $acc.Username -PlaceId $PlaceId
+    }
+}
+
+# ── Recently Played ─────────────────────────────────────────
+
+function Get-ZyntraRecentGames {
+    <# .SYNOPSIS Returns all recently played games. #>
+    _LoadContext
+    return $script:_Context.RecentGames
+}
+
+function Get-ZyntraLastPlayed {
+    <# .SYNOPSIS Returns the most recently played game. #>
+    _LoadContext
+    return $script:_Context.RecentGames | Select-Object -First 1
 }
 
 # ── Flush response on module unload ──────────────────────────

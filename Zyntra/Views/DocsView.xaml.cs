@@ -267,18 +267,21 @@ public partial class DocsView : UserControl
         AddNote("Select PowerShell API or Python API from the sidebar for the full function reference with copyable examples.");
 
         AddDivider();
-        AddHeading("Quick Example — PowerShell");
+        AddHeading("Quick Example — Launch a Game");
+        AddCodeBlock("", @"# PowerShell: launch a game with a specific account
+Launch-ZyntraGame -AccountName 'MyAccount' -PlaceId 4483381587
+Send-ZyntraNotification -Title 'Launched' -Message 'Joining game!' -Type Success", "POWERSHELL");
+
+        AddCodeBlock("", @"# Python: launch a game for all accounts tagged 'alt'
+zyntra.launch_game_all(4483381587, tag='alt')
+zyntra.send_notification('Mass Launch', f'{len(zyntra.get_accounts_by_tag(""alt""))} accounts joining')", "PYTHON");
+
+        AddHeading("Quick Example — List Accounts");
         AddCodeBlock("", @"$accounts = Get-ZyntraAccounts
 foreach ($acc in $accounts) {
     Write-ZyntraLog ""$($acc.DisplayName) [$($acc.Tag)]""
 }
 Send-ZyntraNotification -Title 'Done' -Message 'Finished!' -Type Success", "POWERSHELL");
-
-        AddHeading("Quick Example — Python");
-        AddCodeBlock("", @"for acc in zyntra.get_accounts():
-    zyntra.log(f""{acc['DisplayName']} [{acc.get('Tag', 'none')}]"")
-
-zyntra.send_notification('Done', 'Finished!', 'Success')", "PYTHON");
     }
 
     private void ShowPowerShell()
@@ -311,11 +314,38 @@ zyntra.send_notification('Done', 'Finished!', 'Success')", "PYTHON");
         AddHeading("Clipboard");
         AddFunctionRow("Set-ZyntraClipboard -Text X", "Sets the Windows clipboard after script completes");
 
+        AddHeading("Game Launch");
+        AddFunctionRow("Launch-ZyntraGame -AccountName X -PlaceId Y", "Launch a Roblox game with a specific account");
+        AddFunctionRow("Launch-ZyntraGameAll -PlaceId Y [-Tag T]", "Launch a game for all accounts (optionally by tag)");
+        AddNote("Games are launched after the script finishes. Zyntra resolves the account, decrypts the cookie, and launches Roblox automatically.");
+
+        AddHeading("Recently Played");
+        AddFunctionRow("Get-ZyntraRecentGames", "Returns all recently played games");
+        AddFunctionRow("Get-ZyntraLastPlayed", "Returns the most recently played game");
+        AddNote("Recent game properties: PlaceId, GameName, AccountName, PlayedAt");
+
         AddHeading("Utilities");
         AddFunctionRow("Write-ZyntraLog -Message X", "Writes a timestamped log line to output");
 
         AddDivider();
         AddHeading("Examples");
+
+        AddCodeBlock("Launch a game with a specific account", @"Launch-ZyntraGame -AccountName 'MyAccount' -PlaceId 4483381587
+Send-ZyntraNotification -Title 'Launching' `
+    -Message 'Joining game as MyAccount' -Type Info", "POWERSHELL");
+
+        AddCodeBlock("Launch a game for all alt accounts", @"Launch-ZyntraGameAll -PlaceId 4483381587 -Tag 'alt'
+$count = (Get-ZyntraAccountsByTag -Tag 'alt').Count
+Send-ZyntraNotification -Title 'Mass Launch' `
+    -Message ""Launching $count alt accounts"" -Type Success", "POWERSHELL");
+
+        AddCodeBlock("Rejoin the last played game", @"$last = Get-ZyntraLastPlayed
+if ($last) {
+    Launch-ZyntraGame -AccountName $last.AccountName -PlaceId $last.PlaceId
+    Write-ZyntraLog ""Rejoining $($last.GameName)""
+} else {
+    Write-ZyntraLog 'No recent games'
+}", "POWERSHELL");
 
         AddCodeBlock("List all accounts with tags", @"$accounts = Get-ZyntraAccounts
 foreach ($acc in $accounts) {
@@ -328,22 +358,6 @@ Send-ZyntraNotification -Title 'Done' `
         AddCodeBlock("Copy account names to clipboard", @"$names = (Get-ZyntraAccounts).DisplayName -join ', '
 Set-ZyntraClipboard -Text $names
 Write-ZyntraLog ""Copied $((Get-ZyntraAccounts).Count) names to clipboard""", "POWERSHELL");
-
-        AddCodeBlock("Check which accounts have valid cookies", @"$accounts = Get-ZyntraAccounts
-$valid = ($accounts | Where-Object { $_.CookieValid -eq $true }).Count
-$invalid = ($accounts | Where-Object { $_.CookieValid -eq $false }).Count
-Write-ZyntraLog ""Valid: $valid | Invalid: $invalid""
-Send-ZyntraNotification -Title 'Health Check' `
-    -Message ""$valid valid, $invalid invalid cookies"" `
-    -Type $(if ($invalid -gt 0) { 'Warning' } else { 'Success' })", "POWERSHELL");
-
-        AddCodeBlock("Launch an app by name", @"$app = Get-ZyntraApp -Name 'Potassium'
-if ($app) {
-    Start-Process $app.ExePath
-    Write-ZyntraLog ""Launched $($app.Name)""
-} else {
-    Write-ZyntraLog 'App not found'
-}", "POWERSHELL");
     }
 
     private void ShowPython()
@@ -376,11 +390,35 @@ if ($app) {
         AddHeading("Clipboard");
         AddFunctionRow("zyntra.set_clipboard(text)", "Sets the Windows clipboard after script completes");
 
+        AddHeading("Game Launch");
+        AddFunctionRow("zyntra.launch_game(account_name, place_id)", "Launch a Roblox game with a specific account");
+        AddFunctionRow("zyntra.launch_game_all(place_id, tag=None)", "Launch a game for all accounts (optionally by tag)");
+        AddNote("Games are launched after the script finishes. Zyntra resolves the account, decrypts the cookie, and launches Roblox.");
+
+        AddHeading("Recently Played");
+        AddFunctionRow("zyntra.get_recently_played()", "Returns all recently played games as list of dicts");
+        AddFunctionRow("zyntra.get_last_played()", "Returns the most recently played game, or None");
+        AddNote("Dict keys: PlaceId, GameName, AccountName, PlayedAt");
+
         AddHeading("Utilities");
         AddFunctionRow("zyntra.log(message)", "Writes a timestamped log line to output");
 
         AddDivider();
         AddHeading("Examples");
+
+        AddCodeBlock("Launch a game with a specific account", @"zyntra.launch_game('MyAccount', 4483381587)
+zyntra.send_notification('Launching', 'Joining game as MyAccount')", "PYTHON");
+
+        AddCodeBlock("Launch a game for all alt accounts", @"zyntra.launch_game_all(4483381587, tag='alt')
+alts = zyntra.get_accounts_by_tag('alt')
+zyntra.send_notification('Mass Launch', f'Launching {len(alts)} alts', 'Success')", "PYTHON");
+
+        AddCodeBlock("Rejoin the last played game", @"last = zyntra.get_last_played()
+if last:
+    zyntra.launch_game(last['AccountName'], last['PlaceId'])
+    zyntra.log(f""Rejoining {last['GameName']}"")
+else:
+    zyntra.log('No recent games')", "PYTHON");
 
         AddCodeBlock("List all accounts", @"for acc in zyntra.get_accounts():
     zyntra.log(f""{acc['DisplayName']} [{acc.get('Tag', 'none')}]"")
@@ -394,19 +432,6 @@ zyntra.send_notification(
         AddCodeBlock("Export app names to clipboard", @"names = ', '.join(a['Name'] for a in zyntra.get_apps())
 zyntra.set_clipboard(names)
 zyntra.log(f'Copied {zyntra.get_app_count()} app names')", "PYTHON");
-
-        AddCodeBlock("Filter accounts by tag", @"alts = zyntra.get_accounts_by_tag('alt')
-zyntra.log(f'Found {len(alts)} alt accounts:')
-for acc in alts:
-    zyntra.log(f'  - {acc[""DisplayName""]}' )", "PYTHON");
-
-        AddCodeBlock("Launch an app by name", @"import subprocess
-app = zyntra.get_app('Potassium')
-if app:
-    subprocess.Popen(app['ExePath'])
-    zyntra.log(f""Launched {app['Name']}"")
-else:
-    zyntra.log('App not found')", "PYTHON");
     }
 
     private void ShowBatch()
@@ -445,6 +470,9 @@ else:
   ],
   ""Apps"": [
     { ""Id"": ""..."", ""Name"": ""MyApp"", ""ExePath"": ""C:\\..."" }
+  ],
+  ""RecentGames"": [
+    { ""PlaceId"": 4483381587, ""GameName"": ""Natural Disaster Survival"", ""AccountName"": ""User"", ""PlayedAt"": ""2025-01-01"" }
   ]
 }", "JSON");
     }

@@ -9,7 +9,7 @@ from datetime import datetime
 
 _context_path = os.environ.get("ZYNTRA_CONTEXT", "")
 _context = None
-_response = {"Notifications": [], "SetClipboard": None}
+_response = {"Notifications": [], "SetClipboard": None, "LaunchGame": []}
 
 
 def _load_context():
@@ -102,6 +102,45 @@ def send_notification(title: str, message: str, type: str = "Info"):
 def set_clipboard(text: str):
     """Sets the Windows clipboard text via Zyntra."""
     _response["SetClipboard"] = text
+
+
+# ── Game Launch ──────────────────────────────────────────────
+
+def launch_game(account_name: str, place_id: int):
+    """
+    Launches a Roblox game after script completes.
+    account_name: Username or display name of the account to launch with.
+    place_id: The Roblox Place ID to join.
+    """
+    _response["LaunchGame"].append({
+        "AccountName": account_name,
+        "PlaceId": place_id,
+    })
+
+
+def launch_game_all(place_id: int, tag: str | None = None):
+    """
+    Launches a game for all accounts, optionally filtered by tag.
+    place_id: The Roblox Place ID to join.
+    tag: If set, only launch for accounts with this tag.
+    """
+    accounts = get_accounts_by_tag(tag) if tag else get_accounts()
+    for acc in accounts:
+        launch_game(acc["Username"], place_id)
+
+
+# ── Recently Played ─────────────────────────────────────────
+
+def get_recently_played() -> list:
+    """Returns list of recently played games as dicts."""
+    _load_context()
+    return _context.get("RecentGames", []) if _context else []
+
+
+def get_last_played() -> dict | None:
+    """Returns the most recently played game, or None."""
+    games = get_recently_played()
+    return games[0] if games else None
 
 
 # ── Utilities ────────────────────────────────────────────────

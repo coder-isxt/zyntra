@@ -10,6 +10,15 @@ public class ScriptContext
     public string ResponseFile { get; set; } = string.Empty;
     public List<ScriptContextAccount> Accounts { get; set; } = new();
     public List<ScriptContextApp> Apps { get; set; } = new();
+    public List<ScriptContextRecentGame> RecentGames { get; set; } = new();
+}
+
+public class ScriptContextRecentGame
+{
+    public long PlaceId { get; set; }
+    public string GameName { get; set; } = string.Empty;
+    public string? AccountName { get; set; }
+    public DateTime PlayedAt { get; set; }
 }
 
 public class ScriptContextAccount
@@ -34,6 +43,13 @@ public class ScriptResponse
 {
     public List<ScriptResponseNotification>? Notifications { get; set; }
     public string? SetClipboard { get; set; }
+    public List<ScriptResponseLaunch>? LaunchGame { get; set; }
+}
+
+public class ScriptResponseLaunch
+{
+    public string AccountName { get; set; } = string.Empty;
+    public long PlaceId { get; set; }
 }
 
 public class ScriptResponseNotification
@@ -60,6 +76,8 @@ public static class ScriptContextService
         var accounts = AccountStorageService.Load();
         var apps = AppStorageService.Load();
 
+        var recentGames = RecentlyPlayedService.Games.ToList();
+
         var context = new ScriptContext
         {
             Version = UpdateService.CurrentVersion,
@@ -80,6 +98,13 @@ public static class ScriptContextService
                 ExePath = a.ExePath,
                 Description = a.Description,
                 IsGameModule = a.IsGameModule,
+            }).ToList(),
+            RecentGames = recentGames.Select(g => new ScriptContextRecentGame
+            {
+                PlaceId = g.PlaceId,
+                GameName = g.GameName,
+                AccountName = g.AccountName,
+                PlayedAt = g.PlayedAt,
             }).ToList(),
         };
 
@@ -120,6 +145,14 @@ public static class ScriptContextService
                 System.Windows.Application.Current?.Dispatcher.Invoke(() =>
                     System.Windows.Clipboard.SetText(response.SetClipboard));
             }
+
+            if (response.LaunchGame != null)
+            {
+                foreach (var launch in response.LaunchGame)
+                {
+                    _ = ProcessLaunchAsync(launch);
+                }
+            }
         }
         catch { }
         finally
@@ -134,5 +167,35 @@ public static class ScriptContextService
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Zyntra", "api");
         Directory.CreateDirectory(apiDir);
         return apiDir;
+    }
+
+    private static async Task ProcessLaunchAsync(ScriptResponseLaunch launch)
+    {
+        try
+        {
+            var accounts = AccountStorageService.Load();
+            var account = accounts.FirstOrDefault(a =>
+                a.Username.Equals(launch.AccountName, StringComparison.OrdinalIgnoreCase) ||
+                a.DisplayName.Equals(launch.AccountName, StringComparison.OrdinalIgnoreCase));
+
+            if (account == null)
+            {
+                NotificationService.Push("Launch Failed",
+                    $"Account '{launch.AccountName}' not found.", NotificationType.Error);
+                return;
+            }
+
+            string cookie = CryptoService.Decrypt(account.EncryptedCookie);
+            await RobloxService.LaunchRobloxAsync(cookie, launch.PlaceId);
+            await RecentlyPlayedService.AddGameAsync(launch.PlaceId, account.DisplayName);
+
+            NotificationService.Push("Game Launched",
+                $"Launched Place {launch.PlaceId} as {account.DisplayName}", NotificationType.Success);
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Push("Launch Failed",
+                $"Failed to launch Place {launch.PlaceId}: {ex.Message}", NotificationType.Error);
+        }
     }
 }
