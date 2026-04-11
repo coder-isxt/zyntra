@@ -89,17 +89,15 @@ public class AppsViewModel : BaseViewModel
             {
                 FileName = app.ExePath,
                 UseShellExecute = !app.IsGameModule,
+                WorkingDirectory = !string.IsNullOrEmpty(app.WorkingDirectory)
+                    ? app.WorkingDirectory
+                    : System.IO.Path.GetDirectoryName(app.ExePath) ?? string.Empty,
             };
 
             if (app.IsGameModule)
             {
                 if (!string.IsNullOrEmpty(app.LaunchArgs))
                     psi.Arguments = app.LaunchArgs;
-
-                if (!string.IsNullOrEmpty(app.WorkingDirectory))
-                    psi.WorkingDirectory = app.WorkingDirectory;
-                else
-                    psi.WorkingDirectory = System.IO.Path.GetDirectoryName(app.ExePath) ?? string.Empty;
 
                 if (!string.IsNullOrEmpty(app.EnvironmentVars))
                 {
