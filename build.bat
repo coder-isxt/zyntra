@@ -28,12 +28,12 @@ echo New version: v%VERSION%
 echo.
 
 :: ── Changelog ────────────────────────────────────────────
-echo Current CHANGELOG.txt:
+echo Current README.md changelog:
 echo ----------------------------------------
-type CHANGELOG.txt
+powershell.exe -NoProfile -Command "$r = Get-Content README.md -Raw; $i = $r.IndexOf('## Changelog'); if ($i -ge 0) { Write-Output $r.Substring($i) } else { Write-Output '(no changelog section found)' }"
 echo ----------------------------------------
 echo.
-echo Edit CHANGELOG.txt now if needed, then press any key to continue...
+echo Edit README.md now if needed, then press any key to continue...
 pause >nul
 
 :: ── Update .csproj version ───────────────────────────────
