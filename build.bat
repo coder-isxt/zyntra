@@ -71,13 +71,9 @@ git tag -a "v%VERSION%" -m "v%VERSION%"
 git push origin main
 git push origin "v%VERSION%"
 
-:: ── Create GitHub Release with exe attached ──────────────
-echo.
-echo Creating GitHub Release v%VERSION% with Zyntra.exe...
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File release.ps1 -Version "%VERSION%"
-
 echo.
 echo ========================================
 echo   Released v%VERSION% to GitHub!
+echo   GitHub Actions will create the release.
 echo ========================================
 echo.
