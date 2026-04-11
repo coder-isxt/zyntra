@@ -30,18 +30,21 @@ if (Test-Path $changelogPath) {
 # Create release
 Write-Host "Creating release $tag..."
 $releaseData = @{
-    tag_name = $tag
-    name     = $tag
-    body     = $body
-    draft    = $false
+    tag_name   = $tag
+    name       = $tag
+    body       = $body
+    draft      = $false
     prerelease = $false
-} | ConvertTo-Json
+} | ConvertTo-Json -Depth 10 -Compress
+$jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($releaseData)
 
 try {
     $release = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases" `
-        -Method Post -Headers $headers -Body $releaseData -ContentType "application/json"
+        -Method Post -Headers $headers -Body $jsonBytes -ContentType "application/json; charset=utf-8"
 } catch {
-    Write-Host "Failed to create release: $_" -ForegroundColor Red
+    $err = $_.ErrorDetails.Message
+    if (-not $err) { $err = $_.Exception.Message }
+    Write-Host "Failed to create release: $err" -ForegroundColor Red
     exit 1
 }
 
