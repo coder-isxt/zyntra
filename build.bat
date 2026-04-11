@@ -6,23 +6,28 @@ echo   Zyntra Build ^& Release Tool
 echo ========================================
 echo.
 
-:: Get latest version from git tags, default to 1.0.0
-set "LATEST=1.0.0"
-for /f "tokens=*" %%i in ('git describe --tags --abbrev^=0 2^>nul') do set "LATEST=%%i"
-set "LATEST=!LATEST:v=!"
-set "LATEST=!LATEST:V=!"
+:: ── Compute version (YY.M.patch) ────────────────────────
+:: Year and month from current date
+for /f "tokens=*" %%d in ('powershell.exe -NoProfile -Command "(Get-Date).ToString('yy')"') do set "YY=%%d"
+for /f "tokens=*" %%d in ('powershell.exe -NoProfile -Command "[int](Get-Date).Month"') do set "MM=%%d"
 
-:: Auto-increment patch version
-for /f "tokens=1,2,3 delims=." %%a in ("!LATEST!") do (
-    set /a PATCH=%%c+1
-    set "VERSION=%%a.%%b.!PATCH!"
+:: Find latest tag matching this year.month prefix, auto-increment patch
+set "PREFIX=%YY%.%MM%"
+set "PATCH=0"
+for /f "tokens=*" %%i in ('git tag -l "v%PREFIX%.*" --sort^=-v:refname 2^>nul') do (
+    if "!PATCH!"=="0" (
+        set "TAG=%%i"
+        set "TAG=!TAG:v=!"
+        for /f "tokens=3 delims=." %%p in ("!TAG!") do set /a PATCH=%%p
+    )
 )
+set /a PATCH=%PATCH%+1
+set "VERSION=%PREFIX%.%PATCH%"
 
-echo Latest version: v%LATEST%
-echo New version:    v%VERSION%
+echo New version: v%VERSION%
 echo.
 
-:: Show changelog
+:: ── Changelog ────────────────────────────────────────────
 echo Current CHANGELOG.txt:
 echo ----------------------------------------
 type CHANGELOG.txt
@@ -31,22 +36,20 @@ echo.
 echo Edit CHANGELOG.txt now if needed, then press any key to continue...
 pause >nul
 
-:: Update version in .csproj (single source of truth — assembly version is read at runtime)
+:: ── Update .csproj version ───────────────────────────────
 echo.
 echo Updating version to %VERSION% in Zyntra.csproj...
 powershell.exe -NoProfile -Command "$f = 'Zyntra\Zyntra.csproj'; $c = [System.IO.File]::ReadAllText($f); $c = $c -replace '<Version>[^<]*</Version>', '<Version>%VERSION%</Version>'; $c = $c -replace '<AssemblyVersion>[^<]*</AssemblyVersion>', '<AssemblyVersion>%VERSION%.0</AssemblyVersion>'; $c = $c -replace '<FileVersion>[^<]*</FileVersion>', '<FileVersion>%VERSION%.0</FileVersion>'; [System.IO.File]::WriteAllText($f, $c)"
 
-:: Kill running Zyntra if any
+:: ── Kill running Zyntra ──────────────────────────────────
 taskkill /f /im Zyntra.exe >nul 2>&1
 timeout /t 2 /nobreak >nul
 
-:: Clean old build output
-if exist build\Zyntra.exe del /f /q build\Zyntra.exe >nul 2>&1
+:: ── Clean + Build ────────────────────────────────────────
 if exist build rmdir /s /q build >nul 2>&1
 
-:: Build
 echo.
-echo Building Zyntra (Release, single-file)...
+echo Building Zyntra v%VERSION% (Release, single-file)...
 dotnet publish Zyntra\Zyntra.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:PublishTrimmed=false -o build
 
 if %ERRORLEVEL% NEQ 0 (
@@ -60,7 +63,7 @@ echo.
 echo Build successful! Output: build\Zyntra.exe
 echo.
 
-:: Git commit, tag, and push
+:: ── Git commit, tag, push ────────────────────────────────
 echo Committing and pushing to GitHub...
 git add -A
 git commit -m "Release v%VERSION%"
@@ -68,9 +71,13 @@ git tag -a "v%VERSION%" -m "v%VERSION%"
 git push origin main
 git push origin "v%VERSION%"
 
+:: ── Create GitHub Release with exe attached ──────────────
+echo.
+echo Creating GitHub Release v%VERSION% with Zyntra.exe...
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File release.ps1 -Version "%VERSION%"
+
 echo.
 echo ========================================
 echo   Released v%VERSION% to GitHub!
-echo   GitHub Actions will build the release.
 echo ========================================
 echo.
