@@ -37,6 +37,7 @@ Or use `build.bat` to build, tag, and push a release automatically.
 
 ## Changelog
 
+- Removed Dashboard page — app opens directly to Roblox Accounts
 - Migrated scripting engine to Lua (MoonSharp) — removed PowerShell, Batch, Python support
 - Redesigned Docs tab with horizontal tabs, feature cards, and numbered steps
 - Apps now launch with working directory set to the exe's folder

@@ -13,7 +13,7 @@ public class MainViewModel : BaseViewModel
         set => SetProperty(ref _currentPage, value);
     }
 
-    private string _currentPageName = "Dashboard";
+    private string _currentPageName = "Roblox Accounts";
     public string CurrentPageName
     {
         get => _currentPageName;
@@ -36,7 +36,6 @@ public class MainViewModel : BaseViewModel
 
     public ObservableCollection<NotificationItem> Notifications => NotificationService.Notifications;
 
-    public DashboardViewModel DashboardVM { get; }
     public AppsViewModel AppsVM { get; }
     public RobloxAccountsViewModel RobloxVM { get; }
     public PluginsViewModel PluginsVM { get; }
@@ -51,17 +50,15 @@ public class MainViewModel : BaseViewModel
 
     public MainViewModel()
     {
-        DashboardVM = new DashboardViewModel();
         AppsVM = new AppsViewModel();
         RobloxVM = new RobloxAccountsViewModel();
         PluginsVM = new PluginsViewModel();
         ScriptsVM = new ScriptsViewModel();
         DocsVM = new DocsViewModel();
         SettingsVM = new SettingsViewModel();
-        _currentPage = DashboardVM;
+        _currentPage = RobloxVM;
 
         NavigateCommand = new RelayCommand(Navigate);
-        DashboardVM.NavigateCommand = NavigateCommand;
 
         ToggleNotificationsCommand = new RelayCommand(_ =>
         {
@@ -91,16 +88,11 @@ public class MainViewModel : BaseViewModel
 
     private void Navigate(object? param)
     {
-        string page = param as string ?? "Dashboard";
+        string page = param as string ?? "Roblox";
         NotificationPanelOpen = false;
 
         switch (page)
         {
-            case "Dashboard":
-                DashboardVM.Refresh();
-                CurrentPage = DashboardVM;
-                CurrentPageName = "Dashboard";
-                break;
             case "Apps":
                 CurrentPage = AppsVM;
                 CurrentPageName = "Apps";

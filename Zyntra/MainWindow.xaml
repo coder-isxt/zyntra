@@ -89,14 +89,6 @@
                                        Foreground="{StaticResource SubTextBrush}"
                                        Margin="18,8,0,8" Opacity="0.6" />
 
-                            <Button x:Name="BtnDashboard" Content="◆  Dashboard"
-                                    Command="{Binding NavigateCommand}" CommandParameter="Dashboard"
-                                    Click="SidebarNav_Click" Tag="Dashboard">
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarActiveButtonStyle}" />
-                                </Button.Style>
-                            </Button>
-
                             <Button x:Name="BtnApps" Content="⊞  Applications"
                                     Command="{Binding NavigateCommand}" CommandParameter="Apps"
                                     Click="SidebarNav_Click" Tag="Apps">
@@ -109,7 +101,7 @@
                                     Command="{Binding NavigateCommand}" CommandParameter="Roblox"
                                     Click="SidebarNav_Click" Tag="Roblox">
                                 <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarActiveButtonStyle}" />
                                 </Button.Style>
                             </Button>
 
@@ -168,9 +160,6 @@
                     <Border Background="{StaticResource PanelBrush}">
                         <ContentControl x:Name="PageHost" Content="{Binding CurrentPage}">
                             <ContentControl.Resources>
-                                <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
-                                    <views:DashboardView />
-                                </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:AppsViewModel}">
                                     <views:AppsView />
                                 </DataTemplate>
