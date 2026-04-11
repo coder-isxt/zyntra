@@ -60,6 +60,25 @@
                     </Grid>
                 </Border>
 
+                <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Default page" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextBrush}" />
+                            <TextBlock Text="Page shown when Zyntra starts" FontSize="11"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" VerticalAlignment="Center" Width="140"
+                                  Style="{StaticResource DarkComboBoxStyle}"
+                                  ItemsSource="{x:Static vm:SettingsViewModel.PageOptions}"
+                                  SelectedItem="{Binding DefaultPage}" />
+                    </Grid>
+                </Border>
+
                 <!-- Appearance Section -->
                 <TextBlock Text="APPEARANCE" FontSize="11" FontWeight="Bold"
                            Foreground="{StaticResource SubTextBrush}" Opacity="0.6" Margin="0,20,0,10" />
@@ -71,6 +90,99 @@
                         <TextBlock Text="Choose the accent color used throughout the app" FontSize="11"
                                    Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,10" />
                         <WrapPanel x:Name="AccentPanel" />
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Disable animations" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextBrush}" />
+                            <TextBlock Text="Turn off page transition animations" FontSize="11"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" VerticalAlignment="Center"
+                                 Style="{StaticResource ToggleSwitchStyle}"
+                                 IsChecked="{Binding DisableAnimations}" />
+                    </Grid>
+                </Border>
+
+                <!-- Accounts Section -->
+                <TextBlock Text="ACCOUNTS" FontSize="11" FontWeight="Bold"
+                           Foreground="{StaticResource SubTextBrush}" Opacity="0.6" Margin="0,20,0,10" />
+
+                <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Auto-refresh cookies" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextBrush}" />
+                            <TextBlock Text="Validate all account cookies when Zyntra starts" FontSize="11"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" VerticalAlignment="Center"
+                                 Style="{StaticResource ToggleSwitchStyle}"
+                                 IsChecked="{Binding AutoRefreshCookies}" />
+                    </Grid>
+                </Border>
+
+                <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Default tag for new accounts" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextBrush}" />
+                            <TextBlock Text="Automatically assign this tag when adding accounts" FontSize="11"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <TextBox Grid.Column="1" Width="140" VerticalAlignment="Center"
+                                 Style="{StaticResource DarkTextBoxStyle}" Tag="e.g. alt"
+                                 Text="{Binding DefaultTag, UpdateSourceTrigger=LostFocus}" />
+                    </Grid>
+                </Border>
+
+                <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Hide invalid accounts" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextBrush}" />
+                            <TextBlock Text="Hide accounts with expired cookies from the list" FontSize="11"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" VerticalAlignment="Center"
+                                 Style="{StaticResource ToggleSwitchStyle}"
+                                 IsChecked="{Binding HideInvalidAccounts}" />
+                    </Grid>
+                </Border>
+
+                <!-- Scripting Section -->
+                <TextBlock Text="SCRIPTING" FontSize="11" FontWeight="Bold"
+                           Foreground="{StaticResource SubTextBrush}" Opacity="0.6" Margin="0,20,0,10" />
+
+                <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
+                    <StackPanel>
+                        <TextBlock Text="Default script template" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}" />
+                        <TextBlock Text="Content used when creating a new script" FontSize="11"
+                                   Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,8" />
+                        <TextBox Style="{StaticResource DarkTextBoxStyle}" Tag="Lua template"
+                                 Height="100" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                                 FontFamily="Consolas" FontSize="12"
+                                 Text="{Binding DefaultScriptTemplate, UpdateSourceTrigger=LostFocus}" />
                     </StackPanel>
                 </Border>
 
@@ -101,9 +213,45 @@
                     </Grid>
                 </Border>
 
+                <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Clear recently played" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextBrush}" />
+                            <TextBlock Text="Wipe all recently played game history" FontSize="11"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="Clear" Padding="14,7"
+                                Style="{StaticResource DangerButtonStyle}" VerticalAlignment="Center"
+                                Command="{Binding ClearRecentlyPlayedCommand}" />
+                    </Grid>
+                </Border>
+
                 <!-- Updates Section -->
                 <TextBlock Text="UPDATES" FontSize="11" FontWeight="Bold"
                            Foreground="{StaticResource SubTextBrush}" Opacity="0.6" Margin="0,20,0,10" />
+
+                <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Check on startup" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextBrush}" />
+                            <TextBlock Text="Automatically check for updates when Zyntra starts" FontSize="11"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" VerticalAlignment="Center"
+                                 Style="{StaticResource ToggleSwitchStyle}"
+                                 IsChecked="{Binding CheckForUpdatesOnStartup}" />
+                    </Grid>
+                </Border>
 
                 <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
                     <Grid>

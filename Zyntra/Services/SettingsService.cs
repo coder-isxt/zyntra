@@ -9,6 +9,13 @@ public class AppSettings
     public bool LaunchOnStartup { get; set; }
     public bool MinimizeToTray { get; set; }
     public string AccentColorHex { get; set; } = "#FF709BFF";
+    public string DefaultPage { get; set; } = "Roblox";
+    public bool DisableAnimations { get; set; }
+    public bool AutoRefreshCookies { get; set; }
+    public string DefaultTag { get; set; } = string.Empty;
+    public bool HideInvalidAccounts { get; set; }
+    public string DefaultScriptTemplate { get; set; } = "-- Your script here\nzyntra.log(\"Hello from Zyntra!\")\n\nfor _, acc in ipairs(zyntra.get_accounts()) do\n    zyntra.log(acc.DisplayName)\nend";
+    public bool CheckForUpdatesOnStartup { get; set; } = true;
 }
 
 public static class SettingsService

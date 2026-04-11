@@ -89,8 +89,13 @@ public class RobloxAccountsViewModel : BaseViewModel
     {
         FilteredAccounts.Clear();
         var source = _selectedTag == "All"
-            ? Accounts
+            ? Accounts.AsEnumerable()
             : Accounts.Where(a => a.Tag == _selectedTag);
+
+        var settings = SettingsService.Load();
+        if (settings.HideInvalidAccounts)
+            source = source.Where(a => a.CookieValid != false);
+
         foreach (var acc in source)
             FilteredAccounts.Add(acc);
     }
@@ -180,6 +185,7 @@ public class RobloxAccountsViewModel : BaseViewModel
             }
             else
             {
+                var settings = SettingsService.Load();
                 var account = new RobloxAccount
                 {
                     UserId = userInfo.id,
@@ -188,6 +194,7 @@ public class RobloxAccountsViewModel : BaseViewModel
                     EncryptedCookie = CryptoService.Encrypt(cookie),
                     AvatarUrl = avatarUrl,
                     AddedAt = DateTime.UtcNow,
+                    Tag = settings.DefaultTag,
                 };
                 Accounts.Add(account);
                 StatusText = $"Added account: {userInfo.name}";

@@ -20,14 +20,54 @@ public partial class MainWindow : Window
         InitializeTrayIcon();
         VersionText.Text = $"Zyntra v{UpdateService.CurrentVersion}";
 
-        // Animate page transitions
         if (DataContext is MainViewModel vm)
         {
+            // Animate page transitions (unless disabled)
             vm.PropertyChanged += (_, e) =>
             {
-                if (e.PropertyName == nameof(MainViewModel.CurrentPage))
+                if (e.PropertyName == nameof(MainViewModel.CurrentPage) && !vm.SettingsVM.DisableAnimations)
                     AnimatePageTransition();
             };
+
+            // Highlight the correct sidebar button for the default page
+            Loaded += (_, _) =>
+            {
+                var tag = vm.SettingsVM.DefaultPage;
+                var activeStyle = (Style)FindResource("SidebarActiveButtonStyle");
+                var normalStyle = (Style)FindResource("SidebarButtonStyle");
+                BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
+                BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
+                BtnPlugins.Style = tag == "Plugins" ? activeStyle : normalStyle;
+                BtnScripts.Style = tag == "Scripts" ? activeStyle : normalStyle;
+                BtnDocs.Style = tag == "Docs" ? activeStyle : normalStyle;
+                BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;
+            };
+
+            // Check for updates on startup if enabled
+            if (vm.SettingsVM.CheckForUpdatesOnStartup)
+                _ = CheckForUpdateOnStartupAsync(vm);
+
+            // Auto-refresh cookies if enabled
+            if (vm.SettingsVM.AutoRefreshCookies)
+                vm.RobloxVM.CheckHealthCommand.Execute(null);
+        }
+    }
+
+    private async Task CheckForUpdateOnStartupAsync(MainViewModel vm)
+    {
+        await Task.Delay(2000); // Wait for UI to settle
+        var release = await UpdateService.CheckForUpdateAsync();
+        if (release != null)
+        {
+            string version = release.tag_name.TrimStart('v', 'V');
+            var result = MessageBox.Show(
+                $"A new version is available: v{version}\n\n{release.body}\n\nDownload and install now?",
+                "Zyntra Update", MessageBoxButton.YesNo, MessageBoxImage.Information);
+            if (result == MessageBoxResult.Yes)
+            {
+                var path = await UpdateService.DownloadUpdateAsync(release);
+                if (path != null) UpdateService.ApplyUpdate(path);
+            }
         }
     }
 

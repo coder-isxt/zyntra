@@ -103,11 +103,12 @@ public class ScriptsViewModel : BaseViewModel
 
     private void NewScript()
     {
+        var settings = SettingsService.Load();
         var script = new ScriptEntry
         {
             Name = "New Script",
             ScriptType = "Lua",
-            Content = "-- Your script here\nzyntra.log(\"Hello from Zyntra!\")\n\nfor _, acc in ipairs(zyntra.get_accounts()) do\n    zyntra.log(acc.DisplayName)\nend",
+            Content = settings.DefaultScriptTemplate,
         };
         Scripts.Add(script);
         SelectedScript = script;

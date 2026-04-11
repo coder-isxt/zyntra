@@ -16,6 +16,8 @@ public class SettingsViewModel : BaseViewModel
 {
     private readonly AppSettings _settings;
 
+    public static string[] PageOptions => new[] { "Roblox", "Apps", "Plugins", "Scripts", "Docs" };
+
     private bool _launchOnStartup;
     public bool LaunchOnStartup
     {
@@ -45,12 +47,111 @@ public class SettingsViewModel : BaseViewModel
         }
     }
 
+    private string _defaultPage;
+    public string DefaultPage
+    {
+        get => _defaultPage;
+        set
+        {
+            if (SetProperty(ref _defaultPage, value))
+            {
+                _settings.DefaultPage = value;
+                SettingsService.Save(_settings);
+            }
+        }
+    }
+
+    private bool _disableAnimations;
+    public bool DisableAnimations
+    {
+        get => _disableAnimations;
+        set
+        {
+            if (SetProperty(ref _disableAnimations, value))
+            {
+                _settings.DisableAnimations = value;
+                SettingsService.Save(_settings);
+            }
+        }
+    }
+
+    private bool _autoRefreshCookies;
+    public bool AutoRefreshCookies
+    {
+        get => _autoRefreshCookies;
+        set
+        {
+            if (SetProperty(ref _autoRefreshCookies, value))
+            {
+                _settings.AutoRefreshCookies = value;
+                SettingsService.Save(_settings);
+            }
+        }
+    }
+
+    private string _defaultTag;
+    public string DefaultTag
+    {
+        get => _defaultTag;
+        set
+        {
+            if (SetProperty(ref _defaultTag, value))
+            {
+                _settings.DefaultTag = value;
+                SettingsService.Save(_settings);
+            }
+        }
+    }
+
+    private bool _hideInvalidAccounts;
+    public bool HideInvalidAccounts
+    {
+        get => _hideInvalidAccounts;
+        set
+        {
+            if (SetProperty(ref _hideInvalidAccounts, value))
+            {
+                _settings.HideInvalidAccounts = value;
+                SettingsService.Save(_settings);
+            }
+        }
+    }
+
+    private string _defaultScriptTemplate;
+    public string DefaultScriptTemplate
+    {
+        get => _defaultScriptTemplate;
+        set
+        {
+            if (SetProperty(ref _defaultScriptTemplate, value))
+            {
+                _settings.DefaultScriptTemplate = value;
+                SettingsService.Save(_settings);
+            }
+        }
+    }
+
+    private bool _checkForUpdatesOnStartup;
+    public bool CheckForUpdatesOnStartup
+    {
+        get => _checkForUpdatesOnStartup;
+        set
+        {
+            if (SetProperty(ref _checkForUpdatesOnStartup, value))
+            {
+                _settings.CheckForUpdatesOnStartup = value;
+                SettingsService.Save(_settings);
+            }
+        }
+    }
+
     public ObservableCollection<AccentOption> AccentOptions { get; } = new();
 
     public ICommand SetAccentCommand { get; }
     public ICommand CheckUpdateCommand { get; }
     public ICommand ExportAccountsCommand { get; }
     public ICommand ImportAccountsCommand { get; }
+    public ICommand ClearRecentlyPlayedCommand { get; }
 
     private string _updateStatus = string.Empty;
     public string UpdateStatus
@@ -71,6 +172,13 @@ public class SettingsViewModel : BaseViewModel
         _settings = SettingsService.Load();
         _launchOnStartup = _settings.LaunchOnStartup;
         _minimizeToTray = _settings.MinimizeToTray;
+        _defaultPage = _settings.DefaultPage;
+        _disableAnimations = _settings.DisableAnimations;
+        _autoRefreshCookies = _settings.AutoRefreshCookies;
+        _defaultTag = _settings.DefaultTag;
+        _hideInvalidAccounts = _settings.HideInvalidAccounts;
+        _defaultScriptTemplate = _settings.DefaultScriptTemplate;
+        _checkForUpdatesOnStartup = _settings.CheckForUpdatesOnStartup;
 
         foreach (var (name, hex) in ThemeService.AccentPresets)
         {
@@ -86,8 +194,15 @@ public class SettingsViewModel : BaseViewModel
         CheckUpdateCommand = new RelayCommand(async _ => await CheckForUpdateAsync());
         ExportAccountsCommand = new RelayCommand(_ => ExportAccounts());
         ImportAccountsCommand = new RelayCommand(_ => ImportAccounts());
+        ClearRecentlyPlayedCommand = new RelayCommand(_ => ClearRecentlyPlayed());
 
         ThemeService.ApplyAccentColor(_settings.AccentColorHex);
+    }
+
+    private void ClearRecentlyPlayed()
+    {
+        RecentlyPlayedService.Clear();
+        NotificationService.Push("Recently Played", "History cleared.", NotificationType.Success);
     }
 
     private void SetAccent(object? param)

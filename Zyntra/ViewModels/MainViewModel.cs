@@ -56,9 +56,10 @@ public class MainViewModel : BaseViewModel
         ScriptsVM = new ScriptsViewModel();
         DocsVM = new DocsViewModel();
         SettingsVM = new SettingsViewModel();
-        _currentPage = RobloxVM;
 
+        // Navigate to the saved default page
         NavigateCommand = new RelayCommand(Navigate);
+        Navigate(SettingsVM.DefaultPage);
 
         ToggleNotificationsCommand = new RelayCommand(_ =>
         {
