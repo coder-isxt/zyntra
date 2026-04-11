@@ -31,10 +31,10 @@ echo.
 echo Edit CHANGELOG.txt now if needed, then press any key to continue...
 pause >nul
 
-:: Update version in UpdateService.cs using powershell.exe full path
+:: Update version in .csproj (single source of truth — assembly version is read at runtime)
 echo.
-echo Updating version to %VERSION% in source...
-powershell.exe -NoProfile -Command "$f = 'Zyntra\Services\UpdateService.cs'; $c = [System.IO.File]::ReadAllText($f); $c = $c -replace 'CurrentVersion = \"[^\"]*\"', 'CurrentVersion = \"%VERSION%\"'; [System.IO.File]::WriteAllText($f, $c)"
+echo Updating version to %VERSION% in Zyntra.csproj...
+powershell.exe -NoProfile -Command "$f = 'Zyntra\Zyntra.csproj'; $c = [System.IO.File]::ReadAllText($f); $c = $c -replace '<Version>[^<]*</Version>', '<Version>%VERSION%</Version>'; $c = $c -replace '<AssemblyVersion>[^<]*</AssemblyVersion>', '<AssemblyVersion>%VERSION%.0</AssemblyVersion>'; $c = $c -replace '<FileVersion>[^<]*</FileVersion>', '<FileVersion>%VERSION%.0</FileVersion>'; [System.IO.File]::WriteAllText($f, $c)"
 
 :: Kill running Zyntra if any
 taskkill /f /im Zyntra.exe >nul 2>&1

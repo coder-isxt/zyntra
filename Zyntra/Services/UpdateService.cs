@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using System.Text.Json;
 
 namespace Zyntra.Services;
@@ -22,7 +23,8 @@ public class GitHubAsset
 
 public static class UpdateService
 {
-    public const string CurrentVersion = "1.0.7";
+    public static string CurrentVersion { get; } =
+        Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0";
     public const string GitHubRepo = "coder-isxt/zyntra";
 
     private static readonly HttpClient _http = new()
