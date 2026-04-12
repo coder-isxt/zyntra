@@ -91,38 +91,40 @@
 
                             <Button x:Name="BtnApps"
                                     Command="{Binding NavigateCommand}" CommandParameter="Apps"
-                                    Click="SidebarNav_Click" Tag="Apps">
+                                    Click="SidebarNav_Click" Tag="Apps"
+                                    HorizontalContentAlignment="Stretch">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
                                 </Button.Style>
-                                <Grid>
-                                    <TextBlock Text="⊞  Applications" HorizontalAlignment="Left" />
-                                    <Border CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
-                                            Padding="6,1" HorizontalAlignment="Right" MinWidth="20"
+                                <DockPanel>
+                                    <Border DockPanel.Dock="Right" CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
+                                            Padding="5,1" MinWidth="18" Margin="6,0,0,0"
                                             Visibility="{Binding DataContext.ShowSidebarBadges, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisConverter}}">
                                         <TextBlock Text="{Binding DataContext.AppCount, RelativeSource={RelativeSource AncestorType=Window}}"
                                                    FontSize="10" Foreground="{StaticResource SubTextBrush}"
                                                    HorizontalAlignment="Center" />
                                     </Border>
-                                </Grid>
+                                    <TextBlock Text="⊞  Apps" TextTrimming="CharacterEllipsis" />
+                                </DockPanel>
                             </Button>
 
                             <Button x:Name="BtnRoblox"
                                     Command="{Binding NavigateCommand}" CommandParameter="Roblox"
-                                    Click="SidebarNav_Click" Tag="Roblox">
+                                    Click="SidebarNav_Click" Tag="Roblox"
+                                    HorizontalContentAlignment="Stretch">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource SidebarActiveButtonStyle}" />
                                 </Button.Style>
-                                <Grid>
-                                    <TextBlock Text="◉  Roblox Accounts" HorizontalAlignment="Left" />
-                                    <Border CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
-                                            Padding="6,1" HorizontalAlignment="Right" MinWidth="20"
+                                <DockPanel>
+                                    <Border DockPanel.Dock="Right" CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
+                                            Padding="5,1" MinWidth="18" Margin="6,0,0,0"
                                             Visibility="{Binding DataContext.ShowSidebarBadges, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisConverter}}">
                                         <TextBlock Text="{Binding DataContext.AccountCount, RelativeSource={RelativeSource AncestorType=Window}}"
                                                    FontSize="10" Foreground="{StaticResource SubTextBrush}"
                                                    HorizontalAlignment="Center" />
                                     </Border>
-                                </Grid>
+                                    <TextBlock Text="◉  Accounts" TextTrimming="CharacterEllipsis" />
+                                </DockPanel>
                             </Button>
 
                             <TextBlock Text="TOOLS" FontSize="10" FontWeight="Bold"
@@ -131,38 +133,40 @@
 
                             <Button x:Name="BtnPlugins"
                                     Command="{Binding NavigateCommand}" CommandParameter="Plugins"
-                                    Click="SidebarNav_Click" Tag="Plugins">
+                                    Click="SidebarNav_Click" Tag="Plugins"
+                                    HorizontalContentAlignment="Stretch">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
                                 </Button.Style>
-                                <Grid>
-                                    <TextBlock Text="⧉  Plugins" HorizontalAlignment="Left" />
-                                    <Border CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
-                                            Padding="6,1" HorizontalAlignment="Right" MinWidth="20"
+                                <DockPanel>
+                                    <Border DockPanel.Dock="Right" CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
+                                            Padding="5,1" MinWidth="18" Margin="6,0,0,0"
                                             Visibility="{Binding DataContext.ShowSidebarBadges, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisConverter}}">
                                         <TextBlock Text="{Binding DataContext.PluginCount, RelativeSource={RelativeSource AncestorType=Window}}"
                                                    FontSize="10" Foreground="{StaticResource SubTextBrush}"
                                                    HorizontalAlignment="Center" />
                                     </Border>
-                                </Grid>
+                                    <TextBlock Text="⧉  Plugins" TextTrimming="CharacterEllipsis" />
+                                </DockPanel>
                             </Button>
 
                             <Button x:Name="BtnScripts"
                                     Command="{Binding NavigateCommand}" CommandParameter="Scripts"
-                                    Click="SidebarNav_Click" Tag="Scripts">
+                                    Click="SidebarNav_Click" Tag="Scripts"
+                                    HorizontalContentAlignment="Stretch">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
                                 </Button.Style>
-                                <Grid>
-                                    <TextBlock Text="⟐  Scripts" HorizontalAlignment="Left" />
-                                    <Border CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
-                                            Padding="6,1" HorizontalAlignment="Right" MinWidth="20"
+                                <DockPanel>
+                                    <Border DockPanel.Dock="Right" CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
+                                            Padding="5,1" MinWidth="18" Margin="6,0,0,0"
                                             Visibility="{Binding DataContext.ShowSidebarBadges, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisConverter}}">
                                         <TextBlock Text="{Binding DataContext.ScriptCount, RelativeSource={RelativeSource AncestorType=Window}}"
                                                    FontSize="10" Foreground="{StaticResource SubTextBrush}"
                                                    HorizontalAlignment="Center" />
                                     </Border>
-                                </Grid>
+                                    <TextBlock Text="⟐  Scripts" TextTrimming="CharacterEllipsis" />
+                                </DockPanel>
                             </Button>
 
                             <Button x:Name="BtnDocs" Content="📄  API Docs"

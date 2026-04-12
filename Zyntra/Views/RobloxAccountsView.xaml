@@ -91,10 +91,8 @@
                  HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
-                            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
-                            Padding="14,10" Margin="0,2">
-                        <Border.ContextMenu>
+                    <Grid Margin="0,1">
+                        <Grid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Launch"
                                           Command="{Binding DataContext.LaunchRobloxCommand, Source={x:Reference AccountListRef}}"
@@ -113,94 +111,92 @@
                                           Command="{Binding DataContext.RemoveAccountCommand, Source={x:Reference AccountListRef}}"
                                           CommandParameter="{Binding}" />
                             </ContextMenu>
-                        </Border.ContextMenu>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="48" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                        </Grid.ContextMenu>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="44" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                            <!-- Avatar with health dot -->
-                            <Grid Grid.Column="0" Width="40" Height="40" VerticalAlignment="Center">
-                                <Border Width="40" Height="40" CornerRadius="20"
-                                        Background="{StaticResource AccentBrush}">
-                                    <TextBlock Text="{Binding DisplayName[0]}" FontSize="17" FontWeight="Bold"
-                                               Foreground="#FF0D1117"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                </Border>
-                                <Border Width="40" Height="40" CornerRadius="20"
-                                        Visibility="{Binding AvatarUrl, Converter={StaticResource NonEmptyToVisConverter}}">
-                                    <Border.Background>
-                                        <ImageBrush ImageSource="{Binding AvatarUrl}" Stretch="UniformToFill" />
-                                    </Border.Background>
-                                </Border>
-                                <Ellipse Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                         Stroke="#FF171A22" StrokeThickness="2">
-                                    <Ellipse.Style>
-                                        <Style TargetType="Ellipse">
-                                            <Setter Property="Fill" Value="#FF6B6B6B" />
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding CookieValid}" Value="True">
-                                                    <Setter Property="Fill" Value="#FF6BCB77" />
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding CookieValid}" Value="False">
-                                                    <Setter Property="Fill" Value="#FFFF6B6B" />
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Ellipse.Style>
-                                </Ellipse>
-                            </Grid>
-
-                            <!-- Account Info -->
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding DisplayName}" FontSize="14" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextBrush}" />
-                                    <Border CornerRadius="4" Padding="6,1" Margin="8,0,0,0"
-                                            Background="{StaticResource ControlHoverBrush}"
-                                            Visibility="{Binding Tag, Converter={StaticResource NonEmptyToVisConverter}}">
-                                        <TextBlock Text="{Binding Tag}" FontSize="10"
-                                                   Foreground="{StaticResource AccentBrush}" />
-                                    </Border>
-                                </StackPanel>
-                                <TextBlock FontSize="11.5" Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0">
-                                    <Run Text="@" /><Run Text="{Binding Username, Mode=OneWay}" />
-                                    <Run Text=" · " /><Run Text="{Binding UserId, Mode=OneWay}" />
-                                </TextBlock>
-                                <!-- Notes preview -->
-                                <TextBlock Text="{Binding Notes}" FontSize="10.5" FontStyle="Italic"
-                                           Foreground="{StaticResource SubTextBrush}" Opacity="0.6"
-                                           Margin="0,2,0,0" TextTrimming="CharacterEllipsis" MaxWidth="400"
-                                           HorizontalAlignment="Left"
-                                           Visibility="{Binding Notes, Converter={StaticResource NonEmptyToVisConverter}}" />
-                            </StackPanel>
-
-                            <!-- Action buttons -->
-                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                <Button Content="▶ Launch" Padding="14,7"
-                                        Style="{StaticResource AccentButtonStyle}"
-                                        Command="{Binding DataContext.LaunchRobloxCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                        CommandParameter="{Binding}" Margin="0,0,4,0" />
-                                <Button Content="🏷" FontSize="14" Padding="8,5"
-                                        Style="{StaticResource ControlButtonStyle}" ToolTip="Set tag"
-                                        Command="{Binding DataContext.SetTagCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                        CommandParameter="{Binding}" Margin="0,0,4,0" />
-                                <Button Content="↻" FontSize="16" Padding="8,5"
-                                        Style="{StaticResource ControlButtonStyle}" ToolTip="Refresh"
-                                        Command="{Binding DataContext.RefreshAccountCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                        CommandParameter="{Binding}" Margin="0,0,4,0" />
-                                <Button Content="✕" FontSize="14" Padding="8,5"
-                                        Style="{StaticResource DangerButtonStyle}" ToolTip="Remove"
-                                        Command="{Binding DataContext.RemoveAccountCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                        CommandParameter="{Binding}" />
-                            </StackPanel>
+                        <!-- Avatar with health dot -->
+                        <Grid Grid.Column="0" Width="36" Height="36" VerticalAlignment="Center">
+                            <Border Width="36" Height="36" CornerRadius="18"
+                                    Background="{StaticResource AccentBrush}">
+                                <TextBlock Text="{Binding DisplayName, Converter={StaticResource FirstCharConverter}}"
+                                           FontSize="16" FontWeight="Bold" Foreground="#FF0D1117"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <Border Width="36" Height="36" CornerRadius="18"
+                                    Visibility="{Binding AvatarUrl, Converter={StaticResource NonEmptyToVisConverter}}">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{Binding AvatarUrl}" Stretch="UniformToFill" />
+                                </Border.Background>
+                            </Border>
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                     Stroke="{StaticResource MainBrush}" StrokeThickness="2">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="#FF6B6B6B" />
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding CookieValid}" Value="True">
+                                                <Setter Property="Fill" Value="#FF6BCB77" />
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding CookieValid}" Value="False">
+                                                <Setter Property="Fill" Value="#FFFF6B6B" />
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
                         </Grid>
-                    </Border>
+
+                        <!-- Account Info -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding DisplayName}" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextBrush}" />
+                                <Border CornerRadius="4" Padding="6,1" Margin="8,0,0,0"
+                                        Background="{StaticResource ControlHoverBrush}"
+                                        Visibility="{Binding Tag, Converter={StaticResource NonEmptyToVisConverter}}">
+                                    <TextBlock Text="{Binding Tag}" FontSize="10"
+                                               Foreground="{StaticResource AccentBrush}" />
+                                </Border>
+                            </StackPanel>
+                            <TextBlock FontSize="12" Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0">
+                                <Run Text="@" /><Run Text="{Binding Username, Mode=OneWay}" />
+                                <Run Text=" · ID: " /><Run Text="{Binding UserId, Mode=OneWay}" />
+                            </TextBlock>
+                            <!-- Notes preview -->
+                            <TextBlock Text="{Binding Notes}" FontSize="10.5" FontStyle="Italic"
+                                       Foreground="{StaticResource SubTextBrush}" Opacity="0.6"
+                                       Margin="0,2,0,0" TextTrimming="CharacterEllipsis" MaxWidth="400"
+                                       HorizontalAlignment="Left"
+                                       Visibility="{Binding Notes, Converter={StaticResource NonEmptyToVisConverter}}" />
+                        </StackPanel>
+
+                        <!-- Action buttons -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="▶ Launch" Padding="14,7"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Command="{Binding DataContext.LaunchRobloxCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}" Margin="0,0,4,0" />
+                            <Button Content="🏷" FontSize="14" Padding="8,5"
+                                    Style="{StaticResource ControlButtonStyle}" ToolTip="Set tag"
+                                    Command="{Binding DataContext.SetTagCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}" Margin="0,0,4,0" />
+                            <Button Content="↻" FontSize="16" Padding="8,5"
+                                    Style="{StaticResource ControlButtonStyle}" ToolTip="Refresh"
+                                    Command="{Binding DataContext.RefreshAccountCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}" Margin="0,0,4,0" />
+                            <Button Content="✕" FontSize="14" Padding="8,5"
+                                    Style="{StaticResource DangerButtonStyle}" ToolTip="Remove"
+                                    Command="{Binding DataContext.RemoveAccountCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}" />
+                        </StackPanel>
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

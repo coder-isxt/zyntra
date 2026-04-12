@@ -46,7 +46,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bd" Background="{TemplateBinding Background}"
                             CornerRadius="6" Margin="6,2" Padding="{TemplateBinding Padding}">
-                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        <ContentPresenter HorizontalAlignment="Stretch"
                                           VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -80,7 +80,7 @@
                             </Grid.ColumnDefinitions>
                             <Border Grid.Column="0" Background="{StaticResource AccentBrush}"
                                     CornerRadius="2" Width="3" VerticalAlignment="Stretch" Margin="0,2" />
-                            <ContentPresenter Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                            <ContentPresenter Grid.Column="2" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
                         </Grid>
                     </Border>
                 </ControlTemplate>
