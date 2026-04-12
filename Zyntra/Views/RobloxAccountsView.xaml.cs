@@ -12,6 +12,30 @@ public partial class RobloxAccountsView : UserControl
         InitializeComponent();
     }
 
+    private void OnContextLaunch(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc && DataContext is RobloxAccountsViewModel vm)
+            vm.LaunchRobloxCommand.Execute(acc);
+    }
+
+    private void OnContextSetTag(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc && DataContext is RobloxAccountsViewModel vm)
+            vm.SetTagCommand.Execute(acc);
+    }
+
+    private void OnContextRefresh(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc && DataContext is RobloxAccountsViewModel vm)
+            vm.RefreshAccountCommand.Execute(acc);
+    }
+
+    private void OnContextRemove(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc && DataContext is RobloxAccountsViewModel vm)
+            vm.RemoveAccountCommand.Execute(acc);
+    }
+
     private void OnCopyUsername(object sender, RoutedEventArgs e)
     {
         if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc)

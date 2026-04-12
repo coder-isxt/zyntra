@@ -94,22 +94,14 @@
                     <Grid Margin="0,1">
                         <Grid.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="Launch"
-                                          Command="{Binding DataContext.LaunchRobloxCommand, Source={x:Reference AccountListRef}}"
-                                          CommandParameter="{Binding}" />
-                                <MenuItem Header="Set Tag"
-                                          Command="{Binding DataContext.SetTagCommand, Source={x:Reference AccountListRef}}"
-                                          CommandParameter="{Binding}" />
-                                <MenuItem Header="Refresh Info"
-                                          Command="{Binding DataContext.RefreshAccountCommand, Source={x:Reference AccountListRef}}"
-                                          CommandParameter="{Binding}" />
+                                <MenuItem Header="Launch" Click="OnContextLaunch" />
+                                <MenuItem Header="Set Tag" Click="OnContextSetTag" />
+                                <MenuItem Header="Refresh Info" Click="OnContextRefresh" />
                                 <Separator />
                                 <MenuItem Header="Copy Username" Click="OnCopyUsername" />
                                 <MenuItem Header="Copy User ID" Click="OnCopyUserId" />
                                 <Separator />
-                                <MenuItem Header="Remove Account"
-                                          Command="{Binding DataContext.RemoveAccountCommand, Source={x:Reference AccountListRef}}"
-                                          CommandParameter="{Binding}" />
+                                <MenuItem Header="Remove Account" Click="OnContextRemove" />
                             </ContextMenu>
                         </Grid.ContextMenu>
                         <Grid.ColumnDefinitions>
@@ -200,10 +192,6 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
-        <!-- Hidden element for x:Reference in ContextMenu bindings -->
-        <FrameworkElement x:Name="AccountListRef" Visibility="Collapsed"
-                          DataContext="{Binding}" Grid.Row="6" />
 
         <!-- Empty state -->
         <TextBlock Grid.Row="6" Text="No accounts added yet. Paste a .ROBLOSECURITY cookie above to add one."
