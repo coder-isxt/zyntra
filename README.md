@@ -36,6 +36,7 @@ Or use `build.bat` to build, tag, and push a release automatically.
 
 ## Changelog
 
+- Redesigned script editor with Lua syntax highlighting (keywords, strings, comments, numbers, builtins), unified scroll, and Tab key support
 - Added settings: default page, disable animations, auto-refresh cookies, default tag for new accounts, hide invalid accounts, default script template, clear recently played, check for updates on startup
 - Removed Dashboard page — app opens directly to the configured default page
 - Migrated scripting engine to Lua (MoonSharp) — removed PowerShell, Batch, Python

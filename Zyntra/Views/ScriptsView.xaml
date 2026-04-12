@@ -139,52 +139,63 @@
                                     BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,0,0,1"
                                     Padding="14,6">
                                 <Grid>
-                                    <TextBlock Text="Lua"
-                                               FontSize="10" FontWeight="SemiBold"
-                                               Foreground="{StaticResource SubTextBrush}" Opacity="0.6"
-                                               VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding EditorName}" FontSize="10"
-                                               Foreground="{StaticResource SubTextBrush}" Opacity="0.4"
-                                               HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Background="#30709BFF" CornerRadius="3" Padding="6,2" Margin="0,0,8,0">
+                                            <TextBlock Text="Lua" FontSize="10" FontWeight="Bold"
+                                                       Foreground="{StaticResource AccentBrush}" />
+                                        </Border>
+                                        <TextBlock Text="{Binding EditorName}" FontSize="10"
+                                                   Foreground="{StaticResource SubTextBrush}" Opacity="0.6"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
                                 </Grid>
                             </Border>
 
                             <!-- Line numbers + editor -->
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
+                            <ScrollViewer x:Name="EditorScrollViewer" Grid.Row="1"
+                                          HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Background="#FF0D1117">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
 
-                                <!-- Line numbers gutter -->
-                                <Border Grid.Column="0" Background="#FF0D1117"
-                                        BorderBrush="#FF1E2430" BorderThickness="0,0,1,0"
-                                        MinWidth="40">
-                                    <ScrollViewer x:Name="LineNumberScroll"
-                                                  VerticalScrollBarVisibility="Hidden"
-                                                  HorizontalScrollBarVisibility="Hidden"
-                                                  IsHitTestVisible="False">
-                                        <TextBlock x:Name="LineNumbers" FontFamily="Consolas" FontSize="13"
-                                                   Foreground="#FF484F5E" Padding="10,8,10,8"
-                                                   TextAlignment="Right" />
-                                    </ScrollViewer>
-                                </Border>
+                                    <!-- Line numbers gutter -->
+                                    <ItemsControl x:Name="LineNumbersPanel" Grid.Column="0"
+                                                  IsHitTestVisible="False" Margin="0,6,0,6">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" FontFamily="Consolas" FontSize="13"
+                                                           Foreground="#FF484F5E" Padding="12,0,10,0"
+                                                           TextAlignment="Right" MinWidth="36"
+                                                           Height="{Binding ElementName=CodeEditor, Path=(TextBlock.LineHeight)}" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
 
-                                <!-- Code text box -->
-                                <TextBox x:Name="CodeEditor" Grid.Column="1"
-                                         Text="{Binding EditorContent, UpdateSourceTrigger=PropertyChanged}"
-                                         Background="Transparent" Foreground="#FFC9D1D9"
-                                         CaretBrush="#FFC9D1D9" SelectionBrush="{StaticResource AccentBrush}"
-                                         BorderThickness="0" Padding="8,8,14,8"
-                                         FontFamily="Consolas" FontSize="13"
-                                         AcceptsReturn="True" AcceptsTab="True"
-                                         TextWrapping="NoWrap"
-                                         HorizontalScrollBarVisibility="Auto"
-                                         VerticalScrollBarVisibility="Auto"
-                                         VerticalContentAlignment="Top"
-                                         TextChanged="CodeEditor_TextChanged"
-                                         ScrollViewer.ScrollChanged="CodeEditor_ScrollChanged" />
-                            </Grid>
+                                    <!-- Code text box -->
+                                    <RichTextBox x:Name="CodeEditor" Grid.Column="1"
+                                                 Background="Transparent" Foreground="#FFC9D1D9"
+                                                 CaretBrush="#FFC9D1D9" SelectionBrush="{StaticResource AccentBrush}"
+                                                 BorderThickness="0" Padding="4,4,14,4"
+                                                 FontFamily="Consolas" FontSize="13"
+                                                 AcceptsReturn="True" AcceptsTab="True"
+                                                 HorizontalScrollBarVisibility="Disabled"
+                                                 VerticalScrollBarVisibility="Disabled"
+                                                 VerticalContentAlignment="Top"
+                                                 TextChanged="CodeEditor_TextChanged"
+                                                 PreviewKeyDown="CodeEditor_PreviewKeyDown">
+                                        <RichTextBox.Resources>
+                                            <Style TargetType="Paragraph">
+                                                <Setter Property="Margin" Value="0" />
+                                                <Setter Property="LineHeight" Value="20" />
+                                            </Style>
+                                        </RichTextBox.Resources>
+                                    </RichTextBox>
+                                </Grid>
+                            </ScrollViewer>
                         </Grid>
                     </Border>
 
