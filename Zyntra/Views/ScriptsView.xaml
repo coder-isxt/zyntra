@@ -170,29 +170,10 @@
                                     </ScrollViewer>
                                 </Border>
 
-                                <!-- Syntax highlight layer (read-only, behind) -->
-                                <ScrollViewer x:Name="HighlightScroll" Grid.Column="1"
-                                              VerticalScrollBarVisibility="Hidden"
-                                              HorizontalScrollBarVisibility="Hidden"
-                                              IsHitTestVisible="False">
-                                    <RichTextBox x:Name="HighlightLayer"
-                                                 Background="Transparent" BorderThickness="0"
-                                                 Padding="8,8,14,8" IsReadOnly="True" IsHitTestVisible="False"
-                                                 FontFamily="Consolas" FontSize="13"
-                                                 HorizontalScrollBarVisibility="Disabled"
-                                                 VerticalScrollBarVisibility="Disabled">
-                                        <RichTextBox.Resources>
-                                            <Style TargetType="Paragraph">
-                                                <Setter Property="Margin" Value="0" />
-                                            </Style>
-                                        </RichTextBox.Resources>
-                                    </RichTextBox>
-                                </ScrollViewer>
-
-                                <!-- Code text box (transparent text, on top) -->
+                                <!-- Code text box -->
                                 <TextBox x:Name="CodeEditor" Grid.Column="1"
                                          Text="{Binding EditorContent, UpdateSourceTrigger=PropertyChanged}"
-                                         Background="Transparent" Foreground="Transparent"
+                                         Background="Transparent" Foreground="#FFC9D1D9"
                                          CaretBrush="#FFC9D1D9" SelectionBrush="{StaticResource AccentBrush}"
                                          BorderThickness="0" Padding="8,8,14,8"
                                          FontFamily="Consolas" FontSize="13"

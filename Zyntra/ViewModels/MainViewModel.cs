@@ -6,7 +6,7 @@ namespace Zyntra.ViewModels;
 
 public class MainViewModel : BaseViewModel
 {
-    private BaseViewModel _currentPage;
+    private BaseViewModel _currentPage = null!;
     public BaseViewModel CurrentPage
     {
         get => _currentPage;
