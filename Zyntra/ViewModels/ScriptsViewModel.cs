@@ -22,6 +22,8 @@ public class ScriptsViewModel : BaseViewModel
                 OnPropertyChanged(nameof(EditorContent));
                 OnPropertyChanged(nameof(EditorType));
                 OnPropertyChanged(nameof(HasSelection));
+                OnPropertyChanged(nameof(SchedulerEnabled));
+                OnPropertyChanged(nameof(SchedulerInterval));
             }
         }
     }
@@ -45,6 +47,38 @@ public class ScriptsViewModel : BaseViewModel
     }
 
     public bool HasSelection => _selectedScript != null;
+
+    public bool SchedulerEnabled
+    {
+        get => _selectedScript?.SchedulerEnabled ?? false;
+        set
+        {
+            if (_selectedScript != null)
+            {
+                _selectedScript.SchedulerEnabled = value;
+                if (value && _selectedScript.NextScheduledRun == null)
+                    _selectedScript.NextScheduledRun = DateTime.UtcNow.AddMinutes(_selectedScript.SchedulerIntervalMinutes);
+                OnPropertyChanged();
+                SaveScripts();
+            }
+        }
+    }
+
+    public string SchedulerInterval
+    {
+        get => (_selectedScript?.SchedulerIntervalMinutes ?? 60).ToString();
+        set
+        {
+            if (_selectedScript != null && int.TryParse(value, out int mins) && mins > 0)
+            {
+                _selectedScript.SchedulerIntervalMinutes = mins;
+                if (_selectedScript.SchedulerEnabled)
+                    _selectedScript.NextScheduledRun = DateTime.UtcNow.AddMinutes(mins);
+                OnPropertyChanged();
+                SaveScripts();
+            }
+        }
+    }
 
     private string _output = string.Empty;
     public string Output
@@ -112,6 +146,21 @@ public class ScriptsViewModel : BaseViewModel
         };
         Scripts.Add(script);
         SelectedScript = script;
+        SaveScripts();
+    }
+
+    public void DuplicateScript(ScriptEntry source)
+    {
+        var copy = new ScriptEntry
+        {
+            Name = source.Name + " (copy)",
+            ScriptType = source.ScriptType,
+            Content = source.Content,
+            SchedulerEnabled = false,
+            SchedulerIntervalMinutes = source.SchedulerIntervalMinutes,
+        };
+        Scripts.Add(copy);
+        SelectedScript = copy;
         SaveScripts();
     }
 

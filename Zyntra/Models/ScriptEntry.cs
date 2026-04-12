@@ -9,6 +9,9 @@ public class ScriptEntry
     public string Content { get; set; } = string.Empty;
     public string? Hotkey { get; set; }
     public bool RunOnStartup { get; set; }
+    public bool SchedulerEnabled { get; set; }
+    public int SchedulerIntervalMinutes { get; set; } = 60;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? LastRunAt { get; set; }
+    public DateTime? NextScheduledRun { get; set; }
 }

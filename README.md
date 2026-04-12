@@ -36,8 +36,16 @@ Or use `build.bat` to build, tag, and push a release automatically.
 
 ## Changelog
 
-- Redesigned script editor with Lua syntax highlighting (keywords, strings, comments, numbers, builtins), unified scroll, and Tab key support
-- Added settings: default page, disable animations, auto-refresh cookies, default tag for new accounts, hide invalid accounts, default script template, clear recently played, check for updates on startup
+- **Favorite Games** — Save frequently played games and launch them with one click from the launch prompt; star button on recent games to add to favorites
+- **Script Scheduler** — Run scripts on a timer with configurable interval (minutes); enable/disable per script; auto-runs in background
+- **Account Notes** — Free-text notes field per account, shown as italic preview on account cards
+- **Account Card Redesign** — Rich bordered cards with larger avatars, health dots, tag badges, notes preview, and grouped action buttons
+- **Toast Notifications** — Slide-in toast popups (bottom-right) for events like script completion, errors, and scheduler runs; auto-dismiss after 4 seconds
+- **Sidebar Badges** — Count badges on Apps, Roblox, Plugins, and Scripts nav items; toggle on/off in Settings > Appearance
+- **Context Menus** — Right-click on accounts (launch, tag, refresh, copy username/ID, remove) and scripts (run, duplicate, delete)
+- Redesigned script editor with VS Code-like aesthetics (One Dark theme, Cascadia Code font, tab bar, language badge)
+- Custom dark scrollbar with rounded thumb and hover/drag states
+- Added settings: default page, disable animations, auto-refresh cookies, default tag for new accounts, hide invalid accounts, default script template, clear recently played, check for updates on startup, show sidebar badges
 - Removed Dashboard page — app opens directly to the configured default page
 - Migrated scripting engine to Lua (MoonSharp) — removed PowerShell, Batch, Python
 - Redesigned Docs tab with horizontal tabs, feature cards, and numbered steps

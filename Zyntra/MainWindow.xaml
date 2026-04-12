@@ -89,40 +89,80 @@
                                        Foreground="{StaticResource SubTextBrush}"
                                        Margin="18,8,0,8" Opacity="0.6" />
 
-                            <Button x:Name="BtnApps" Content="⊞  Applications"
+                            <Button x:Name="BtnApps"
                                     Command="{Binding NavigateCommand}" CommandParameter="Apps"
                                     Click="SidebarNav_Click" Tag="Apps">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
                                 </Button.Style>
+                                <Grid>
+                                    <TextBlock Text="⊞  Applications" HorizontalAlignment="Left" />
+                                    <Border CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
+                                            Padding="6,1" HorizontalAlignment="Right" MinWidth="20"
+                                            Visibility="{Binding DataContext.ShowSidebarBadges, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisConverter}}">
+                                        <TextBlock Text="{Binding DataContext.AppCount, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                   FontSize="10" Foreground="{StaticResource SubTextBrush}"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </Grid>
                             </Button>
 
-                            <Button x:Name="BtnRoblox" Content="◉  Roblox Accounts"
+                            <Button x:Name="BtnRoblox"
                                     Command="{Binding NavigateCommand}" CommandParameter="Roblox"
                                     Click="SidebarNav_Click" Tag="Roblox">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource SidebarActiveButtonStyle}" />
                                 </Button.Style>
+                                <Grid>
+                                    <TextBlock Text="◉  Roblox Accounts" HorizontalAlignment="Left" />
+                                    <Border CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
+                                            Padding="6,1" HorizontalAlignment="Right" MinWidth="20"
+                                            Visibility="{Binding DataContext.ShowSidebarBadges, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisConverter}}">
+                                        <TextBlock Text="{Binding DataContext.AccountCount, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                   FontSize="10" Foreground="{StaticResource SubTextBrush}"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </Grid>
                             </Button>
 
                             <TextBlock Text="TOOLS" FontSize="10" FontWeight="Bold"
                                        Foreground="{StaticResource SubTextBrush}"
                                        Margin="18,12,0,8" Opacity="0.6" />
 
-                            <Button x:Name="BtnPlugins" Content="⧉  Plugins"
+                            <Button x:Name="BtnPlugins"
                                     Command="{Binding NavigateCommand}" CommandParameter="Plugins"
                                     Click="SidebarNav_Click" Tag="Plugins">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
                                 </Button.Style>
+                                <Grid>
+                                    <TextBlock Text="⧉  Plugins" HorizontalAlignment="Left" />
+                                    <Border CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
+                                            Padding="6,1" HorizontalAlignment="Right" MinWidth="20"
+                                            Visibility="{Binding DataContext.ShowSidebarBadges, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisConverter}}">
+                                        <TextBlock Text="{Binding DataContext.PluginCount, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                   FontSize="10" Foreground="{StaticResource SubTextBrush}"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </Grid>
                             </Button>
 
-                            <Button x:Name="BtnScripts" Content="⟐  Scripts"
+                            <Button x:Name="BtnScripts"
                                     Command="{Binding NavigateCommand}" CommandParameter="Scripts"
                                     Click="SidebarNav_Click" Tag="Scripts">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
                                 </Button.Style>
+                                <Grid>
+                                    <TextBlock Text="⟐  Scripts" HorizontalAlignment="Left" />
+                                    <Border CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
+                                            Padding="6,1" HorizontalAlignment="Right" MinWidth="20"
+                                            Visibility="{Binding DataContext.ShowSidebarBadges, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisConverter}}">
+                                        <TextBlock Text="{Binding DataContext.ScriptCount, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                   FontSize="10" Foreground="{StaticResource SubTextBrush}"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </Grid>
                             </Button>
 
                             <Button x:Name="BtnDocs" Content="📄  API Docs"
@@ -181,6 +221,28 @@
                             </ContentControl.Resources>
                         </ContentControl>
                     </Border>
+
+                    <!-- Toast Notifications Overlay -->
+                    <ItemsControl ItemsSource="{Binding Toasts}"
+                                  HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                  Margin="0,0,14,14" IsHitTestVisible="False" Width="300">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
+                                        BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+                                        Padding="14,10" Margin="0,4,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Title}" FontSize="12" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextBrush}" />
+                                        <TextBlock Text="{Binding Message}" FontSize="11"
+                                                   Foreground="{StaticResource SubTextBrush}"
+                                                   TextWrapping="Wrap" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"
+                                                   MaxHeight="40" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
                     <!-- Notification Panel Overlay -->
                     <Border HorizontalAlignment="Right" VerticalAlignment="Top"

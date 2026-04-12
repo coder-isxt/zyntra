@@ -1,6 +1,8 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Zyntra.Models;
+using Zyntra.ViewModels;
 
 namespace Zyntra.Views;
 
@@ -10,6 +12,30 @@ public partial class ScriptsView : UserControl
     {
         InitializeComponent();
         UpdateLineNumbers("");
+    }
+
+    private void OnContextRunScript(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi && mi.DataContext is ScriptEntry script && DataContext is ScriptsViewModel vm)
+        {
+            vm.SelectedScript = script;
+            vm.RunScriptCommand.Execute(null);
+        }
+    }
+
+    private void OnContextDuplicateScript(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi && mi.DataContext is ScriptEntry script && DataContext is ScriptsViewModel vm)
+            vm.DuplicateScript(script);
+    }
+
+    private void OnContextDeleteScript(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi && mi.DataContext is ScriptEntry script && DataContext is ScriptsViewModel vm)
+        {
+            vm.SelectedScript = script;
+            vm.DeleteScriptCommand.Execute(null);
+        }
     }
 
     private void CodeEditor_TextChanged(object sender, TextChangedEventArgs e)

@@ -54,6 +54,14 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="2,1">
+                                        <Grid.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Run" Click="OnContextRunScript" />
+                                                <MenuItem Header="Duplicate" Click="OnContextDuplicateScript" />
+                                                <Separator />
+                                                <MenuItem Header="Delete" Click="OnContextDeleteScript" />
+                                            </ContextMenu>
+                                        </Grid.ContextMenu>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="8" />
@@ -65,9 +73,14 @@
                                                        Foreground="{StaticResource AccentBrush}"
                                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
-                                        <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis"
-                                                   VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock FontSize="9.5" Foreground="{StaticResource SubTextBrush}" Opacity="0.6"
+                                                       Visibility="{Binding SchedulerEnabled, Converter={StaticResource BoolToVisConverter}}">
+                                                <Run Text="⏱ Every " /><Run Text="{Binding SchedulerIntervalMinutes, Mode=OneWay}" /><Run Text="m" />
+                                            </TextBlock>
+                                        </StackPanel>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -104,24 +117,53 @@
                     <!-- Script toolbar -->
                     <Border Grid.Row="0" Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
                             BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1" Padding="10,8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="10" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="6" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0"
-                                     Text="{Binding EditorName, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource DarkTextBoxStyle}" Tag="Script name" />
-                            <Button Grid.Column="2" Content="▶  Run" Padding="18,8"
-                                    Style="{StaticResource AccentButtonStyle}"
-                                    Command="{Binding RunScriptCommand}" />
-                            <Button Grid.Column="4" Content="Delete" Padding="12,8" FontSize="12"
-                                    Style="{StaticResource DangerButtonStyle}"
-                                    Command="{Binding DeleteScriptCommand}" />
-                        </Grid>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="6" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding EditorName, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource DarkTextBoxStyle}" Tag="Script name" />
+                                <Button Grid.Column="2" Content="▶  Run" Padding="18,8"
+                                        Style="{StaticResource AccentButtonStyle}"
+                                        Command="{Binding RunScriptCommand}" />
+                                <Button Grid.Column="4" Content="Delete" Padding="12,8" FontSize="12"
+                                        Style="{StaticResource DangerButtonStyle}"
+                                        Command="{Binding DeleteScriptCommand}" />
+                            </Grid>
+                            <!-- Scheduler row -->
+                            <Grid Margin="0,6,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="4" />
+                                    <ColumnDefinition Width="60" />
+                                    <ColumnDefinition Width="4" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Scheduler:" FontSize="11"
+                                           Foreground="{StaticResource SubTextBrush}" VerticalAlignment="Center" />
+                                <CheckBox Grid.Column="2" VerticalAlignment="Center"
+                                          Style="{StaticResource ToggleSwitchStyle}"
+                                          IsChecked="{Binding SchedulerEnabled}" />
+                                <TextBlock Grid.Column="4" Text="Every" FontSize="11"
+                                           Foreground="{StaticResource SubTextBrush}" VerticalAlignment="Center" />
+                                <TextBox Grid.Column="6"
+                                         Text="{Binding SchedulerInterval, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource DarkTextBoxStyle}" FontSize="11"
+                                         Tag="min" />
+                                <TextBlock Grid.Column="8" Text="minutes" FontSize="11"
+                                           Foreground="{StaticResource SubTextBrush}" VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
                     </Border>
 
                     <!-- Code Editor -->

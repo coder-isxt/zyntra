@@ -34,6 +34,9 @@ public static class NotificationService
                 Notifications.RemoveAt(Notifications.Count - 1);
             OnChanged?.Invoke();
         });
+
+        // Also show a toast
+        ToastService.Show(title, message, type);
     }
 
     public static void MarkAllRead()

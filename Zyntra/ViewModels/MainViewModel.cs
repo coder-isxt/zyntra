@@ -34,7 +34,24 @@ public class MainViewModel : BaseViewModel
         set => SetProperty(ref _notificationPanelOpen, value);
     }
 
+    // Sidebar badge counts
+    private int _accountCount;
+    public int AccountCount { get => _accountCount; set => SetProperty(ref _accountCount, value); }
+
+    private int _appCount;
+    public int AppCount { get => _appCount; set => SetProperty(ref _appCount, value); }
+
+    private int _scriptCount;
+    public int ScriptCount { get => _scriptCount; set => SetProperty(ref _scriptCount, value); }
+
+    private int _pluginCount;
+    public int PluginCount { get => _pluginCount; set => SetProperty(ref _pluginCount, value); }
+
+    private bool _showSidebarBadges;
+    public bool ShowSidebarBadges { get => _showSidebarBadges; set => SetProperty(ref _showSidebarBadges, value); }
+
     public ObservableCollection<NotificationItem> Notifications => NotificationService.Notifications;
+    public ObservableCollection<ToastItem> Toasts => ToastService.ActiveToasts;
 
     public AppsViewModel AppsVM { get; }
     public RobloxAccountsViewModel RobloxVM { get; }
@@ -56,6 +73,17 @@ public class MainViewModel : BaseViewModel
         ScriptsVM = new ScriptsViewModel();
         DocsVM = new DocsViewModel();
         SettingsVM = new SettingsViewModel();
+
+        // Sidebar badges
+        var settings = SettingsService.Load();
+        _showSidebarBadges = settings.ShowSidebarBadges;
+        RefreshBadgeCounts();
+
+        // Load favorite games
+        FavoriteGamesService.Load();
+
+        // Start script scheduler
+        ScriptSchedulerService.Start();
 
         // Navigate to the saved default page
         NavigateCommand = new RelayCommand(Navigate);
@@ -85,6 +113,21 @@ public class MainViewModel : BaseViewModel
         {
             UnreadNotifications = NotificationService.UnreadCount;
         };
+
+        // Listen for settings changes to update sidebar badges toggle
+        SettingsVM.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(SettingsViewModel.ShowSidebarBadges))
+                ShowSidebarBadges = SettingsVM.ShowSidebarBadges;
+        };
+    }
+
+    public void RefreshBadgeCounts()
+    {
+        AccountCount = AccountStorageService.Load().Count;
+        AppCount = AppStorageService.Load().Count;
+        ScriptCount = ScriptService.Load().Count;
+        PluginCount = PluginService.LoadIndex().Count;
     }
 
     private void Navigate(object? param)

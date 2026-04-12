@@ -145,6 +145,20 @@ public class SettingsViewModel : BaseViewModel
         }
     }
 
+    private bool _showSidebarBadges;
+    public bool ShowSidebarBadges
+    {
+        get => _showSidebarBadges;
+        set
+        {
+            if (SetProperty(ref _showSidebarBadges, value))
+            {
+                _settings.ShowSidebarBadges = value;
+                SettingsService.Save(_settings);
+            }
+        }
+    }
+
     public ObservableCollection<AccentOption> AccentOptions { get; } = new();
 
     public ICommand SetAccentCommand { get; }
@@ -179,6 +193,7 @@ public class SettingsViewModel : BaseViewModel
         _hideInvalidAccounts = _settings.HideInvalidAccounts;
         _defaultScriptTemplate = _settings.DefaultScriptTemplate;
         _checkForUpdatesOnStartup = _settings.CheckForUpdatesOnStartup;
+        _showSidebarBadges = _settings.ShowSidebarBadges;
 
         foreach (var (name, hex) in ThemeService.AccentPresets)
         {

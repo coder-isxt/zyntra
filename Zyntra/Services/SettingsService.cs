@@ -16,6 +16,7 @@ public class AppSettings
     public bool HideInvalidAccounts { get; set; }
     public string DefaultScriptTemplate { get; set; } = "-- Your script here\nzyntra.log(\"Hello from Zyntra!\")\n\nfor _, acc in ipairs(zyntra.get_accounts()) do\n    zyntra.log(acc.DisplayName)\nend";
     public bool CheckForUpdatesOnStartup { get; set; } = true;
+    public bool ShowSidebarBadges { get; set; } = true;
 }
 
 public static class SettingsService

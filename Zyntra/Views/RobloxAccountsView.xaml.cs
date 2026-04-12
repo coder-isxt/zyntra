@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using Zyntra.Models;
 using Zyntra.ViewModels;
 
 namespace Zyntra.Views;
@@ -9,6 +10,18 @@ public partial class RobloxAccountsView : UserControl
     public RobloxAccountsView()
     {
         InitializeComponent();
+    }
+
+    private void OnCopyUsername(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc)
+            System.Windows.Clipboard.SetText(acc.Username);
+    }
+
+    private void OnCopyUserId(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc)
+            System.Windows.Clipboard.SetText(acc.UserId.ToString());
     }
 
     private async void OnAddAccountClick(object sender, RoutedEventArgs e)

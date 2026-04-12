@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Zyntra.Models;
 using Zyntra.Services;
@@ -18,7 +19,18 @@ public partial class LaunchPromptWindow : Window
     public LaunchPromptWindow()
     {
         InitializeComponent();
+        LoadFavoriteGames();
         LoadRecentGames();
+    }
+
+    private void LoadFavoriteGames()
+    {
+        var favorites = FavoriteGamesService.Games.ToList();
+        if (favorites.Count > 0)
+        {
+            FavoritesList.ItemsSource = favorites;
+            FavoritesPanel.Visibility = Visibility.Visible;
+        }
     }
 
     private void LoadRecentGames()
@@ -31,6 +43,17 @@ public partial class LaunchPromptWindow : Window
         }
     }
 
+    private void OnFavoriteGameClick(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.DataContext is FavoriteGame game)
+        {
+            PlaceId = game.PlaceId;
+            JustLaunch = false;
+            DialogResult = true;
+            Close();
+        }
+    }
+
     private void OnRecentGameClick(object sender, MouseButtonEventArgs e)
     {
         if (sender is FrameworkElement fe && fe.DataContext is RecentGame game)
@@ -39,6 +62,15 @@ public partial class LaunchPromptWindow : Window
             JustLaunch = false;
             DialogResult = true;
             Close();
+        }
+    }
+
+    private async void OnAddToFavorites(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is RecentGame game)
+        {
+            await FavoriteGamesService.AddAsync(game.PlaceId);
+            LoadFavoriteGames();
         }
     }
 
