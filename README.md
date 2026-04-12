@@ -1,54 +1,158 @@
 # Zyntra
 
-A desktop application for managing Roblox accounts, launching games, and automating workflows with Lua scripting.
+A Windows desktop app for managing multiple Roblox accounts, launching games, and automating workflows with Lua scripting. Built with WPF and .NET 8.
+
+---
 
 ## Features
 
-- **Account Management** — Add, tag, filter, import/export Roblox accounts with encrypted cookie storage
-- **Game Launching** — Launch games per account or mass-launch by tag, with recently played history
-- **Lua Scripting** — Built-in script editor with auto-injected API (MoonSharp engine)
-- **Applications** — Register and launch external apps with custom args, env vars, and working directories
-- **Plugin System** — Extend Zyntra with .NET class library plugins
-- **Auto-Updater** — Checks GitHub releases for new versions
-- **Notifications** — In-app notification panel with bell icon badge
-- **Theming** — 9 accent color presets, dark UI throughout
-- **System Tray** — Minimize to tray with quick-launch accounts
+### Account Management
+- Add accounts via `.ROBLOSECURITY` cookie paste or built-in browser login
+- Tag, filter, and search accounts
+- Cookie health checks (single or bulk)
+- Import / export accounts as JSON
+- Per-account notes
+- Right-click context menu: launch, tag, refresh, copy username/ID, remove
+
+### Game Launching
+- Launch any account into a specific game by Place ID
+- **Favorite Games** — star frequently played games for one-click launch
+- Recently played history in the launch prompt
+- Staggered multi-launch support
+
+### Lua Scripting
+- Built-in code editor (VS Code-style: One Dark theme, Cascadia Code font, line numbers)
+- Full `zyntra` API auto-injected — no setup needed
+- **Script Scheduler** — run scripts on a timer (e.g. every 60 minutes), enable/disable per script
+- Duplicate and manage scripts via right-click context menu
+
+### Applications
+- Register and launch external apps with custom arguments, environment variables, and working directories
+- Drag-and-drop reorder
+
+### Plugins
+- Extend Zyntra with .NET class library plugins (`.dll`)
+- Plugin marketplace index
+
+### UI / UX
+- **Toast Notifications** — slide-in popups (bottom-right) for events, auto-dismiss after 4 seconds
+- **Sidebar Badges** — item count badges on nav items (toggle in Settings)
+- **Notification Panel** — bell icon with unread count, mark-all-read, clear
+- 9 accent color presets, fully dark themed
+- System tray support — minimize to tray with quick-launch from tray menu
+- Auto-updater checks GitHub releases on startup
+
+---
+
+## Getting Started
+
+### Download
+
+Grab the latest `Zyntra.exe` from the [Releases](https://github.com/coder-isxt/zyntra/releases) page. It's a single self-contained `.exe` — no install required.
+
+### First Run
+
+1. Launch `Zyntra.exe`
+2. Go to **Roblox Accounts** and add an account:
+   - **Paste cookie** — copy your `.ROBLOSECURITY` cookie from your browser and paste it
+   - **Browser Login** — click "Browser Login" to sign in directly
+3. Click **Launch** on any account to open Roblox, optionally entering a Place ID or picking a favorite/recent game
+4. Explore **Scripts**, **Apps**, and **Plugins** from the sidebar
+
+### Settings
+
+Open **Settings** from the sidebar to configure:
+- Default startup page
+- Accent color
+- Sidebar badges (on/off)
+- Animation toggle
+- Auto-refresh cookies on startup
+- Default tag for new accounts
+- Default script template
+- Update checks
+
+All settings are saved to `%AppData%\Zyntra\settings.json`.
+
+---
 
 ## Scripting
 
-Zyntra uses Lua as its scripting language. The `zyntra` API is auto-injected into every script — no setup needed.
+Zyntra uses **Lua** (via [MoonSharp](https://www.moonsharp.org/)) as its scripting engine. The `zyntra` API table is auto-injected into every script.
 
 ```lua
--- Launch a game with a specific account
+-- Log all accounts
+for _, acc in ipairs(zyntra.get_accounts()) do
+    zyntra.log(acc.DisplayName .. " — @" .. acc.Username)
+end
+
+-- Launch a game
 zyntra.launch_game("MyAccount", 4483381587)
-zyntra.notify("Launched", "Joining game!", "Success")
+zyntra.notify("Done", "Game launched!", "Success")
 ```
+
+### Scheduler
+
+Enable the scheduler on any script to run it automatically on an interval:
+1. Select a script in the editor
+2. Toggle **Scheduler** on
+3. Set the interval in minutes
+4. The script runs in the background — results appear in notifications
 
 See the in-app **Docs** tab for the full API reference.
 
-## Building
+---
+
+## Building from Source
+
+### Prerequisites
+- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) (Windows)
+- Git
+
+### Build
+
+```bash
+git clone https://github.com/coder-isxt/zyntra.git
+cd zyntra
+dotnet publish Zyntra/Zyntra.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true -o build
+```
+
+Output: `build/Zyntra.exe`
+
+### Release (maintainers)
+
+Run `build.bat` to:
+1. Auto-compute the next version (`YY.M.patch`)
+2. Build a single-file Release exe
+3. Commit, tag, and push to GitHub
+4. GitHub Actions automatically creates a release with `Zyntra.exe` attached
+
+---
+
+## Project Structure
 
 ```
-dotnet publish Zyntra\Zyntra.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true -o build
+Zyntra/
+├── Models/          # Data models (RobloxAccount, ScriptEntry, FavoriteGame, etc.)
+├── ViewModels/      # MVVM ViewModels
+├── Views/           # WPF UserControls and Windows
+├── Services/        # Business logic (accounts, scripts, plugins, settings, scheduler)
+├── Converters/      # WPF value converters
+├── Themes/          # DarkTheme.xaml — all styles and brushes
+└── Resources/       # Embedded Lua API
 ```
 
-Or use `build.bat` to build, tag, and push a release automatically.
+---
 
 ## Changelog
 
-- **Favorite Games** — Save frequently played games and launch them with one click from the launch prompt; star button on recent games to add to favorites
-- **Script Scheduler** — Run scripts on a timer with configurable interval (minutes); enable/disable per script; auto-runs in background
-- **Account Notes** — Free-text notes field per account, shown as italic preview on account cards
-- **Account Card Redesign** — Rich bordered cards with larger avatars, health dots, tag badges, notes preview, and grouped action buttons
-- **Toast Notifications** — Slide-in toast popups (bottom-right) for events like script completion, errors, and scheduler runs; auto-dismiss after 4 seconds
-- **Sidebar Badges** — Count badges on Apps, Roblox, Plugins, and Scripts nav items; toggle on/off in Settings > Appearance
-- **Context Menus** — Right-click on accounts (launch, tag, refresh, copy username/ID, remove) and scripts (run, duplicate, delete)
-- Redesigned script editor with VS Code-like aesthetics (One Dark theme, Cascadia Code font, tab bar, language badge)
-- Custom dark scrollbar with rounded thumb and hover/drag states
-- Added settings: default page, disable animations, auto-refresh cookies, default tag for new accounts, hide invalid accounts, default script template, clear recently played, check for updates on startup, show sidebar badges
-- Removed Dashboard page — app opens directly to the configured default page
-- Migrated scripting engine to Lua (MoonSharp) — removed PowerShell, Batch, Python
-- Redesigned Docs tab with horizontal tabs, feature cards, and numbered steps
-- Apps now launch with working directory set to the exe's folder
-- Version read from assembly at runtime (date-based versioning: YY.M.patch)
-- Build script auto-increments version; GitHub Actions creates releases
+- **Favorite Games** — save frequently played games; one-click launch from prompt; star button on recent games
+- **Script Scheduler** — run scripts on a timer with configurable interval; enable/disable per script; background execution
+- **Account Notes** — free-text notes per account, shown as preview on account cards
+- **Toast Notifications** — slide-in toasts (bottom-right) for events; auto-dismiss after 4 seconds
+- **Sidebar Badges** — item count badges on nav items; toggle in Settings > Appearance
+- **Context Menus** — right-click on accounts (launch, tag, refresh, copy, remove) and scripts (run, duplicate, delete)
+- Redesigned script editor with VS Code-style aesthetics
+- Custom dark scrollbar with hover/drag states
+- Migrated scripting engine to Lua (MoonSharp)
+- Redesigned Docs tab with horizontal tabs and feature cards
+- Date-based versioning (YY.M.patch); GitHub Actions auto-releases

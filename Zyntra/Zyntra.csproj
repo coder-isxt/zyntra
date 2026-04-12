@@ -12,9 +12,9 @@
     <RootNamespace>Zyntra</RootNamespace>
     <ApplicationIcon>..\logo.ico</ApplicationIcon>
 
-    <Version>26.4.14</Version>
-    <AssemblyVersion>26.4.14.0</AssemblyVersion>
-    <FileVersion>26.4.14.0</FileVersion>
+    <Version>26.4.15</Version>
+    <AssemblyVersion>26.4.15.0</AssemblyVersion>
+    <FileVersion>26.4.15.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
