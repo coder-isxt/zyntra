@@ -126,7 +126,7 @@
 
                     <!-- Code Editor -->
                     <Border Grid.Row="2" Background="#FF0D1117" CornerRadius="8"
-                            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+                            BorderBrush="#FF1E2430" BorderThickness="1"
                             ClipToBounds="True">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -134,19 +134,32 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <!-- Editor header bar -->
-                            <Border Grid.Row="0" Background="#FF161B22"
-                                    BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,0,0,1"
-                                    Padding="14,6">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#30709BFF" CornerRadius="3" Padding="6,2" Margin="0,0,8,0">
-                                        <TextBlock Text="Lua" FontSize="10" FontWeight="Bold"
+                            <!-- Editor tab bar -->
+                            <Border Grid.Row="0" Background="#FF161B22" Padding="0">
+                                <Grid>
+                                    <!-- Tab row -->
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Background="#FF0D1117" Padding="12,7,12,7"
+                                                BorderBrush="#FF1E2430" BorderThickness="0,0,1,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="●" FontSize="8" Foreground="{StaticResource AccentBrush}"
+                                                           VerticalAlignment="Center" Margin="0,0,6,0" />
+                                                <TextBlock Text="{Binding EditorName}" FontSize="11"
+                                                           Foreground="{StaticResource TextBrush}"
+                                                           VerticalAlignment="Center" />
+                                                <TextBlock Text=".lua" FontSize="11"
+                                                           Foreground="{StaticResource SubTextBrush}" Opacity="0.5"
+                                                           VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                    <!-- Language badge on the right -->
+                                    <Border Background="#20709BFF" CornerRadius="3" Padding="8,3"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
+                                        <TextBlock Text="Lua" FontSize="9" FontWeight="Bold"
                                                    Foreground="{StaticResource AccentBrush}" />
                                     </Border>
-                                    <TextBlock Text="{Binding EditorName}" FontSize="10"
-                                               Foreground="{StaticResource SubTextBrush}" Opacity="0.6"
-                                               VerticalAlignment="Center" />
-                                </StackPanel>
+                                </Grid>
                             </Border>
 
                             <!-- Line numbers + editor -->
@@ -158,14 +171,15 @@
 
                                 <!-- Line numbers gutter -->
                                 <Border Grid.Column="0" Background="#FF0D1117"
-                                        BorderBrush="#FF1E2430" BorderThickness="0,0,1,0"
-                                        MinWidth="40">
+                                        BorderBrush="#FF1B1F2A" BorderThickness="0,0,1,0"
+                                        MinWidth="44">
                                     <ScrollViewer x:Name="LineNumberScroll"
                                                   VerticalScrollBarVisibility="Hidden"
                                                   HorizontalScrollBarVisibility="Hidden"
                                                   IsHitTestVisible="False">
-                                        <TextBlock x:Name="LineNumbers" FontFamily="Consolas" FontSize="13"
-                                                   Foreground="#FF484F5E" Padding="10,8,10,8"
+                                        <TextBlock x:Name="LineNumbers" FontFamily="Cascadia Code,Consolas,Courier New"
+                                                   FontSize="12.5" LineHeight="20"
+                                                   Foreground="#FF3E4452" Padding="12,6,10,6"
                                                    TextAlignment="Right" />
                                     </ScrollViewer>
                                 </Border>
@@ -173,10 +187,11 @@
                                 <!-- Code text box -->
                                 <TextBox x:Name="CodeEditor" Grid.Column="1"
                                          Text="{Binding EditorContent, UpdateSourceTrigger=PropertyChanged}"
-                                         Background="Transparent" Foreground="#FFC9D1D9"
-                                         CaretBrush="#FFC9D1D9" SelectionBrush="{StaticResource AccentBrush}"
-                                         BorderThickness="0" Padding="8,8,14,8"
-                                         FontFamily="Consolas" FontSize="13"
+                                         Background="Transparent" Foreground="#FFABB2BF"
+                                         CaretBrush="#FF528BFF" SelectionBrush="#40528BFF"
+                                         BorderThickness="0" Padding="10,6,14,6"
+                                         FontFamily="Cascadia Code,Consolas,Courier New" FontSize="12.5"
+                                         Block.LineHeight="20"
                                          AcceptsReturn="True" AcceptsTab="True"
                                          TextWrapping="NoWrap"
                                          HorizontalScrollBarVisibility="Auto"
