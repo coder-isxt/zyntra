@@ -27,9 +27,6 @@ public partial class DashboardView : UserControl
     private void OnNavRoblox(object sender, MouseButtonEventArgs e)
         => GetMain()?.NavigateCommand.Execute("Roblox");
 
-    private void OnNavPlugins(object sender, MouseButtonEventArgs e)
-        => GetMain()?.NavigateCommand.Execute("Plugins");
-
     private void OnNavScripts(object sender, MouseButtonEventArgs e)
         => GetMain()?.NavigateCommand.Execute("Scripts");
 
@@ -43,6 +40,4 @@ public partial class DashboardView : UserControl
     private void OnQuickNewScript(object sender, RoutedEventArgs e)
         => GetMain()?.NavigateCommand.Execute("Scripts");
 
-    private void OnQuickInstallPlugin(object sender, RoutedEventArgs e)
-        => GetMain()?.NavigateCommand.Execute("Plugins");
 }

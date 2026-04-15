@@ -84,6 +84,102 @@ public static class ScriptService
                     Thread.Sleep(ms);
                 });
 
+                // UI callbacks
+                var uiTabs = new Dictionary<int, ScriptTab>();
+                int nextTabHandle = 1;
+
+                luaScript.Globals["_zyntra_ui_create_tab"] = (Func<string, string, int>)((name, icon) =>
+                {
+                    var tab = ScriptUIService.CreateTab(name, icon, script.Id);
+                    int handle = nextTabHandle++;
+                    uiTabs[handle] = tab;
+                    return handle;
+                });
+
+                luaScript.Globals["_zyntra_ui_add_label"] = (Action<int, string, double, bool>)((handle, text, fontSize, bold) =>
+                {
+                    if (uiTabs.TryGetValue(handle, out var tab))
+                        ScriptUIService.AddElement(tab, new ScriptUIElement
+                        {
+                            Type = UIElementType.Label, Text = text, FontSize = fontSize, Bold = bold
+                        });
+                });
+
+                luaScript.Globals["_zyntra_ui_add_button"] = (Action<int, string, Closure>)((handle, text, callback) =>
+                {
+                    if (uiTabs.TryGetValue(handle, out var tab))
+                    {
+                        var cbId = Guid.NewGuid().ToString();
+                        ScriptUIService.AddElement(tab, new ScriptUIElement
+                        {
+                            Type = UIElementType.Button, Text = text, CallbackId = cbId
+                        });
+                        ScriptUIService.RegisterCallback(tab, cbId, () =>
+                        {
+                            try { callback.Call(); }
+                            catch (Exception ex)
+                            {
+                                NotificationService.Push("Script UI Error", ex.Message, NotificationType.Error);
+                            }
+                        });
+                    }
+                });
+
+                luaScript.Globals["_zyntra_ui_add_text_input"] = (Action<int, string, string>)((handle, id, placeholder) =>
+                {
+                    if (uiTabs.TryGetValue(handle, out var tab))
+                        ScriptUIService.AddElement(tab, new ScriptUIElement
+                        {
+                            Type = UIElementType.TextInput, Id = id, Placeholder = placeholder
+                        });
+                });
+
+                luaScript.Globals["_zyntra_ui_add_separator"] = (Action<int>)((handle) =>
+                {
+                    if (uiTabs.TryGetValue(handle, out var tab))
+                        ScriptUIService.AddElement(tab, new ScriptUIElement { Type = UIElementType.Separator });
+                });
+
+                luaScript.Globals["_zyntra_ui_add_progress"] = (Action<int, double, string>)((handle, value, label) =>
+                {
+                    if (uiTabs.TryGetValue(handle, out var tab))
+                        ScriptUIService.AddElement(tab, new ScriptUIElement
+                        {
+                            Type = UIElementType.ProgressBar, Value = value, Text = label
+                        });
+                });
+
+                luaScript.Globals["_zyntra_ui_add_checkbox"] = (Action<int, string, string, bool>)((handle, id, text, isChecked) =>
+                {
+                    if (uiTabs.TryGetValue(handle, out var tab))
+                        ScriptUIService.AddElement(tab, new ScriptUIElement
+                        {
+                            Type = UIElementType.CheckBox, Id = id, Text = text, IsChecked = isChecked
+                        });
+                });
+
+                luaScript.Globals["_zyntra_ui_add_dropdown"] = (Action<int, string, string, Table, int>)((handle, id, label, options, selectedIdx) =>
+                {
+                    if (uiTabs.TryGetValue(handle, out var tab))
+                    {
+                        var opts = new List<string>();
+                        foreach (var pair in options.Pairs)
+                            opts.Add(pair.Value.String ?? pair.Value.ToPrintString());
+                        ScriptUIService.AddElement(tab, new ScriptUIElement
+                        {
+                            Type = UIElementType.ComboBox, Id = id, Text = label,
+                            Options = opts, SelectedIndex = Math.Max(0, selectedIdx - 1)
+                        });
+                    }
+                });
+
+                luaScript.Globals["_zyntra_ui_get_value"] = (Func<int, string, string>)((handle, id) =>
+                {
+                    if (uiTabs.TryGetValue(handle, out var tab))
+                        return ScriptUIService.GetState(tab, id);
+                    return "";
+                });
+
                 // Override print to capture output
                 luaScript.Globals["print"] = (Action<DynValue[]>)(args =>
                 {

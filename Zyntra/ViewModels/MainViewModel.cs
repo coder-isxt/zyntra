@@ -44,18 +44,15 @@ public class MainViewModel : BaseViewModel
     private int _scriptCount;
     public int ScriptCount { get => _scriptCount; set => SetProperty(ref _scriptCount, value); }
 
-    private int _pluginCount;
-    public int PluginCount { get => _pluginCount; set => SetProperty(ref _pluginCount, value); }
-
     private bool _showSidebarBadges;
     public bool ShowSidebarBadges { get => _showSidebarBadges; set => SetProperty(ref _showSidebarBadges, value); }
 
     public ObservableCollection<NotificationItem> Notifications => NotificationService.Notifications;
     public ObservableCollection<ToastItem> Toasts => ToastService.ActiveToasts;
+    public ObservableCollection<ScriptTab> ScriptTabs => ScriptUIService.Tabs;
 
     public AppsViewModel AppsVM { get; }
     public RobloxAccountsViewModel RobloxVM { get; }
-    public PluginsViewModel PluginsVM { get; }
     public ScriptsViewModel ScriptsVM { get; }
     public DocsViewModel DocsVM { get; }
     public SettingsViewModel SettingsVM { get; }
@@ -69,7 +66,6 @@ public class MainViewModel : BaseViewModel
     {
         AppsVM = new AppsViewModel();
         RobloxVM = new RobloxAccountsViewModel();
-        PluginsVM = new PluginsViewModel();
         ScriptsVM = new ScriptsViewModel();
         DocsVM = new DocsViewModel();
         SettingsVM = new SettingsViewModel();
@@ -122,12 +118,21 @@ public class MainViewModel : BaseViewModel
         };
     }
 
+    public void NavigateToScriptTab(string tabId)
+    {
+        var tab = ScriptUIService.Tabs.FirstOrDefault(t => t.Id == tabId);
+        if (tab != null)
+        {
+            CurrentPage = new ScriptTabViewModel(tab);
+            CurrentPageName = tab.Name;
+        }
+    }
+
     public void RefreshBadgeCounts()
     {
         AccountCount = AccountStorageService.Load().Count;
         AppCount = AppStorageService.Load().Count;
         ScriptCount = ScriptService.Load().Count;
-        PluginCount = PluginService.LoadIndex().Count;
     }
 
     private void Navigate(object? param)
@@ -144,10 +149,6 @@ public class MainViewModel : BaseViewModel
             case "Roblox":
                 CurrentPage = RobloxVM;
                 CurrentPageName = "Roblox Accounts";
-                break;
-            case "Plugins":
-                CurrentPage = PluginsVM;
-                CurrentPageName = "Plugins";
                 break;
             case "Scripts":
                 CurrentPage = ScriptsVM;

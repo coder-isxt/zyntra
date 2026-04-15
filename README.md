@@ -24,17 +24,15 @@ A Windows desktop app for managing multiple Roblox accounts, launching games, an
 - Built-in code editor (VS Code-style: One Dark theme, Cascadia Code font, line numbers)
 - Full `zyntra` API auto-injected — no setup needed
 - **Script Scheduler** — run scripts on a timer (e.g. every 60 minutes), enable/disable per script
+- **Script UI** — create custom sidebar tabs with labels, buttons, inputs, checkboxes, dropdowns, and progress bars from Lua
 - Duplicate and manage scripts via right-click context menu
 
 ### Applications
 - Register and launch external apps with custom arguments, environment variables, and working directories
 - Drag-and-drop reorder
 
-### Plugins
-- Extend Zyntra with .NET class library plugins (`.dll`)
-- Plugin marketplace index
-
 ### UI / UX
+- **List / Grid view toggle** — switch between list and grid layout for Accounts and Apps
 - **Toast Notifications** — slide-in popups (bottom-right) for events, auto-dismiss after 4 seconds
 - **Sidebar Badges** — item count badges on nav items (toggle in Settings)
 - **Notification Panel** — bell icon with unread count, mark-all-read, clear
@@ -57,7 +55,7 @@ Grab the latest `Zyntra.exe` from the [Releases](https://github.com/coder-isxt/z
    - **Paste cookie** — copy your `.ROBLOSECURITY` cookie from your browser and paste it
    - **Browser Login** — click "Browser Login" to sign in directly
 3. Click **Launch** on any account to open Roblox, optionally entering a Place ID or picking a favorite/recent game
-4. Explore **Scripts**, **Apps**, and **Plugins** from the sidebar
+4. Explore **Scripts**, **Apps**, and **Docs** from the sidebar
 
 ### Settings
 
@@ -135,7 +133,7 @@ Zyntra/
 ├── Models/          # Data models (RobloxAccount, ScriptEntry, FavoriteGame, etc.)
 ├── ViewModels/      # MVVM ViewModels
 ├── Views/           # WPF UserControls and Windows
-├── Services/        # Business logic (accounts, scripts, plugins, settings, scheduler)
+├── Services/        # Business logic (accounts, scripts, settings, scheduler, UI)
 ├── Converters/      # WPF value converters
 ├── Themes/          # DarkTheme.xaml — all styles and brushes
 └── Resources/       # Embedded Lua API
@@ -145,6 +143,9 @@ Zyntra/
 
 ## Changelog
 
+- **Script UI API** — create custom sidebar tabs from Lua with buttons, inputs, checkboxes, dropdowns, progress bars; button callbacks; state persistence
+- **List / Grid view** — toggle between list and card grid layout for Accounts and Apps; click grid cards to launch
+- Removed Plugins system (replaced by Script UI)
 - **Favorite Games** — save frequently played games; one-click launch from prompt; star button on recent games
 - **Script Scheduler** — run scripts on a timer with configurable interval; enable/disable per script; background execution
 - **Account Notes** — free-text notes per account, shown as preview on account cards

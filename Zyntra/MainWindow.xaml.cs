@@ -37,7 +37,6 @@ public partial class MainWindow : Window
                 var normalStyle = (Style)FindResource("SidebarButtonStyle");
                 BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
                 BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
-                BtnPlugins.Style = tag == "Plugins" ? activeStyle : normalStyle;
                 BtnScripts.Style = tag == "Scripts" ? activeStyle : normalStyle;
                 BtnDocs.Style = tag == "Docs" ? activeStyle : normalStyle;
                 BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;
@@ -226,6 +225,22 @@ public partial class MainWindow : Window
         }
     }
 
+    private void OnScriptTabClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string tabId && DataContext is MainViewModel vm)
+        {
+            vm.NavigateToScriptTab(tabId);
+
+            // Reset all nav buttons to normal
+            var normalStyle = (Style)FindResource("SidebarButtonStyle");
+            BtnApps.Style = normalStyle;
+            BtnRoblox.Style = normalStyle;
+            BtnScripts.Style = normalStyle;
+            BtnDocs.Style = normalStyle;
+            BtnSettings.Style = normalStyle;
+        }
+    }
+
     private void SidebarNav_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button clicked)
@@ -237,7 +252,6 @@ public partial class MainWindow : Window
 
             BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
             BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
-            BtnPlugins.Style = tag == "Plugins" ? activeStyle : normalStyle;
             BtnScripts.Style = tag == "Scripts" ? activeStyle : normalStyle;
             BtnDocs.Style = tag == "Docs" ? activeStyle : normalStyle;
             BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;

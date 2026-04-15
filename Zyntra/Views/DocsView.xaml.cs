@@ -24,12 +24,12 @@ public partial class DocsView : UserControl
 
         BtnOverview.Style = tag == "overview" ? activeStyle : normalStyle;
         BtnLuaApi.Style = tag == "lua" ? activeStyle : normalStyle;
-        BtnPlugins.Style = tag == "plugins" ? activeStyle : normalStyle;
+        BtnScriptUI.Style = tag == "scriptui" ? activeStyle : normalStyle;
 
         switch (tag)
         {
             case "lua": ShowLuaApi(); break;
-            case "plugins": ShowPlugins(); break;
+            case "scriptui": ShowScriptUI(); break;
             default: ShowOverview(); break;
         }
     }
@@ -446,83 +446,61 @@ end
 zyntra.notify(""Done"", #accounts .. "" accounts queued"", ""Success"")", "LUA");
     }
 
-    private void ShowPlugins()
+    private void ShowScriptUI()
     {
         Clear();
-        AddTitle("Plugin SDK");
-        AddSubtitle("Extend Zyntra with .NET class library plugins that implement the IZyntraPlugin interface.");
+        AddTitle("Script UI API");
+        AddSubtitle("Create custom tabs with interactive UI elements from Lua scripts.");
 
         AddHeading("Getting Started");
-        AddStepRow("1", "Create a .NET class library project targeting the same framework as Zyntra.");
-        AddStepRow("2", "Reference the IZyntraPlugin interface (or copy it into your project).");
-        AddStepRow("3", "Implement the interface in a public class.");
-        AddStepRow("4", "Build the DLL and install it via the Plugins tab.");
+        AddStepRow("1", "Create a tab with zyntra.ui.create_tab(name, icon)");
+        AddStepRow("2", "Add elements: labels, buttons, inputs, checkboxes, dropdowns, progress bars");
+        AddStepRow("3", "Run the script — the tab appears in the sidebar automatically");
+        AddStepRow("4", "Button callbacks execute when clicked by the user");
 
         AddDivider();
-        AddHeading("IZyntraPlugin Interface");
-        AddCodeBlock("", @"public interface IZyntraPlugin
-{
-    string Name { get; }
-    string Description { get; }
-    string Version { get; }
-    void Initialize();
-    void Execute();
-    void Shutdown();
-}", "C#");
-
-        AddHeading("Interface Members");
-        AddFunctionRow("Name", "Display name shown in the Plugins list");
-        AddFunctionRow("Description", "Short description of what the plugin does");
-        AddFunctionRow("Version", "Version string (e.g. \"1.0.0\")");
-        AddFunctionRow("Initialize()", "Called when the plugin is loaded at startup");
-        AddFunctionRow("Execute()", "Called when the plugin is triggered to run");
-        AddFunctionRow("Shutdown()", "Called when Zyntra is closing or the plugin is disabled");
+        AddHeading("zyntra.ui Functions");
+        AddFunctionRow("create_tab(name, icon)", "Creates a new sidebar tab. Returns a tab handle. Icon is optional (e.g. \"\u2605\").");
+        AddFunctionRow("add_label(tab, text, opts)", "Adds a text label. opts: {font_size=14, bold=false}");
+        AddFunctionRow("add_button(tab, text, callback)", "Adds a clickable button. callback is a Lua function.");
+        AddFunctionRow("add_text_input(tab, id, opts)", "Adds a text input field. opts: {placeholder=\"...\"}");
+        AddFunctionRow("add_separator(tab)", "Adds a horizontal divider line.");
+        AddFunctionRow("add_progress(tab, value, label)", "Adds a progress bar. value is 0.0\u20131.0.");
+        AddFunctionRow("add_checkbox(tab, id, text, checked)", "Adds a checkbox. checked is a boolean.");
+        AddFunctionRow("add_dropdown(tab, id, label, options, index)", "Adds a dropdown. options is a table of strings.");
+        AddFunctionRow("get_value(tab, id)", "Gets the current value of an input, checkbox, or dropdown by id.");
 
         AddDivider();
-        AddHeading("Example Plugin");
-        AddCodeBlock("MyPlugin.cs", @"using Zyntra.Services;
+        AddHeading("Example: Custom Dashboard");
+        AddCodeBlock("my_dashboard.lua", @"local tab = zyntra.ui.create_tab(""My Dashboard"", ""★"")
 
-public class MyPlugin : IZyntraPlugin
-{
-    public string Name => ""My Plugin"";
-    public string Description => ""A sample Zyntra plugin"";
-    public string Version => ""1.0.0"";
+zyntra.ui.add_label(tab, ""Account Manager"", {font_size = 20, bold = true})
+zyntra.ui.add_separator(tab)
 
-    public void Initialize()
-    {
-        // Called once when plugin loads
-    }
+zyntra.ui.add_label(tab, ""You have "" .. zyntra.get_account_count() .. "" accounts"")
 
-    public void Execute()
-    {
-        // Your plugin logic here
-        NotificationService.Push(
-            ""My Plugin"",
-            ""Plugin executed successfully!"",
-            NotificationType.Success
-        );
-    }
+zyntra.ui.add_text_input(tab, ""place_id"", {placeholder = ""Enter Place ID...""})
 
-    public void Shutdown()
-    {
-        // Cleanup resources
-    }
-}", "C#");
+zyntra.ui.add_button(tab, ""▶ Launch All"", function()
+    local pid = zyntra.ui.get_value(tab, ""place_id"")
+    if pid ~= """" then
+        zyntra.launch_game_all(tonumber(pid))
+        zyntra.notify(""Launched"", ""All accounts joining "" .. pid, ""Success"")
+    end
+end)
+
+zyntra.ui.add_separator(tab)
+zyntra.ui.add_checkbox(tab, ""auto_refresh"", ""Auto-refresh cookies"", true)
+zyntra.ui.add_dropdown(tab, ""server"", ""Region"", {""US East"", ""US West"", ""Europe"", ""Asia""}, 1)", "LUA");
 
         AddDivider();
-        AddHeading("Plugin Lifecycle");
-        AddStepRow("1", "Install \u2014 User selects a .DLL file from the Plugins tab. Zyntra copies it to the plugins folder.");
-        AddStepRow("2", "Enable \u2014 The plugin is loaded and Initialize() is called on startup.");
-        AddStepRow("3", "Execute \u2014 Execute() is called when the plugin is triggered.");
-        AddStepRow("4", "Shutdown \u2014 Shutdown() is called when the app closes or the plugin is disabled.");
+        AddHeading("How It Works");
+        AddStepRow("1", "Running the script creates a sidebar tab visible to the user.");
+        AddStepRow("2", "UI elements are rendered in the tab with the app\u2019s dark theme.");
+        AddStepRow("3", "Button callbacks run the Lua function when the user clicks.");
+        AddStepRow("4", "get_value() reads input/checkbox/dropdown state at any time.");
+        AddStepRow("5", "Re-running the script replaces the tab with the updated layout.");
 
-        AddNote("Plugins run in the same process as Zyntra. Unhandled errors will be caught, but may mark the plugin as failed.");
-
-        AddDivider();
-        AddHeading("File Locations");
-        AddFunctionRow("Plugin DLLs", "%AppData%\\Zyntra\\plugins\\");
-        AddFunctionRow("Plugin index", "%AppData%\\Zyntra\\plugins.json");
-
-        AddNote("Keep plugins lightweight. Use async patterns for long-running operations to avoid blocking the UI thread.");
+        AddNote("Script tabs persist in the sidebar until the app is restarted or the script creates a new version of the same tab.");
     }
 }

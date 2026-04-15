@@ -23,7 +23,7 @@
         </StackPanel>
 
         <!-- Stat Cards -->
-        <UniformGrid Grid.Row="2" Columns="4" Rows="1">
+        <UniformGrid Grid.Row="2" Columns="3" Rows="1">
             <!-- Apps -->
             <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="10"
                     BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
@@ -52,20 +52,6 @@
                 </StackPanel>
             </Border>
 
-            <!-- Plugins -->
-            <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="10"
-                    BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
-                    Padding="20,16" Margin="0,0,10,0" Cursor="Hand"
-                    MouseLeftButtonUp="OnNavPlugins">
-                <StackPanel>
-                    <TextBlock Text="⧉" FontSize="22" Foreground="{StaticResource AccentBrush}" />
-                    <TextBlock Text="{Binding PluginCount}" FontSize="28" FontWeight="Bold"
-                               Foreground="{StaticResource TextBrush}" Margin="0,6,0,2" />
-                    <TextBlock Text="Plugins" FontSize="12"
-                               Foreground="{StaticResource SubTextBrush}" />
-                </StackPanel>
-            </Border>
-
             <!-- Scripts -->
             <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="10"
                     BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
@@ -90,8 +76,6 @@
                         Margin="0,0,8,8" Click="OnQuickAddApp" />
                 <Button Content="+ New Script" Style="{StaticResource ControlButtonStyle}" Padding="16,8"
                         Margin="0,0,8,8" Click="OnQuickNewScript" />
-                <Button Content="+ Install Plugin" Style="{StaticResource ControlButtonStyle}" Padding="16,8"
-                        Margin="0,0,8,8" Click="OnQuickInstallPlugin" />
             </WrapPanel>
         </StackPanel>
 

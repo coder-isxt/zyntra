@@ -19,13 +19,6 @@ public class DashboardViewModel : BaseViewModel
         set => SetProperty(ref _accountCount, value);
     }
 
-    private int _pluginCount;
-    public int PluginCount
-    {
-        get => _pluginCount;
-        set => SetProperty(ref _pluginCount, value);
-    }
-
     private int _scriptCount;
     public int ScriptCount
     {
@@ -59,7 +52,6 @@ public class DashboardViewModel : BaseViewModel
     {
         AppCount = AppStorageService.Load().Count;
         AccountCount = AccountStorageService.Load().Count;
-        PluginCount = PluginService.LoadIndex().Count;
         ScriptCount = ScriptService.Load().Count;
         UpdateGreeting();
     }

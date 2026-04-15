@@ -29,9 +29,9 @@
                 <Button x:Name="BtnLuaApi" Content="Lua API Reference" Padding="16,7"
                         Style="{StaticResource SidebarButtonStyle}"
                         Click="OnDocNav" Tag="lua" FontSize="12" />
-                <Button x:Name="BtnPlugins" Content="Plugin SDK" Padding="16,7"
+                <Button x:Name="BtnScriptUI" Content="Script UI API" Padding="16,7"
                         Style="{StaticResource SidebarButtonStyle}"
-                        Click="OnDocNav" Tag="plugins" FontSize="12" />
+                        Click="OnDocNav" Tag="scriptui" FontSize="12" />
             </StackPanel>
         </Border>
 

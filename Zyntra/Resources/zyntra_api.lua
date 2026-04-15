@@ -117,4 +117,50 @@ function zyntra.sleep(ms)
     _zyntra_sleep(ms)
 end
 
+-- ── UI ──────────────────────────────────────────────────────
+
+zyntra.ui = {}
+
+function zyntra.ui.create_tab(name, icon)
+    icon = icon or ""
+    return _zyntra_ui_create_tab(name, icon)
+end
+
+function zyntra.ui.add_label(tab, text, opts)
+    opts = opts or {}
+    _zyntra_ui_add_label(tab, text, opts.font_size or 14, opts.bold or false)
+end
+
+function zyntra.ui.add_button(tab, text, callback)
+    _zyntra_ui_add_button(tab, text, callback)
+end
+
+function zyntra.ui.add_text_input(tab, id, opts)
+    opts = opts or {}
+    _zyntra_ui_add_text_input(tab, id, opts.placeholder or "")
+end
+
+function zyntra.ui.add_separator(tab)
+    _zyntra_ui_add_separator(tab)
+end
+
+function zyntra.ui.add_progress(tab, value, label)
+    label = label or ""
+    _zyntra_ui_add_progress(tab, value, label)
+end
+
+function zyntra.ui.add_checkbox(tab, id, text, checked)
+    if checked == nil then checked = false end
+    _zyntra_ui_add_checkbox(tab, id, text, checked)
+end
+
+function zyntra.ui.add_dropdown(tab, id, label, options, selected_index)
+    selected_index = selected_index or 1
+    _zyntra_ui_add_dropdown(tab, id, label, options, selected_index)
+end
+
+function zyntra.ui.get_value(tab, id)
+    return _zyntra_ui_get_value(tab, id)
+end
+
 return zyntra

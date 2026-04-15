@@ -131,25 +131,6 @@
                                        Foreground="{StaticResource SubTextBrush}"
                                        Margin="18,12,0,8" Opacity="0.6" />
 
-                            <Button x:Name="BtnPlugins"
-                                    Command="{Binding NavigateCommand}" CommandParameter="Plugins"
-                                    Click="SidebarNav_Click" Tag="Plugins"
-                                    HorizontalContentAlignment="Stretch">
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
-                                </Button.Style>
-                                <DockPanel>
-                                    <Border DockPanel.Dock="Right" CornerRadius="8" Background="{StaticResource ControlHoverBrush}"
-                                            Padding="5,1" MinWidth="18" Margin="6,0,0,0"
-                                            Visibility="{Binding DataContext.ShowSidebarBadges, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisConverter}}">
-                                        <TextBlock Text="{Binding DataContext.PluginCount, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                   FontSize="10" Foreground="{StaticResource SubTextBrush}"
-                                                   HorizontalAlignment="Center" />
-                                    </Border>
-                                    <TextBlock Text="⧉  Plugins" TextTrimming="CharacterEllipsis" />
-                                </DockPanel>
-                            </Button>
-
                             <Button x:Name="BtnScripts"
                                     Command="{Binding NavigateCommand}" CommandParameter="Scripts"
                                     Click="SidebarNav_Click" Tag="Scripts"
@@ -176,6 +157,26 @@
                                     <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
                                 </Button.Style>
                             </Button>
+
+                            <!-- Script Tabs (dynamic) -->
+                            <ItemsControl x:Name="ScriptTabButtons"
+                                          ItemsSource="{Binding ScriptTabs}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Click="OnScriptTabClick" Tag="{Binding Id}" Cursor="Hand"
+                                                HorizontalContentAlignment="Stretch">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}" />
+                                            </Button.Style>
+                                            <TextBlock TextTrimming="CharacterEllipsis">
+                                                <Run Text="{Binding Icon, Mode=OneWay}" />
+                                                <Run Text="  " />
+                                                <Run Text="{Binding Name, Mode=OneWay}" />
+                                            </TextBlock>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
                         </StackPanel>
 
@@ -210,11 +211,11 @@
                                 <DataTemplate DataType="{x:Type vm:RobloxAccountsViewModel}">
                                     <views:RobloxAccountsView />
                                 </DataTemplate>
-                                <DataTemplate DataType="{x:Type vm:PluginsViewModel}">
-                                    <views:PluginsView />
-                                </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:ScriptsViewModel}">
                                     <views:ScriptsView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:ScriptTabViewModel}">
+                                    <views:ScriptTabView />
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:DocsViewModel}">
                                     <views:DocsView />
