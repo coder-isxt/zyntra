@@ -19,6 +19,13 @@ public class AppsViewModel : BaseViewModel
         set => SetProperty(ref _selectedApp, value);
     }
 
+    private bool _isGridView;
+    public bool IsGridView
+    {
+        get => _isGridView;
+        set => SetProperty(ref _isGridView, value);
+    }
+
     private string _searchText = string.Empty;
     public string SearchText
     {

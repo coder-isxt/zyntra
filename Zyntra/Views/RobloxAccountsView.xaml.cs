@@ -24,6 +24,12 @@ public partial class RobloxAccountsView : UserControl
             vm.IsGridView = true;
     }
 
+    private void OnGridCardLaunchAccount(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.DataContext is RobloxAccount acc && DataContext is RobloxAccountsViewModel vm)
+            vm.LaunchRobloxCommand.Execute(acc);
+    }
+
     private void OnContextLaunch(object sender, RoutedEventArgs e)
     {
         if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc && DataContext is RobloxAccountsViewModel vm)

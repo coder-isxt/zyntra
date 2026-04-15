@@ -27,13 +27,47 @@
                     Command="{Binding AddAppCommand}" VerticalAlignment="Top" />
         </Grid>
 
-        <!-- Search Bar -->
-        <TextBox Grid.Row="2" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                 Style="{StaticResource DarkTextBoxStyle}" Tag="🔍  Search applications..."
-                 FontSize="13" />
+        <!-- Search Bar + View Toggle -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource DarkTextBoxStyle}" Tag="🔍  Search applications..."
+                     FontSize="13" />
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button x:Name="BtnAppListView" Content="≡" FontSize="16" Padding="8,4" ToolTip="List view"
+                        Click="OnListViewClick">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource ControlButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsGridView}" Value="False">
+                                    <Setter Property="Background" Value="{StaticResource ControlHoverBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button x:Name="BtnAppGridView" Content="⊞" FontSize="16" Padding="8,4" Margin="4,0,0,0" ToolTip="Grid view"
+                        Click="OnGridViewClick">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource ControlButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsGridView}" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource ControlHoverBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+        </Grid>
 
-        <!-- App List -->
+        <!-- App List (List View) -->
         <ListBox x:Name="AppListBox" Grid.Row="4" ItemsSource="{Binding FilteredApps}"
+                 Visibility="{Binding IsGridView, Converter={StaticResource InverseBoolToVisConverter}}"
                  SelectedItem="{Binding SelectedApp}"
                  Style="{StaticResource DarkListBoxStyle}"
                  ItemContainerStyle="{StaticResource DarkListBoxItemStyle}"
@@ -137,6 +171,81 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+
+        <!-- App Grid (Grid View) -->
+        <ScrollViewer Grid.Row="4" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Visibility="{Binding IsGridView, Converter={StaticResource BoolToVisConverter}}">
+            <ItemsControl ItemsSource="{Binding FilteredApps}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="150" Height="150" Background="{StaticResource PanelInsetBrush}"
+                                CornerRadius="10" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+                                Margin="4" Cursor="Hand" MouseLeftButtonUp="OnGridCardLaunchApp">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Icon area -->
+                                <Grid Grid.Row="0" Width="52" Height="52" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <!-- Fallback letter -->
+                                    <Border Width="52" Height="52" CornerRadius="12"
+                                            Background="{StaticResource ControlBrush}">
+                                        <TextBlock Text="{Binding Name, Converter={StaticResource FirstCharConverter}}"
+                                                   FontSize="24" FontWeight="Bold"
+                                                   Foreground="{StaticResource AccentBrush}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <!-- Custom icon -->
+                                    <Border Width="52" Height="52" CornerRadius="12"
+                                            Background="{StaticResource ControlBrush}" Padding="6"
+                                            Visibility="{Binding IconPath, Converter={StaticResource ExeHasIconVis}}">
+                                        <Image Source="{Binding IconPath, Converter={StaticResource ExeIconConverter}}"
+                                               RenderOptions.BitmapScalingMode="HighQuality" />
+                                    </Border>
+                                    <!-- Exe icon -->
+                                    <Border Width="52" Height="52" CornerRadius="12"
+                                            Background="{StaticResource ControlBrush}" Padding="6"
+                                            Visibility="{Binding IconPath, Converter={StaticResource ExeNoIconVis}}">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ExePath, Converter={StaticResource ExeHasIconVis}}" Value="Collapsed">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Image Source="{Binding ExePath, Converter={StaticResource ExeIconConverter}}"
+                                               RenderOptions.BitmapScalingMode="HighQuality" />
+                                    </Border>
+                                </Grid>
+
+                                <!-- Name + badge -->
+                                <StackPanel Grid.Row="1" Margin="8,0,8,10" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis"
+                                               HorizontalAlignment="Center" MaxWidth="130" />
+                                    <Border CornerRadius="4" Padding="6,1" Margin="0,3,0,0"
+                                            Background="{StaticResource AccentBrush}"
+                                            HorizontalAlignment="Center"
+                                            Visibility="{Binding IsBuiltIn, Converter={StaticResource BoolToVisConverter}}">
+                                        <TextBlock Text="Built-in" FontSize="9" FontWeight="Bold" Foreground="#FF0D1117" />
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
 
         <!-- Empty state -->
         <TextBlock Grid.Row="4" Text="No applications found. Click '+ Add App' to get started."

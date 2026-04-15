@@ -16,6 +16,24 @@ public partial class AppsView : UserControl
         InitializeComponent();
     }
 
+    private void OnListViewClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is AppsViewModel vm)
+            vm.IsGridView = false;
+    }
+
+    private void OnGridViewClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is AppsViewModel vm)
+            vm.IsGridView = true;
+    }
+
+    private void OnGridCardLaunchApp(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.DataContext is AppEntry app && DataContext is AppsViewModel vm)
+            vm.LaunchAppCommand.Execute(app);
+    }
+
     private void AppList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         _dragStartPoint = e.GetPosition(null);

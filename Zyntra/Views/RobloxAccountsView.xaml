@@ -237,7 +237,7 @@
                     <DataTemplate>
                         <Border Width="170" Height="190" Background="{StaticResource PanelInsetBrush}"
                                 CornerRadius="10" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
-                                Margin="4" Cursor="Hand">
+                                Margin="4" Cursor="Hand" MouseLeftButtonUp="OnGridCardLaunchAccount">
                             <Border.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Launch" Click="OnContextLaunch" />
