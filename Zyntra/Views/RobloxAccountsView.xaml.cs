@@ -12,6 +12,18 @@ public partial class RobloxAccountsView : UserControl
         InitializeComponent();
     }
 
+    private void OnListViewClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is RobloxAccountsViewModel vm)
+            vm.IsGridView = false;
+    }
+
+    private void OnGridViewClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is RobloxAccountsViewModel vm)
+            vm.IsGridView = true;
+    }
+
     private void OnContextLaunch(object sender, RoutedEventArgs e)
     {
         if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc && DataContext is RobloxAccountsViewModel vm)

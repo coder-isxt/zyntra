@@ -66,8 +66,10 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Filter:" FontSize="12" VerticalAlignment="Center"
@@ -76,14 +78,42 @@
                           SelectedItem="{Binding SelectedTag}"
                           Style="{StaticResource DarkComboBoxStyle}"
                           Width="140" HorizontalAlignment="Left" />
-                <Button Grid.Column="4" Content="🔍 Check Health" Padding="12,6"
+                <!-- View toggle -->
+                <StackPanel Grid.Column="4" Orientation="Horizontal">
+                    <Button x:Name="BtnListView" Content="≡" FontSize="16" Padding="8,4" ToolTip="List view"
+                            Click="OnListViewClick">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource ControlButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsGridView}" Value="False">
+                                        <Setter Property="Background" Value="{StaticResource ControlHoverBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button x:Name="BtnGridView" Content="⊞" FontSize="16" Padding="8,4" Margin="4,0,0,0" ToolTip="Grid view"
+                            Click="OnGridViewClick">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource ControlButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsGridView}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource ControlHoverBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+                <Button Grid.Column="6" Content="🔍 Check Health" Padding="12,6"
                         Style="{StaticResource ControlButtonStyle}" VerticalAlignment="Center"
                         Command="{Binding CheckHealthCommand}" ToolTip="Validate all cookies" />
             </Grid>
         </Border>
 
-        <!-- Account List -->
+        <!-- Account List (List View) -->
         <ListBox Grid.Row="6" ItemsSource="{Binding FilteredAccounts}"
+                 Visibility="{Binding IsGridView, Converter={StaticResource InverseBoolToVisConverter}}"
                  SelectedItem="{Binding SelectedAccount}"
                  Style="{StaticResource DarkListBoxStyle}"
                  ItemContainerStyle="{StaticResource DarkListBoxItemStyle}"
@@ -192,6 +222,98 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+
+        <!-- Account Grid (Grid View) -->
+        <ScrollViewer Grid.Row="6" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Visibility="{Binding IsGridView, Converter={StaticResource BoolToVisConverter}}">
+            <ItemsControl ItemsSource="{Binding FilteredAccounts}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="170" Height="190" Background="{StaticResource PanelInsetBrush}"
+                                CornerRadius="10" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+                                Margin="4" Cursor="Hand">
+                            <Border.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Launch" Click="OnContextLaunch" />
+                                    <MenuItem Header="Set Tag" Click="OnContextSetTag" />
+                                    <MenuItem Header="Refresh Info" Click="OnContextRefresh" />
+                                    <Separator />
+                                    <MenuItem Header="Copy Username" Click="OnCopyUsername" />
+                                    <MenuItem Header="Copy User ID" Click="OnCopyUserId" />
+                                    <Separator />
+                                    <MenuItem Header="Remove Account" Click="OnContextRemove" />
+                                </ContextMenu>
+                            </Border.ContextMenu>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Avatar area -->
+                                <Grid Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <Border Width="64" Height="64" CornerRadius="32"
+                                            Background="{StaticResource AccentBrush}">
+                                        <TextBlock Text="{Binding DisplayName, Converter={StaticResource FirstCharConverter}}"
+                                                   FontSize="28" FontWeight="Bold" Foreground="#FF0D1117"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <Border Width="64" Height="64" CornerRadius="32"
+                                            Visibility="{Binding AvatarUrl, Converter={StaticResource NonEmptyToVisConverter}}">
+                                        <Border.Background>
+                                            <ImageBrush ImageSource="{Binding AvatarUrl}" Stretch="UniformToFill" />
+                                        </Border.Background>
+                                    </Border>
+                                    <Ellipse Width="14" Height="14" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                             Margin="0,0,2,2" Stroke="{StaticResource PanelInsetBrush}" StrokeThickness="2">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="#FF6B6B6B" />
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding CookieValid}" Value="True">
+                                                        <Setter Property="Fill" Value="#FF6BCB77" />
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding CookieValid}" Value="False">
+                                                        <Setter Property="Fill" Value="#FFFF6B6B" />
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                </Grid>
+
+                                <!-- Info area -->
+                                <StackPanel Grid.Row="1" Margin="10,0,10,10" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding DisplayName}" FontSize="13" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis"
+                                               HorizontalAlignment="Center" MaxWidth="150" />
+                                    <TextBlock FontSize="11" Foreground="{StaticResource SubTextBrush}"
+                                               HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="150">
+                                        <Run Text="@" /><Run Text="{Binding Username, Mode=OneWay}" />
+                                    </TextBlock>
+                                    <Border CornerRadius="4" Padding="6,1" Margin="0,4,0,0"
+                                            Background="{StaticResource ControlHoverBrush}"
+                                            HorizontalAlignment="Center"
+                                            Visibility="{Binding Tag, Converter={StaticResource NonEmptyToVisConverter}}">
+                                        <TextBlock Text="{Binding Tag}" FontSize="9.5"
+                                                   Foreground="{StaticResource AccentBrush}" />
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
 
         <!-- Empty state -->
         <TextBlock Grid.Row="6" Text="No accounts added yet. Paste a .ROBLOSECURITY cookie above to add one."

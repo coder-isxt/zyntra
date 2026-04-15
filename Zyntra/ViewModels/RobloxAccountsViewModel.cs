@@ -32,6 +32,13 @@ public class RobloxAccountsViewModel : BaseViewModel
         }
     }
 
+    private bool _isGridView;
+    public bool IsGridView
+    {
+        get => _isGridView;
+        set => SetProperty(ref _isGridView, value);
+    }
+
     private bool _isLoading;
     public bool IsLoading
     {
