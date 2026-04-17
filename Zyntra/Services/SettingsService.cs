@@ -17,6 +17,8 @@ public class AppSettings
     public string DefaultScriptTemplate { get; set; } = "-- Your script here\nzyntra.log(\"Hello from Zyntra!\")\n\nfor _, acc in ipairs(zyntra.get_accounts()) do\n    zyntra.log(acc.DisplayName)\nend";
     public bool CheckForUpdatesOnStartup { get; set; } = true;
     public bool ShowSidebarBadges { get; set; } = true;
+    public bool AutoUpdateRoblox { get; set; } = true;
+    public string RobloxVersionPath { get; set; } = string.Empty;
 }
 
 public static class SettingsService

@@ -130,9 +130,44 @@ public static class RobloxService
 
     public static async Task LaunchRobloxAsync(string cookie, long? placeId = null)
     {
-        string? playerPath = FindRobloxPlayerPath();
+        var settings = SettingsService.Load();
+
+        // Resolve player path
+        string? playerPath = null;
+
+        // 1. Use custom path from settings if set
+        if (!string.IsNullOrEmpty(settings.RobloxVersionPath) && File.Exists(settings.RobloxVersionPath))
+        {
+            playerPath = settings.RobloxVersionPath;
+        }
+        // 2. Auto-update: check and download latest if enabled
+        else if (settings.AutoUpdateRoblox)
+        {
+            try
+            {
+                NotificationService.Push("Roblox", "Checking for latest version...", NotificationType.Info);
+                var progress = new Progress<(double progress, string status)>(p =>
+                {
+                    // Update via toast for visibility
+                    if (p.progress < 1.0 && p.progress > 0.02)
+                        ToastService.Show("Roblox Update", p.status);
+                });
+                playerPath = await RobloxVersionService.EnsureLatestVersionAsync(progress);
+            }
+            catch
+            {
+                // Fall back to local detection
+                playerPath = FindRobloxPlayerPath();
+            }
+        }
+        // 3. Fallback: find any local installation
+        else
+        {
+            playerPath = FindRobloxPlayerPath();
+        }
+
         if (playerPath == null)
-            throw new Exception("Roblox Player not found on this computer. Please install Roblox first.");
+            throw new Exception("Roblox Player not found on this computer. Enable 'Auto Update Roblox' in Settings or install Roblox manually.");
 
         string authTicket = await GetAuthTicketAsync(cookie);
         long launchTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
