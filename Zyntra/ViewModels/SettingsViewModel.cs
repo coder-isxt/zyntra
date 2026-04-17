@@ -159,72 +159,18 @@ public class SettingsViewModel : BaseViewModel
         }
     }
 
-    private bool _autoUpdateRoblox;
-    public bool AutoUpdateRoblox
+    private string _robloxPlayerFolder;
+    public string RobloxPlayerFolder
     {
-        get => _autoUpdateRoblox;
+        get => _robloxPlayerFolder;
         set
         {
-            if (SetProperty(ref _autoUpdateRoblox, value))
+            if (SetProperty(ref _robloxPlayerFolder, value))
             {
-                _settings.AutoUpdateRoblox = value;
+                _settings.RobloxPlayerFolder = value;
                 SettingsService.Save(_settings);
             }
         }
-    }
-
-    private string _robloxVersionPath;
-    public string RobloxVersionPath
-    {
-        get => _robloxVersionPath;
-        set
-        {
-            if (SetProperty(ref _robloxVersionPath, value))
-            {
-                _settings.RobloxVersionPath = value;
-                SettingsService.Save(_settings);
-            }
-        }
-    }
-
-    private ObservableCollection<string> _availableRobloxVersions = new();
-    public ObservableCollection<string> AvailableRobloxVersions
-    {
-        get => _availableRobloxVersions;
-        set => SetProperty(ref _availableRobloxVersions, value);
-    }
-
-    private string _selectedRobloxVersion = string.Empty;
-    public string SelectedRobloxVersion
-    {
-        get => _selectedRobloxVersion;
-        set
-        {
-            if (SetProperty(ref _selectedRobloxVersion, value) && !string.IsNullOrEmpty(value))
-            {
-                if (value == "(auto-detect latest)")
-                {
-                    RobloxVersionPath = string.Empty;
-                }
-                else if (value == "Browse folder...")
-                {
-                    BrowseRobloxFolder();
-                }
-                else
-                {
-                    // A specific version hash was selected — find its actual path
-                    var path = RobloxVersionService.FindVersionPath(value);
-                    RobloxVersionPath = path ?? string.Empty;
-                }
-            }
-        }
-    }
-
-    private string _robloxVersionStatus = string.Empty;
-    public string RobloxVersionStatus
-    {
-        get => _robloxVersionStatus;
-        set => SetProperty(ref _robloxVersionStatus, value);
     }
 
     public ObservableCollection<AccentOption> AccentOptions { get; } = new();
@@ -234,8 +180,8 @@ public class SettingsViewModel : BaseViewModel
     public ICommand ExportAccountsCommand { get; }
     public ICommand ImportAccountsCommand { get; }
     public ICommand ClearRecentlyPlayedCommand { get; }
-    public ICommand CheckRobloxVersionCommand { get; }
     public ICommand BrowseRobloxFolderCommand { get; }
+    public ICommand ClearRobloxFolderCommand { get; }
 
     private string _updateStatus = string.Empty;
     public string UpdateStatus
@@ -264,8 +210,7 @@ public class SettingsViewModel : BaseViewModel
         _defaultScriptTemplate = _settings.DefaultScriptTemplate;
         _checkForUpdatesOnStartup = _settings.CheckForUpdatesOnStartup;
         _showSidebarBadges = _settings.ShowSidebarBadges;
-        _autoUpdateRoblox = _settings.AutoUpdateRoblox;
-        _robloxVersionPath = _settings.RobloxVersionPath;
+        _robloxPlayerFolder = _settings.RobloxPlayerFolder;
 
         foreach (var (name, hex) in ThemeService.AccentPresets)
         {
@@ -282,102 +227,35 @@ public class SettingsViewModel : BaseViewModel
         ExportAccountsCommand = new RelayCommand(_ => ExportAccounts());
         ImportAccountsCommand = new RelayCommand(_ => ImportAccounts());
         ClearRecentlyPlayedCommand = new RelayCommand(_ => ClearRecentlyPlayed());
-        CheckRobloxVersionCommand = new RelayCommand(async _ => await CheckRobloxVersionAsync());
         BrowseRobloxFolderCommand = new RelayCommand(_ => BrowseRobloxFolder());
-
-        RefreshRobloxVersions();
+        ClearRobloxFolderCommand = new RelayCommand(_ => { RobloxPlayerFolder = string.Empty; });
 
         ThemeService.ApplyAccentColor(_settings.AccentColorHex);
     }
 
-    public void RefreshRobloxVersions()
-    {
-        AvailableRobloxVersions.Clear();
-        AvailableRobloxVersions.Add("(auto-detect latest)");
-
-        foreach (var v in RobloxVersionService.GetLocalVersions())
-            AvailableRobloxVersions.Add(v);
-
-        AvailableRobloxVersions.Add("Browse folder...");
-
-        // Set selection
-        if (string.IsNullOrEmpty(_robloxVersionPath))
-        {
-            _selectedRobloxVersion = "(auto-detect latest)";
-        }
-        else
-        {
-            // Try to find a matching version in the list
-            var dirName = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(_robloxVersionPath) ?? "");
-            if (AvailableRobloxVersions.Contains(dirName))
-                _selectedRobloxVersion = dirName;
-            else
-                _selectedRobloxVersion = "(auto-detect latest)";
-        }
-        OnPropertyChanged(nameof(SelectedRobloxVersion));
-    }
-
-    private async Task CheckRobloxVersionAsync()
-    {
-        RobloxVersionStatus = "Checking...";
-        try
-        {
-            var info = await RobloxVersionService.GetLatestVersionAsync();
-            if (info == null)
-            {
-                RobloxVersionStatus = "Failed to check (no internet?)";
-                return;
-            }
-
-            string? existing = RobloxVersionService.FindVersionPath(info.clientVersionUpload);
-            if (existing != null)
-            {
-                RobloxVersionStatus = $"Up to date: {info.version} ({info.clientVersionUpload})";
-            }
-            else
-            {
-                RobloxVersionStatus = $"New version available: {info.version}";
-                if (AutoUpdateRoblox)
-                {
-                    RobloxVersionStatus = $"Downloading {info.version}...";
-                    var progress = new Progress<(double progress, string status)>(p =>
-                    {
-                        RobloxVersionStatus = p.status;
-                    });
-                    await RobloxVersionService.DownloadVersionAsync(info.clientVersionUpload, progress);
-                    RobloxVersionStatus = $"Installed: {info.version}";
-                    RefreshRobloxVersions();
-                    NotificationService.Push("Roblox Updated", $"Roblox {info.version} installed.", NotificationType.Success);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            RobloxVersionStatus = $"Error: {ex.Message}";
-        }
-    }
-
     private void BrowseRobloxFolder()
     {
-        var dialog = new Microsoft.Win32.OpenFileDialog
+        using var dialog = new System.Windows.Forms.FolderBrowserDialog
         {
-            Title = "Select RobloxPlayerBeta.exe",
-            Filter = "Roblox Player|RobloxPlayerBeta.exe|All Files (*.*)|*.*",
+            Description = "Select the folder containing RobloxPlayerBeta.exe",
+            UseDescriptionForTitle = true,
         };
 
-        if (dialog.ShowDialog() == true)
+        if (!string.IsNullOrEmpty(_robloxPlayerFolder) && System.IO.Directory.Exists(_robloxPlayerFolder))
+            dialog.SelectedPath = _robloxPlayerFolder;
+
+        if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
         {
-            RobloxVersionPath = dialog.FileName;
-            RobloxVersionStatus = $"Custom: {dialog.FileName}";
-            // Reset dropdown to auto since custom path is set directly
-            _selectedRobloxVersion = "(auto-detect latest)";
-            OnPropertyChanged(nameof(SelectedRobloxVersion));
-        }
-        else
-        {
-            // User cancelled — reset to auto
-            _selectedRobloxVersion = "(auto-detect latest)";
-            OnPropertyChanged(nameof(SelectedRobloxVersion));
+            string exe = System.IO.Path.Combine(dialog.SelectedPath, "RobloxPlayerBeta.exe");
+            if (System.IO.File.Exists(exe))
+            {
+                RobloxPlayerFolder = dialog.SelectedPath;
+            }
+            else
+            {
+                MessageBox.Show("RobloxPlayerBeta.exe was not found in that folder.", "Zyntra",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
     }
 

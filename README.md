@@ -143,7 +143,7 @@ Zyntra/
 
 ## Changelog
 
-- **Roblox Version Manager** — auto-detect, download, and install the latest Roblox player before launching; select specific versions or browse custom folders in Settings
+- **Roblox Player Folder** — select a custom Roblox player folder in Settings; direct exe launch bypasses the Roblox bootstrapper/installer
 - **Script UI API** — create custom sidebar tabs from Lua with buttons, inputs, checkboxes, dropdowns, progress bars; button callbacks; state persistence
 - **List / Grid view** — toggle between list and card grid layout for Accounts and Apps; click grid cards to launch
 - Removed Plugins system (replaced by Script UI)

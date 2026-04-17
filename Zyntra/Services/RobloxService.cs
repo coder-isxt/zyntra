@@ -131,51 +131,26 @@ public static class RobloxService
     public static async Task LaunchRobloxAsync(string cookie, long? placeId = null)
     {
         var settings = SettingsService.Load();
-
-        // Resolve player path — always prefer existing install to avoid slow re-downloads
-        // that would expire the auth ticket (~30s lifetime).
         string? playerPath = null;
 
-        // 1. Custom path from settings takes priority
-        if (!string.IsNullOrEmpty(settings.RobloxVersionPath) && File.Exists(settings.RobloxVersionPath))
+        // 1. Use custom folder from settings if set
+        if (!string.IsNullOrEmpty(settings.RobloxPlayerFolder))
         {
-            playerPath = settings.RobloxVersionPath;
+            string candidate = Path.Combine(settings.RobloxPlayerFolder, "RobloxPlayerBeta.exe");
+            if (File.Exists(candidate))
+                playerPath = candidate;
         }
-        else
-        {
-            // 2. Any existing local installation (standard or managed)
-            playerPath = FindRobloxPlayerPath();
 
-            // 3. Only download if NOTHING is installed and auto-update is enabled
-            if (playerPath == null && settings.AutoUpdateRoblox)
-            {
-                try
-                {
-                    ToastService.Show("Roblox", "Downloading latest version...");
-                    var progress = new Progress<(double progress, string status)>(p =>
-                    {
-                        if (p.progress > 0.02 && p.progress < 1.0)
-                            ToastService.Show("Roblox Download", p.status);
-                    });
-                    playerPath = await RobloxVersionService.EnsureLatestVersionAsync(progress);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Failed to install Roblox: {ex.Message}");
-                }
-            }
-        }
+        // 2. Fallback to auto-detect
+        playerPath ??= FindRobloxPlayerPath();
 
         if (playerPath == null)
-            throw new Exception("Roblox Player not found. Enable 'Auto Update Roblox' in Settings or install Roblox manually.");
+            throw new Exception("Roblox Player not found. Set the Roblox folder in Settings or install Roblox.");
 
-        // Fetch auth ticket AFTER version resolution (ticket expires in ~30 seconds)
         string authTicket = await GetAuthTicketAsync(cookie);
         long launchTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         long browserTrackerId = new Random().NextInt64(100000000000, 999999999999);
 
-        // Launch RobloxPlayerBeta.exe directly with CLI args.
-        // Avoids the roblox-player: protocol which invokes Roblox's own bootstrapper/installer.
         if (placeId.HasValue && placeId.Value > 0)
         {
             string placeLauncherUrl =
@@ -193,7 +168,6 @@ public static class RobloxService
         }
         else
         {
-            // "Just Launch" — open the Roblox app home
             Process.Start(new ProcessStartInfo
             {
                 FileName = playerPath,

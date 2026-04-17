@@ -196,54 +196,22 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Auto update Roblox" FontSize="13" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextBrush}" />
-                            <TextBlock Text="Automatically download the latest Roblox version before launching" FontSize="11"
-                                       Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0" />
-                        </StackPanel>
-                        <CheckBox Grid.Column="1" VerticalAlignment="Center"
-                                 Style="{StaticResource ToggleSwitchStyle}"
-                                 IsChecked="{Binding AutoUpdateRoblox}" />
-                    </Grid>
-                </Border>
-
-                <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="Roblox version" FontSize="13" FontWeight="SemiBold"
+                            <TextBlock Text="Roblox player folder" FontSize="13" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextBrush}" />
-                            <TextBlock Text="Select a local Roblox version or browse for a custom folder" FontSize="11"
-                                       Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0" />
-                        </StackPanel>
-                        <ComboBox Grid.Column="1" VerticalAlignment="Center" Width="220"
-                                  Style="{StaticResource DarkComboBoxStyle}"
-                                  ItemsSource="{Binding AvailableRobloxVersions}"
-                                  SelectedItem="{Binding SelectedRobloxVersion}" />
-                    </Grid>
-                </Border>
-
-                <Border Background="{StaticResource ControlBrush}" CornerRadius="8" Padding="16,14" Margin="0,0,0,8">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Check Roblox version" FontSize="13" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextBrush}" />
-                            <TextBlock Text="{Binding RobloxVersionStatus, FallbackValue='Click to check the latest Roblox version'}"
+                            <TextBlock Text="{Binding RobloxPlayerFolder, FallbackValue='Not set (auto-detect)'}"
                                        FontSize="11" Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0"
-                                       TextTrimming="CharacterEllipsis" />
+                                       TextTrimming="CharacterEllipsis" MaxWidth="350" />
                         </StackPanel>
-                        <Button Grid.Column="1" Content="Check Now" Padding="14,7"
+                        <Button Grid.Column="1" Content="Browse" Padding="14,7"
                                 Style="{StaticResource AccentButtonStyle}" VerticalAlignment="Center"
-                                Command="{Binding CheckRobloxVersionCommand}" />
+                                Command="{Binding BrowseRobloxFolderCommand}" />
+                        <Button Grid.Column="3" Content="Reset" Padding="14,7"
+                                Style="{StaticResource ControlButtonStyle}" VerticalAlignment="Center"
+                                Command="{Binding ClearRobloxFolderCommand}" />
                     </Grid>
                 </Border>
 
