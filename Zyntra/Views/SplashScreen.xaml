@@ -26,7 +26,7 @@
                            Foreground="{StaticResource TextBrush}" HorizontalAlignment="Center" />
 
                 <!-- Tagline -->
-                <TextBlock Text="Your personal app launcher" FontSize="13"
+                <TextBlock Text="All-in-one Roblox management tool" FontSize="13"
                            Foreground="{StaticResource SubTextBrush}" HorizontalAlignment="Center"
                            Margin="0,4,0,0" />
             </StackPanel>
