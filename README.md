@@ -143,6 +143,7 @@ Zyntra/
 
 ## Changelog
 
+- **AvalonEdit Script Editor** — replaced TextBox with professional code editor (AvalonEdit); Lua syntax highlighting; inline API autocomplete on dot typing; dark-themed completion popup; Ctrl+F search support
 - **Roblox Player Folder** — select a custom Roblox player folder in Settings; direct exe launch bypasses the Roblox bootstrapper/installer
 - **Script UI API** — create custom sidebar tabs from Lua with buttons, inputs, checkboxes, dropdowns, progress bars; button callbacks; state persistence
 - **List / Grid view** — toggle between list and card grid layout for Accounts and Apps; click grid cards to launch
