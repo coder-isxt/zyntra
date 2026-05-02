@@ -50,10 +50,10 @@ public partial class SplashScreen : Window
 
     private void AnimateProgress(double fraction)
     {
-        double targetWidth = (ActualWidth - 60) * fraction;
-        var anim = new DoubleAnimation(targetWidth, TimeSpan.FromMilliseconds(300))
+        double targetWidth = (ActualWidth - 72) * fraction;
+        var anim = new DoubleAnimation(targetWidth, TimeSpan.FromMilliseconds(350))
         {
-            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
         };
         ProgressFill.BeginAnimation(WidthProperty, anim);
     }
