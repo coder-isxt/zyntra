@@ -60,6 +60,12 @@ public partial class ScriptsView : UserControl
         }
     }
 
+    private void OnClearOutputClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is ScriptsViewModel vm)
+            vm.Output = string.Empty;
+    }
+
     private void UpdateLineNumbers(string text)
     {
         int count = 1;

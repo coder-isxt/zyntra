@@ -56,6 +56,19 @@ public class NonEmptyStringToVisibilityConverter : IValueConverter
         => throw new NotImplementedException();
 }
 
+public class EmptyStringToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string s && !string.IsNullOrEmpty(s))
+            return Visibility.Collapsed;
+        return Visibility.Visible;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
 public class NonZeroToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

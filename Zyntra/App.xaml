@@ -14,6 +14,7 @@
             <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisConverter" />
             <conv:ZeroToVisibilityConverter x:Key="ZeroToVisConverter" />
             <conv:NonEmptyStringToVisibilityConverter x:Key="NonEmptyToVisConverter" />
+            <conv:EmptyStringToVisibilityConverter x:Key="EmptyStringToVisConverter" />
             <conv:ExeIconConverter x:Key="ExeIconConverter" />
             <conv:ExeHasIconToVisibilityConverter x:Key="ExeHasIconVis" />
             <conv:ExeHasIconToInverseVisibilityConverter x:Key="ExeNoIconVis" />
