@@ -9,6 +9,8 @@ public partial class SplashScreen : Window
 {
     private readonly DispatcherTimer _timer;
     private int _step;
+    private double _trackWidth;
+    private double _currentFraction;
     private readonly string[] _messages = [
         "Loading configuration...",
         "Preparing services...",
@@ -50,11 +52,24 @@ public partial class SplashScreen : Window
 
     private void AnimateProgress(double fraction)
     {
-        double targetWidth = (ActualWidth - 72) * fraction;
+        _currentFraction = fraction;
+        if (_trackWidth <= 0) return;
+        double targetWidth = _trackWidth * fraction;
         var anim = new DoubleAnimation(targetWidth, TimeSpan.FromMilliseconds(350))
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
         };
         ProgressFill.BeginAnimation(WidthProperty, anim);
+    }
+
+    private void TrackBorder_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        _trackWidth = e.NewSize.Width;
+        // Re-apply current fraction to match new width without animation
+        if (_currentFraction > 0)
+        {
+            ProgressFill.BeginAnimation(WidthProperty, null);
+            ProgressFill.Width = _trackWidth * _currentFraction;
+        }
     }
 }

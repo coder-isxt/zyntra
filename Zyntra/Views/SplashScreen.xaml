@@ -108,46 +108,17 @@
                            Margin="0,0,0,12" Opacity="0.7" />
 
                 <!-- Progress bar track -->
-                <Border CornerRadius="3" Background="{StaticResource PanelInsetBrush}" Height="4">
-                    <Grid>
-                        <!-- Progress fill -->
-                        <Border x:Name="ProgressFill" CornerRadius="3" HorizontalAlignment="Left"
-                                Width="0" Height="4">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                    <GradientStop Color="{StaticResource AccentColor}" Offset="0" />
-                                    <GradientStop Color="#FF8EB4FF" Offset="1" />
-                                </LinearGradientBrush>
-                            </Border.Background>
-                        </Border>
-
-                        <!-- Shimmer overlay -->
-                        <Border x:Name="ShimmerOverlay" CornerRadius="3" Height="4"
-                                HorizontalAlignment="Left" Width="60" Opacity="0.3"
-                                IsHitTestVisible="False" ClipToBounds="True">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                    <GradientStop Color="Transparent" Offset="0" />
-                                    <GradientStop Color="#44FFFFFF" Offset="0.5" />
-                                    <GradientStop Color="Transparent" Offset="1" />
-                                </LinearGradientBrush>
-                            </Border.Background>
-                            <Border.RenderTransform>
-                                <TranslateTransform x:Name="ShimmerTranslate" X="-60" />
-                            </Border.RenderTransform>
-                            <Border.Triggers>
-                                <EventTrigger RoutedEvent="Border.Loaded">
-                                    <BeginStoryboard>
-                                        <Storyboard RepeatBehavior="Forever">
-                                            <DoubleAnimation Storyboard.TargetName="ShimmerTranslate"
-                                                             Storyboard.TargetProperty="X"
-                                                             From="-60" To="440" Duration="0:0:1.8" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Border.Triggers>
-                        </Border>
-                    </Grid>
+                <Border x:Name="TrackBorder" CornerRadius="3" Background="{StaticResource PanelInsetBrush}"
+                        Height="4" ClipToBounds="True" SizeChanged="TrackBorder_SizeChanged">
+                    <Border x:Name="ProgressFill" CornerRadius="3" HorizontalAlignment="Left"
+                            Width="0" Height="4">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="{StaticResource AccentColor}" Offset="0" />
+                                <GradientStop Color="#FF8EB4FF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
                 </Border>
 
                 <!-- Version -->
