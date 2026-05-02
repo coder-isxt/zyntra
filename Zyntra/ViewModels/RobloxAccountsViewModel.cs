@@ -244,36 +244,14 @@ public class RobloxAccountsViewModel : BaseViewModel
         var account = param as RobloxAccount ?? SelectedAccount;
         if (account == null) return;
 
-        var prompt = new Views.LaunchPromptWindow
-        {
-            Owner = Application.Current.MainWindow,
-            AccountName = account.DisplayName,
-        };
-
-        if (prompt.ShowDialog() != true) return;
-
         IsLoading = true;
         StatusText = $"Launching Roblox as {account.Username}...";
 
         try
         {
             string cookie = CryptoService.Decrypt(account.EncryptedCookie);
-            await RobloxService.LaunchRobloxAsync(cookie, prompt.PlaceId);
-
-            if (!prompt.JustLaunch && prompt.PlaceId.HasValue)
-            {
-                StatusText = $"Resolving game name...";
-                await RecentlyPlayedService.AddGameAsync(prompt.PlaceId.Value, account.DisplayName);
-                var latest = RecentlyPlayedService.Games.FirstOrDefault();
-                StatusText = latest != null
-                    ? $"Launched {latest.GameName} as {account.Username}"
-                    : $"Roblox launched as {account.Username} (Place {prompt.PlaceId})";
-                OnPropertyChanged(nameof(RecentGames));
-            }
-            else
-            {
-                StatusText = $"Roblox launched as {account.Username}";
-            }
+            await RobloxService.LaunchRobloxAsync(cookie);
+            StatusText = $"Roblox launched as {account.Username}";
         }
         catch (Exception ex)
         {

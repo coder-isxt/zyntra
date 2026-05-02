@@ -127,29 +127,15 @@ public partial class MainWindow : Window
                 {
                     await Dispatcher.InvokeAsync(async () =>
                     {
-                        var prompt = new Views.LaunchPromptWindow
+                        try
                         {
-                            AccountName = acc.DisplayName,
-                        };
-
-                        // Show on top even when in tray
-                        prompt.Topmost = true;
-                        prompt.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-
-                        if (prompt.ShowDialog() == true)
+                            string cookie = CryptoService.Decrypt(acc.EncryptedCookie);
+                            await RobloxService.LaunchRobloxAsync(cookie);
+                        }
+                        catch (Exception ex)
                         {
-                            try
-                            {
-                                string cookie = CryptoService.Decrypt(acc.EncryptedCookie);
-                                await RobloxService.LaunchRobloxAsync(cookie, prompt.PlaceId);
-                                if (!prompt.JustLaunch && prompt.PlaceId.HasValue)
-                                    await RecentlyPlayedService.AddGameAsync(prompt.PlaceId.Value, acc.DisplayName);
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show($"Launch failed: {ex.Message}", "Zyntra",
-                                    MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
+                            MessageBox.Show($"Launch failed: {ex.Message}", "Zyntra",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     });
                 });
