@@ -204,7 +204,7 @@
                                        Foreground="{StaticResource TextBrush}" />
                             <TextBlock Text="{Binding RobloxPlayerFolder, FallbackValue='Not set (auto-detect)'}"
                                        FontSize="11" Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0"
-                                       TextTrimming="CharacterEllipsis" MaxWidth="350" />
+                                       TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" />
                         </StackPanel>
                         <Button Grid.Column="1" Content="Browse" Padding="14,7"
                                 Style="{StaticResource AccentButtonStyle}" VerticalAlignment="Center"
