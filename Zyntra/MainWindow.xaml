@@ -197,6 +197,21 @@
                                 </Grid>
                             </Button>
 
+                            <Button x:Name="BtnYouTube"
+                                    Command="{Binding NavigateCommand}" CommandParameter="YouTube"
+                                    Click="SidebarNav_Click" Tag="YouTube"
+                                    HorizontalContentAlignment="Stretch"
+                                    Style="{StaticResource SidebarButtonStyle}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource IconVideo}"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="2" StrokeLineJoin="Round"
+                                          Width="17" Height="17" Stretch="Uniform"
+                                          Margin="0,0,12,0" />
+                                    <TextBlock Text="YouTube" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
                             <Button x:Name="BtnDocs"
                                     Command="{Binding NavigateCommand}" CommandParameter="Docs"
                                     Click="SidebarNav_Click" Tag="Docs"
@@ -274,6 +289,9 @@
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:ScriptsViewModel}">
                                     <views:ScriptsView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:YouTubePlayerViewModel}">
+                                    <views:YouTubePlayerView />
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:ScriptTabViewModel}">
                                     <views:ScriptTabView />

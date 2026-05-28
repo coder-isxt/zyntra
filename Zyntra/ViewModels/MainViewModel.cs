@@ -54,6 +54,7 @@ public class MainViewModel : BaseViewModel
     public AppsViewModel AppsVM { get; }
     public RobloxAccountsViewModel RobloxVM { get; }
     public ScriptsViewModel ScriptsVM { get; }
+    public YouTubePlayerViewModel YouTubeVM { get; }
     public DocsViewModel DocsVM { get; }
     public SettingsViewModel SettingsVM { get; }
 
@@ -67,6 +68,7 @@ public class MainViewModel : BaseViewModel
         AppsVM = new AppsViewModel();
         RobloxVM = new RobloxAccountsViewModel();
         ScriptsVM = new ScriptsViewModel();
+        YouTubeVM = new YouTubePlayerViewModel();
         DocsVM = new DocsViewModel();
         SettingsVM = new SettingsViewModel();
 
@@ -153,6 +155,10 @@ public class MainViewModel : BaseViewModel
             case "Scripts":
                 CurrentPage = ScriptsVM;
                 CurrentPageName = "Scripts";
+                break;
+            case "YouTube":
+                CurrentPage = YouTubeVM;
+                CurrentPageName = "YouTube";
                 break;
             case "Docs":
                 CurrentPage = DocsVM;

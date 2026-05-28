@@ -38,6 +38,7 @@ public partial class MainWindow : Window
                 BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
                 BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
                 BtnScripts.Style = tag == "Scripts" ? activeStyle : normalStyle;
+                BtnYouTube.Style = tag == "YouTube" ? activeStyle : normalStyle;
                 BtnDocs.Style = tag == "Docs" ? activeStyle : normalStyle;
                 BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;
             };
@@ -222,6 +223,7 @@ public partial class MainWindow : Window
             BtnApps.Style = normalStyle;
             BtnRoblox.Style = normalStyle;
             BtnScripts.Style = normalStyle;
+            BtnYouTube.Style = normalStyle;
             BtnDocs.Style = normalStyle;
             BtnSettings.Style = normalStyle;
         }
@@ -239,6 +241,7 @@ public partial class MainWindow : Window
             BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
             BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
             BtnScripts.Style = tag == "Scripts" ? activeStyle : normalStyle;
+            BtnYouTube.Style = tag == "YouTube" ? activeStyle : normalStyle;
             BtnDocs.Style = tag == "Docs" ? activeStyle : normalStyle;
             BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;
         }
