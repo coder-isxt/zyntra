@@ -1,3 +1,4 @@
+using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -5,6 +6,8 @@ namespace Zyntra.Services;
 
 public static class YouTubeEmbedService
 {
+    public const string PlayerHostName = "zyntra.youtube.local";
+
     private static readonly Regex VideoIdRegex = new(@"^[A-Za-z0-9_-]{11}$", RegexOptions.Compiled);
 
     public static bool TryGetVideoId(string input, out string videoId)
@@ -42,12 +45,87 @@ public static class YouTubeEmbedService
         return false;
     }
 
-    public static string BuildEmbedUrl(string videoId)
+    public static string EnsurePlayerHostFolder()
+    {
+        string folder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "Zyntra", "YouTubePlayer");
+
+        Directory.CreateDirectory(folder);
+        File.WriteAllText(Path.Combine(folder, "player.html"), BuildPlayerHostHtml());
+        return folder;
+    }
+
+    public static string BuildHostedPlayerUrl(string videoId)
     {
         string safeId = WebUtility.UrlEncode(videoId);
-        string origin = WebUtility.UrlEncode("https://www.youtube.com");
+        return $"https://{PlayerHostName}/player.html?v={safeId}&player=2";
+    }
+
+    private static string BuildEmbedUrl(string videoId)
+    {
+        string safeId = WebUtility.UrlEncode(videoId);
+        string origin = WebUtility.UrlEncode($"https://{PlayerHostName}");
         return $"https://www.youtube.com/embed/{safeId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin={origin}&widget_referrer={origin}";
     }
+
+    private static string BuildPlayerHostHtml()
+        => $$"""
+            <!doctype html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+              <style>
+                html, body {
+                  margin: 0;
+                  width: 100%;
+                  height: 100%;
+                  background: #0d1117;
+                  overflow: hidden;
+                }
+                #player, iframe {
+                  width: 100%;
+                  height: 100%;
+                  border: 0;
+                  display: block;
+                  background: #0d1117;
+                }
+                .empty {
+                  width: 100%;
+                  height: 100%;
+                  display: grid;
+                  place-items: center;
+                  color: #99a1b2;
+                  font: 14px Segoe UI, sans-serif;
+                }
+              </style>
+            </head>
+            <body>
+              <div id="player" class="empty">Loading video...</div>
+              <script>
+                const params = new URLSearchParams(location.search);
+                const videoId = params.get("v") || "";
+                const valid = /^[A-Za-z0-9_-]{11}$/.test(videoId);
+                const root = document.getElementById("player");
+
+                if (valid) {
+                  const iframe = document.createElement("iframe");
+                  iframe.title = "YouTube video player";
+                  iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+                  iframe.allowFullscreen = true;
+                  iframe.referrerPolicy = "strict-origin-when-cross-origin";
+                  iframe.src = "{{BuildEmbedUrl("__VIDEO_ID__")}}".replace("__VIDEO_ID__", encodeURIComponent(videoId));
+                  root.className = "";
+                  root.textContent = "";
+                  root.appendChild(iframe);
+                } else {
+                  root.textContent = "Invalid YouTube video ID.";
+                }
+              </script>
+            </body>
+            </html>
+            """;
 
     private static bool SetIfValid(string value, out string videoId)
     {

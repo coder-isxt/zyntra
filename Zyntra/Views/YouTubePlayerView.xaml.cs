@@ -64,6 +64,12 @@ public partial class YouTubePlayerView : UserControl
             var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
             await PlayerWebView.EnsureCoreWebView2Async(env);
 
+            string playerHostFolder = YouTubeEmbedService.EnsurePlayerHostFolder();
+            PlayerWebView.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                YouTubeEmbedService.PlayerHostName,
+                playerHostFolder,
+                CoreWebView2HostResourceAccessKind.Allow);
+
             PlayerWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
             PlayerWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
             PlayerWebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
@@ -99,7 +105,7 @@ public partial class YouTubePlayerView : UserControl
         vm.CurrentVideoId = videoId;
         vm.StatusText = $"Playing {videoId}";
         EmptyOverlay.Visibility = Visibility.Collapsed;
-        NavigateToYouTubeEmbed(PlayerWebView.CoreWebView2, videoId);
+        PlayerWebView.CoreWebView2.Navigate(YouTubeEmbedService.BuildHostedPlayerUrl(videoId));
     }
 
     private void OpenPip()
@@ -146,21 +152,4 @@ public partial class YouTubePlayerView : UserControl
 
     private static string BuildBlankPage()
         => "<html><body style=\"margin:0;background:#0d1117\"></body></html>";
-
-    private static void NavigateToYouTubeEmbed(CoreWebView2 webView, string videoId)
-    {
-        string headers = string.Join("\r\n", new[]
-        {
-            "Referer: https://www.youtube.com/",
-            "Origin: https://www.youtube.com",
-        });
-
-        var request = webView.Environment.CreateWebResourceRequest(
-            YouTubeEmbedService.BuildEmbedUrl(videoId),
-            "GET",
-            null,
-            headers);
-
-        webView.NavigateWithWebResourceRequest(request);
-    }
 }

@@ -28,10 +28,16 @@ public partial class YouTubePipWindow : Window
             var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
             await PipWebView.EnsureCoreWebView2Async(env);
 
+            string playerHostFolder = YouTubeEmbedService.EnsurePlayerHostFolder();
+            PipWebView.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                YouTubeEmbedService.PlayerHostName,
+                playerHostFolder,
+                CoreWebView2HostResourceAccessKind.Allow);
+
             PipWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
             PipWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
             PipWebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
-            NavigateToYouTubeEmbed(_videoId);
+            PipWebView.CoreWebView2.Navigate(YouTubeEmbedService.BuildHostedPlayerUrl(_videoId));
         }
         catch (Exception ex)
         {
@@ -62,22 +68,5 @@ public partial class YouTubePipWindow : Window
     {
         PipWebView?.Dispose();
         base.OnClosed(e);
-    }
-
-    private void NavigateToYouTubeEmbed(string videoId)
-    {
-        string headers = string.Join("\r\n", new[]
-        {
-            "Referer: https://www.youtube.com/",
-            "Origin: https://www.youtube.com",
-        });
-
-        var request = PipWebView.CoreWebView2.Environment.CreateWebResourceRequest(
-            YouTubeEmbedService.BuildEmbedUrl(videoId),
-            "GET",
-            null,
-            headers);
-
-        PipWebView.CoreWebView2.NavigateWithWebResourceRequest(request);
     }
 }
