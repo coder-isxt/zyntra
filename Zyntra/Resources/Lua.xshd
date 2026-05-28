@@ -20,7 +20,7 @@
       <End>\]\]</End>
     </Span>
 
-    <!-- Long-bracket comments --[[ ... ]] -->
+    <!-- Long-bracket block comments -->
     <Span color="Comment" multiline="true">
       <Begin>--\[\[</Begin>
       <End>\]\]</End>

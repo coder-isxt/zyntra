@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -31,13 +32,20 @@ public partial class ScriptsView : UserControl
 
     private void LoadLuaHighlighting()
     {
-        using var stream = Assembly.GetExecutingAssembly()
-            .GetManifestResourceStream("Zyntra.Resources.Lua.xshd");
-        if (stream != null)
+        try
         {
+            using var stream = Assembly.GetExecutingAssembly()
+                .GetManifestResourceStream("Zyntra.Resources.Lua.xshd");
+            if (stream == null)
+                return;
+
             using var reader = new System.Xml.XmlTextReader(stream);
             var xshd = HighlightingLoader.LoadXshd(reader);
             CodeEditor.SyntaxHighlighting = HighlightingLoader.Load(xshd, HighlightingManager.Instance);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to load Lua highlighting: {ex}");
         }
     }
 

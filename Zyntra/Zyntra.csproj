@@ -7,14 +7,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 
     <AssemblyName>Zyntra</AssemblyName>
     <RootNamespace>Zyntra</RootNamespace>
     <ApplicationIcon>..\logo.ico</ApplicationIcon>
 
-    <Version>26.5.6</Version>
-    <AssemblyVersion>26.5.6.0</AssemblyVersion>
-    <FileVersion>26.5.6.0</FileVersion>
+    <Version>26.5.7</Version>
+    <AssemblyVersion>26.5.7.0</AssemblyVersion>
+    <FileVersion>26.5.7.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
