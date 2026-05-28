@@ -45,7 +45,8 @@ public static class YouTubeEmbedService
     public static string BuildEmbedUrl(string videoId)
     {
         string safeId = WebUtility.UrlEncode(videoId);
-        return $"https://www.youtube-nocookie.com/embed/{safeId}?autoplay=1&rel=0&modestbranding=1&playsinline=1";
+        string origin = WebUtility.UrlEncode("https://www.youtube.com");
+        return $"https://www.youtube.com/embed/{safeId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin={origin}&widget_referrer={origin}";
     }
 
     private static bool SetIfValid(string value, out string videoId)
