@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Web.WebView2.Core;
@@ -15,6 +16,7 @@ public partial class YouTubePlayerView : UserControl
     {
         InitializeComponent();
         Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
         DataContextChanged += OnDataContextChanged;
     }
 
@@ -28,7 +30,7 @@ public partial class YouTubePlayerView : UserControl
     {
         if (e.OldValue is YouTubePlayerViewModel oldVm)
         {
-            oldVm.LoadRequested -= LoadVideo;
+            oldVm.PlayRequested -= PlayVideo;
             oldVm.PipRequested -= OpenPip;
             oldVm.StopRequested -= StopVideo;
         }
@@ -36,16 +38,22 @@ public partial class YouTubePlayerView : UserControl
         WireViewModel();
     }
 
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is YouTubePlayerViewModel vm)
+            vm.SaveNow();
+    }
+
     private void WireViewModel()
     {
         if (DataContext is not YouTubePlayerViewModel vm)
             return;
 
-        vm.LoadRequested -= LoadVideo;
+        vm.PlayRequested -= PlayVideo;
         vm.PipRequested -= OpenPip;
         vm.StopRequested -= StopVideo;
 
-        vm.LoadRequested += LoadVideo;
+        vm.PlayRequested += PlayVideo;
         vm.PipRequested += OpenPip;
         vm.StopRequested += StopVideo;
     }
@@ -73,6 +81,7 @@ public partial class YouTubePlayerView : UserControl
             PlayerWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
             PlayerWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
             PlayerWebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
+            PlayerWebView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
 
             _webViewReady = true;
         }
@@ -87,7 +96,7 @@ public partial class YouTubePlayerView : UserControl
         }
     }
 
-    private async void LoadVideo()
+    private async void PlayVideo(string videoId, double startSeconds)
     {
         if (DataContext is not YouTubePlayerViewModel vm)
             return;
@@ -96,16 +105,12 @@ public partial class YouTubePlayerView : UserControl
         if (!_webViewReady)
             return;
 
-        if (!YouTubeEmbedService.TryGetVideoId(vm.VideoInput, out string videoId))
-        {
-            vm.StatusText = "Enter a valid YouTube link or video ID";
-            return;
-        }
-
         vm.CurrentVideoId = videoId;
-        vm.StatusText = $"Playing {videoId}";
+        vm.StatusText = startSeconds > 0
+            ? $"Continuing {videoId}"
+            : $"Playing {videoId}";
         EmptyOverlay.Visibility = Visibility.Collapsed;
-        PlayerWebView.CoreWebView2.Navigate(YouTubeEmbedService.BuildHostedPlayerUrl(videoId));
+        PlayerWebView.CoreWebView2.Navigate(YouTubeEmbedService.BuildHostedPlayerUrl(videoId, startSeconds));
     }
 
     private void OpenPip()
@@ -121,7 +126,7 @@ public partial class YouTubePlayerView : UserControl
             return;
         }
 
-        var window = new YouTubePipWindow(videoId)
+        var window = new YouTubePipWindow(videoId, vm.CurrentPositionSeconds)
         {
             Owner = Window.GetWindow(this)
         };
@@ -134,6 +139,38 @@ public partial class YouTubePlayerView : UserControl
         }
 
         vm.StatusText = "PiP window opened";
+    }
+
+    private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+    {
+        if (DataContext is not YouTubePlayerViewModel vm)
+            return;
+
+        try
+        {
+            var message = JsonSerializer.Deserialize<YouTubePlayerMessage>(
+                e.WebMessageAsJson,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (message == null)
+                return;
+
+            if (message.Type is "ready" or "state" or "progress")
+            {
+                vm.RecordProgress(
+                    message.VideoId,
+                    message.Title,
+                    message.CurrentTime,
+                    message.Duration);
+            }
+            else if (message.Type == "error")
+            {
+                vm.StatusText = $"YouTube player error: {message.ErrorCode}";
+            }
+        }
+        catch
+        {
+            // Ignore malformed script messages from the hosted player.
+        }
     }
 
     private void StopVideo()
@@ -152,4 +189,15 @@ public partial class YouTubePlayerView : UserControl
 
     private static string BuildBlankPage()
         => "<html><body style=\"margin:0;background:#0d1117\"></body></html>";
+
+    private sealed class YouTubePlayerMessage
+    {
+        public string Type { get; set; } = string.Empty;
+        public string VideoId { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public double CurrentTime { get; set; }
+        public double Duration { get; set; }
+        public int State { get; set; }
+        public string ErrorCode { get; set; } = string.Empty;
+    }
 }

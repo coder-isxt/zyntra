@@ -56,21 +56,15 @@ public static class YouTubeEmbedService
         return folder;
     }
 
-    public static string BuildHostedPlayerUrl(string videoId)
+    public static string BuildHostedPlayerUrl(string videoId, double startSeconds = 0)
     {
         string safeId = WebUtility.UrlEncode(videoId);
-        return $"https://{PlayerHostName}/player.html?v={safeId}&player=2";
-    }
-
-    private static string BuildEmbedUrl(string videoId)
-    {
-        string safeId = WebUtility.UrlEncode(videoId);
-        string origin = WebUtility.UrlEncode($"https://{PlayerHostName}");
-        return $"https://www.youtube.com/embed/{safeId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin={origin}&widget_referrer={origin}";
+        int start = Math.Max(0, (int)Math.Floor(startSeconds));
+        return $"https://{PlayerHostName}/player.html?v={safeId}&t={start}&player=3";
     }
 
     private static string BuildPlayerHostHtml()
-        => $$"""
+        => """
             <!doctype html>
             <html>
             <head>
@@ -103,23 +97,92 @@ public static class YouTubeEmbedService
             </head>
             <body>
               <div id="player" class="empty">Loading video...</div>
+              <script src="https://www.youtube.com/iframe_api"></script>
               <script>
                 const params = new URLSearchParams(location.search);
                 const videoId = params.get("v") || "";
+                const startSeconds = Math.max(0, parseInt(params.get("t") || "0", 10) || 0);
                 const valid = /^[A-Za-z0-9_-]{11}$/.test(videoId);
                 const root = document.getElementById("player");
+                let player = null;
+                let progressTimer = null;
 
-                if (valid) {
-                  const iframe = document.createElement("iframe");
-                  iframe.title = "YouTube video player";
-                  iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-                  iframe.allowFullscreen = true;
-                  iframe.referrerPolicy = "strict-origin-when-cross-origin";
-                  iframe.src = "{{BuildEmbedUrl("__VIDEO_ID__")}}".replace("__VIDEO_ID__", encodeURIComponent(videoId));
+                function send(type, extra) {
+                  const payload = Object.assign({
+                    type,
+                    videoId,
+                    title: "",
+                    currentTime: 0,
+                    duration: 0,
+                    state: -1
+                  }, extra || {});
+
+                  if (player && typeof player.getCurrentTime === "function") {
+                    try {
+                      const data = player.getVideoData ? player.getVideoData() : null;
+                      payload.title = data && data.title ? data.title : payload.title;
+                      payload.currentTime = player.getCurrentTime() || 0;
+                      payload.duration = player.getDuration ? player.getDuration() || 0 : 0;
+                      payload.state = player.getPlayerState ? player.getPlayerState() : -1;
+                    } catch {}
+                  }
+
+                  if (window.chrome && window.chrome.webview) {
+                    window.chrome.webview.postMessage(payload);
+                  }
+                }
+
+                function startProgressTimer() {
+                  if (progressTimer) return;
+                  progressTimer = setInterval(() => send("progress"), 3000);
+                }
+
+                function stopProgressTimer() {
+                  if (!progressTimer) return;
+                  clearInterval(progressTimer);
+                  progressTimer = null;
+                }
+
+                function onYouTubeIframeAPIReady() {
+                  if (!valid) {
+                    root.textContent = "Invalid YouTube video ID.";
+                    send("error", { errorCode: "invalid-id" });
+                    return;
+                  }
+
                   root.className = "";
                   root.textContent = "";
-                  root.appendChild(iframe);
-                } else {
+                  player = new YT.Player("player", {
+                    width: "100%",
+                    height: "100%",
+                    videoId,
+                    playerVars: {
+                      autoplay: 1,
+                      rel: 0,
+                      modestbranding: 1,
+                      playsinline: 1,
+                      start: startSeconds,
+                      origin: location.origin,
+                      widget_referrer: location.origin
+                    },
+                    events: {
+                      onReady: () => {
+                        send("ready");
+                        startProgressTimer();
+                      },
+                      onStateChange: (event) => {
+                        send("state", { state: event.data });
+                        if (event.data === YT.PlayerState.PLAYING) startProgressTimer();
+                        if (event.data === YT.PlayerState.ENDED) stopProgressTimer();
+                      },
+                      onError: (event) => send("error", { errorCode: event.data })
+                    }
+                  });
+                }
+
+                window.addEventListener("beforeunload", () => send("progress"));
+
+                if (!valid) {
                   root.textContent = "Invalid YouTube video ID.";
                 }
               </script>

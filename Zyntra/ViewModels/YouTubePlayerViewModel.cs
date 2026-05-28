@@ -1,9 +1,20 @@
+using System.Collections.ObjectModel;
 using System.Windows.Input;
+using Zyntra.Models;
+using Zyntra.Services;
 
 namespace Zyntra.ViewModels;
 
 public class YouTubePlayerViewModel : BaseViewModel
 {
+    private readonly YouTubeLibraryData _library;
+    private DateTime _lastProgressSave = DateTime.MinValue;
+
+    public ObservableCollection<YouTubeHistoryItem> History { get; } = new();
+    public ObservableCollection<YouTubeHistoryItem> ContinueWatching { get; } = new();
+    public ObservableCollection<YouTubePlaylist> Playlists { get; } = new();
+    public ObservableCollection<YouTubePlaylistItem> SelectedPlaylistItems { get; } = new();
+
     private string _videoInput = string.Empty;
     public string VideoInput
     {
@@ -18,6 +29,45 @@ public class YouTubePlayerViewModel : BaseViewModel
         set => SetProperty(ref _currentVideoId, value);
     }
 
+    private string _currentTitle = string.Empty;
+    public string CurrentTitle
+    {
+        get => _currentTitle;
+        set => SetProperty(ref _currentTitle, value);
+    }
+
+    private double _currentPositionSeconds;
+    public double CurrentPositionSeconds
+    {
+        get => _currentPositionSeconds;
+        set => SetProperty(ref _currentPositionSeconds, value);
+    }
+
+    private double _currentDurationSeconds;
+    public double CurrentDurationSeconds
+    {
+        get => _currentDurationSeconds;
+        set => SetProperty(ref _currentDurationSeconds, value);
+    }
+
+    private string _newPlaylistName = string.Empty;
+    public string NewPlaylistName
+    {
+        get => _newPlaylistName;
+        set => SetProperty(ref _newPlaylistName, value);
+    }
+
+    private YouTubePlaylist? _selectedPlaylist;
+    public YouTubePlaylist? SelectedPlaylist
+    {
+        get => _selectedPlaylist;
+        set
+        {
+            if (SetProperty(ref _selectedPlaylist, value))
+                RefreshSelectedPlaylistItems();
+        }
+    }
+
     private string _statusText = "Ready";
     public string StatusText
     {
@@ -28,15 +78,246 @@ public class YouTubePlayerViewModel : BaseViewModel
     public ICommand LoadVideoCommand { get; }
     public ICommand OpenPipCommand { get; }
     public ICommand StopCommand { get; }
+    public ICommand PlayHistoryCommand { get; }
+    public ICommand ClearHistoryCommand { get; }
+    public ICommand CreatePlaylistCommand { get; }
+    public ICommand DeletePlaylistCommand { get; }
+    public ICommand AddCurrentToPlaylistCommand { get; }
+    public ICommand PlayPlaylistItemCommand { get; }
+    public ICommand RemovePlaylistItemCommand { get; }
 
-    public event Action? LoadRequested;
+    public event Action<string, double>? PlayRequested;
     public event Action? PipRequested;
     public event Action? StopRequested;
 
     public YouTubePlayerViewModel()
     {
-        LoadVideoCommand = new RelayCommand(_ => LoadRequested?.Invoke());
+        _library = YouTubeLibraryService.Load();
+        LoadLibrary();
+
+        LoadVideoCommand = new RelayCommand(_ => LoadFromInput());
         OpenPipCommand = new RelayCommand(_ => PipRequested?.Invoke());
         StopCommand = new RelayCommand(_ => StopRequested?.Invoke());
+        PlayHistoryCommand = new RelayCommand(PlayHistory);
+        ClearHistoryCommand = new RelayCommand(_ => ClearHistory());
+        CreatePlaylistCommand = new RelayCommand(_ => CreatePlaylist());
+        DeletePlaylistCommand = new RelayCommand(_ => DeleteSelectedPlaylist());
+        AddCurrentToPlaylistCommand = new RelayCommand(_ => AddCurrentToPlaylist());
+        PlayPlaylistItemCommand = new RelayCommand(PlayPlaylistItem);
+        RemovePlaylistItemCommand = new RelayCommand(RemovePlaylistItem);
+    }
+
+    public void RecordProgress(string videoId, string title, double positionSeconds, double durationSeconds)
+    {
+        if (string.IsNullOrWhiteSpace(videoId))
+            return;
+
+        CurrentVideoId = videoId;
+        CurrentPositionSeconds = Math.Max(0, positionSeconds);
+        CurrentDurationSeconds = Math.Max(0, durationSeconds);
+        if (!string.IsNullOrWhiteSpace(title))
+            CurrentTitle = title;
+
+        var existing = _library.History.FirstOrDefault(h => h.VideoId == videoId);
+        bool isNew = existing == null;
+        existing ??= new YouTubeHistoryItem { VideoId = videoId, WatchCount = 0 };
+
+        existing.Title = string.IsNullOrWhiteSpace(title)
+            ? existing.Title.Length > 0 ? existing.Title : videoId
+            : title;
+        existing.LastPositionSeconds = Math.Max(0, positionSeconds);
+        existing.DurationSeconds = Math.Max(existing.DurationSeconds, durationSeconds);
+        existing.LastPlayedAt = DateTime.UtcNow;
+        if (isNew)
+            existing.WatchCount++;
+
+        if (isNew)
+            _library.History.Insert(0, existing);
+        else
+        {
+            _library.History.Remove(existing);
+            _library.History.Insert(0, existing);
+        }
+
+        SyncHistoryCollections();
+
+        if ((DateTime.UtcNow - _lastProgressSave).TotalSeconds >= 3 || isNew)
+        {
+            SaveLibrary();
+            _lastProgressSave = DateTime.UtcNow;
+        }
+    }
+
+    public void SaveNow()
+    {
+        SaveLibrary();
+    }
+
+    private void LoadFromInput()
+    {
+        if (!YouTubeEmbedService.TryGetVideoId(VideoInput, out string videoId))
+        {
+            StatusText = "Enter a valid YouTube link or video ID";
+            return;
+        }
+
+        var history = _library.History.FirstOrDefault(h => h.VideoId == videoId);
+        double startSeconds = GetResumeStart(history);
+        PlayRequested?.Invoke(videoId, startSeconds);
+    }
+
+    private void PlayHistory(object? param)
+    {
+        if (param is not YouTubeHistoryItem item)
+            return;
+
+        PlayRequested?.Invoke(item.VideoId, GetResumeStart(item));
+    }
+
+    private void PlayPlaylistItem(object? param)
+    {
+        if (param is not YouTubePlaylistItem item)
+            return;
+
+        var history = _library.History.FirstOrDefault(h => h.VideoId == item.VideoId);
+        PlayRequested?.Invoke(item.VideoId, GetResumeStart(history));
+    }
+
+    private void CreatePlaylist()
+    {
+        string name = NewPlaylistName.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            StatusText = "Enter a playlist name";
+            return;
+        }
+
+        var playlist = new YouTubePlaylist { Name = name };
+        _library.Playlists.Add(playlist);
+        Playlists.Add(playlist);
+        SelectedPlaylist = playlist;
+        NewPlaylistName = string.Empty;
+        SaveLibrary();
+        StatusText = $"Created playlist: {name}";
+    }
+
+    private void DeleteSelectedPlaylist()
+    {
+        if (SelectedPlaylist == null)
+            return;
+
+        string name = SelectedPlaylist.Name;
+        _library.Playlists.Remove(SelectedPlaylist);
+        Playlists.Remove(SelectedPlaylist);
+        SelectedPlaylist = Playlists.FirstOrDefault();
+        SaveLibrary();
+        StatusText = $"Deleted playlist: {name}";
+    }
+
+    private void AddCurrentToPlaylist()
+    {
+        if (SelectedPlaylist == null)
+        {
+            StatusText = "Create or select a playlist first";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(CurrentVideoId))
+        {
+            StatusText = "Load a video before adding it";
+            return;
+        }
+
+        if (SelectedPlaylist.Items.Any(i => i.VideoId == CurrentVideoId))
+        {
+            StatusText = "Video is already in this playlist";
+            return;
+        }
+
+        string title = string.IsNullOrWhiteSpace(CurrentTitle) ? CurrentVideoId : CurrentTitle;
+        var item = new YouTubePlaylistItem { VideoId = CurrentVideoId, Title = title };
+        SelectedPlaylist.Items.Add(item);
+        SelectedPlaylistItems.Add(item);
+        SaveLibrary();
+        StatusText = $"Added to {SelectedPlaylist.Name}";
+    }
+
+    private void RemovePlaylistItem(object? param)
+    {
+        if (SelectedPlaylist == null || param is not YouTubePlaylistItem item)
+            return;
+
+        SelectedPlaylist.Items.Remove(item);
+        SelectedPlaylistItems.Remove(item);
+        SaveLibrary();
+        StatusText = "Removed from playlist";
+    }
+
+    private void ClearHistory()
+    {
+        _library.History.Clear();
+        History.Clear();
+        ContinueWatching.Clear();
+        SaveLibrary();
+        StatusText = "History cleared";
+    }
+
+    private void LoadLibrary()
+    {
+        SyncHistoryCollections();
+
+        Playlists.Clear();
+        foreach (var playlist in _library.Playlists.OrderBy(p => p.CreatedAt))
+            Playlists.Add(playlist);
+
+        SelectedPlaylist = Playlists.FirstOrDefault();
+    }
+
+    private void SyncHistoryCollections()
+    {
+        History.Clear();
+        foreach (var item in _library.History.OrderByDescending(h => h.LastPlayedAt).Take(50))
+            History.Add(item);
+
+        ContinueWatching.Clear();
+        foreach (var item in _library.History
+                     .Where(CanResume)
+                     .OrderByDescending(h => h.LastPlayedAt)
+                     .Take(5))
+            ContinueWatching.Add(item);
+    }
+
+    private void RefreshSelectedPlaylistItems()
+    {
+        SelectedPlaylistItems.Clear();
+        if (SelectedPlaylist == null)
+            return;
+
+        foreach (var item in SelectedPlaylist.Items.OrderBy(i => i.AddedAt))
+            SelectedPlaylistItems.Add(item);
+    }
+
+    private void SaveLibrary()
+    {
+        YouTubeLibraryService.Save(_library);
+    }
+
+    private static bool CanResume(YouTubeHistoryItem item)
+    {
+        if (item.LastPositionSeconds < 15)
+            return false;
+
+        if (item.DurationSeconds <= 0)
+            return true;
+
+        return item.LastPositionSeconds < item.DurationSeconds - 20;
+    }
+
+    private static double GetResumeStart(YouTubeHistoryItem? item)
+    {
+        if (item == null || !CanResume(item))
+            return 0;
+
+        return Math.Max(0, item.LastPositionSeconds - 3);
     }
 }
