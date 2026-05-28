@@ -31,7 +31,7 @@ public partial class YouTubePipWindow : Window
             PipWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
             PipWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
             PipWebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
-            PipWebView.NavigateToString(YouTubeEmbedService.BuildPlayerHtml(_videoId));
+            PipWebView.CoreWebView2.Navigate(YouTubeEmbedService.BuildEmbedUrl(_videoId));
         }
         catch (Exception ex)
         {

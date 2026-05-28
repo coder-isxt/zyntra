@@ -99,7 +99,7 @@ public partial class YouTubePlayerView : UserControl
         vm.CurrentVideoId = videoId;
         vm.StatusText = $"Playing {videoId}";
         EmptyOverlay.Visibility = Visibility.Collapsed;
-        PlayerWebView.NavigateToString(YouTubeEmbedService.BuildPlayerHtml(videoId));
+        PlayerWebView.CoreWebView2.Navigate(YouTubeEmbedService.BuildEmbedUrl(videoId));
     }
 
     private void OpenPip()

@@ -42,44 +42,10 @@ public static class YouTubeEmbedService
         return false;
     }
 
-    public static string BuildPlayerHtml(string videoId)
+    public static string BuildEmbedUrl(string videoId)
     {
-        string safeId = WebUtility.HtmlEncode(videoId);
-        string src = $"https://www.youtube-nocookie.com/embed/{safeId}?autoplay=1&rel=0&modestbranding=1&playsinline=1";
-
-        return $$"""
-            <!doctype html>
-            <html>
-            <head>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1">
-              <style>
-                html, body {
-                  margin: 0;
-                  width: 100%;
-                  height: 100%;
-                  background: #0d1117;
-                  overflow: hidden;
-                }
-                iframe {
-                  width: 100%;
-                  height: 100%;
-                  border: 0;
-                  display: block;
-                  background: #0d1117;
-                }
-              </style>
-            </head>
-            <body>
-              <iframe
-                src="{{src}}"
-                title="YouTube video player"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen>
-              </iframe>
-            </body>
-            </html>
-            """;
+        string safeId = WebUtility.UrlEncode(videoId);
+        return $"https://www.youtube-nocookie.com/embed/{safeId}?autoplay=1&rel=0&modestbranding=1&playsinline=1";
     }
 
     private static bool SetIfValid(string value, out string videoId)
