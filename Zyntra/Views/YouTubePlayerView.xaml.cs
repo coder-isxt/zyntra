@@ -2,6 +2,7 @@ using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using Microsoft.Web.WebView2.Core;
 using Zyntra.Services;
 using Zyntra.ViewModels;
@@ -10,7 +11,13 @@ namespace Zyntra.Views;
 
 public partial class YouTubePlayerView : UserControl
 {
+    private static readonly JsonSerializerOptions MessageJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private bool _webViewReady;
+    private bool _isUnloaded;
 
     public YouTubePlayerView()
     {
@@ -22,6 +29,7 @@ public partial class YouTubePlayerView : UserControl
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        _isUnloaded = false;
         await InitializeWebViewAsync();
         WireViewModel();
     }
@@ -40,8 +48,39 @@ public partial class YouTubePlayerView : UserControl
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
+        _isUnloaded = true;
+
         if (DataContext is YouTubePlayerViewModel vm)
+        {
+            vm.PlayRequested -= PlayVideo;
+            vm.PipRequested -= OpenPip;
+            vm.StopRequested -= StopVideo;
             vm.SaveNow();
+        }
+
+        TeardownWebView();
+    }
+
+    private void TeardownWebView()
+    {
+        if (!_webViewReady)
+            return;
+
+        try
+        {
+            var core = PlayerWebView.CoreWebView2;
+            if (core != null)
+            {
+                core.WebMessageReceived -= OnWebMessageReceived;
+                core.NavigateToString(BuildBlankPage());
+            }
+        }
+        catch
+        {
+            // WebView may already be disposing.
+        }
+
+        _webViewReady = false;
     }
 
     private void WireViewModel()
@@ -143,14 +182,34 @@ public partial class YouTubePlayerView : UserControl
 
     private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
-        if (DataContext is not YouTubePlayerViewModel vm)
+        if (_isUnloaded)
+            return;
+
+        string json;
+        try
+        {
+            json = e.WebMessageAsJson;
+        }
+        catch
+        {
+            return;
+        }
+
+        var dispatcher = Dispatcher;
+        if (dispatcher == null || dispatcher.CheckAccess())
+            HandleWebMessage(json);
+        else
+            dispatcher.BeginInvoke(() => HandleWebMessage(json), DispatcherPriority.Background);
+    }
+
+    private void HandleWebMessage(string json)
+    {
+        if (_isUnloaded || DataContext is not YouTubePlayerViewModel vm)
             return;
 
         try
         {
-            var message = JsonSerializer.Deserialize<YouTubePlayerMessage>(
-                e.WebMessageAsJson,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var message = JsonSerializer.Deserialize<YouTubePlayerMessage>(json, MessageJsonOptions);
             if (message == null)
                 return;
 

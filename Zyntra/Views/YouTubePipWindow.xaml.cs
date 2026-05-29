@@ -2,6 +2,7 @@ using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Microsoft.Web.WebView2.Core;
 using Zyntra.Models;
 using Zyntra.Services;
@@ -10,9 +11,15 @@ namespace Zyntra.Views;
 
 public partial class YouTubePipWindow : Window
 {
+    private static readonly JsonSerializerOptions MessageJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private readonly string _videoId;
     private readonly double _startSeconds;
     private DateTime _lastProgressSave = DateTime.MinValue;
+    private bool _isClosed;
 
     public YouTubePipWindow(string videoId, double startSeconds = 0)
     {
@@ -72,17 +79,53 @@ public partial class YouTubePipWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        _isClosed = true;
+
+        try
+        {
+            var core = PipWebView.CoreWebView2;
+            if (core != null)
+                core.WebMessageReceived -= OnWebMessageReceived;
+        }
+        catch
+        {
+            // WebView may already be disposing.
+        }
+
         PipWebView?.Dispose();
         base.OnClosed(e);
     }
 
     private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
+        if (_isClosed)
+            return;
+
+        string json;
         try
         {
-            var message = JsonSerializer.Deserialize<YouTubePlayerMessage>(
-                e.WebMessageAsJson,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            json = e.WebMessageAsJson;
+        }
+        catch
+        {
+            return;
+        }
+
+        var dispatcher = Dispatcher;
+        if (dispatcher == null || dispatcher.CheckAccess())
+            HandleWebMessage(json);
+        else
+            dispatcher.BeginInvoke(() => HandleWebMessage(json), DispatcherPriority.Background);
+    }
+
+    private void HandleWebMessage(string json)
+    {
+        if (_isClosed)
+            return;
+
+        try
+        {
+            var message = JsonSerializer.Deserialize<YouTubePlayerMessage>(json, MessageJsonOptions);
             if (message == null || message.Type is not ("ready" or "state" or "progress"))
                 return;
 
@@ -91,17 +134,21 @@ public partial class YouTubePipWindow : Window
 
             var library = YouTubeLibraryService.Load();
             var item = library.History.FirstOrDefault(h => h.VideoId == message.VideoId);
+            bool isNew = item == null;
             item ??= new YouTubeHistoryItem { VideoId = message.VideoId, WatchCount = 1 };
 
-            item.Title = string.IsNullOrWhiteSpace(message.Title)
-                ? item.Title.Length > 0 ? item.Title : message.VideoId
-                : message.Title;
-            item.LastPositionSeconds = Math.Max(0, message.CurrentTime);
-            item.DurationSeconds = Math.Max(item.DurationSeconds, message.Duration);
-            item.LastPlayedAt = DateTime.UtcNow;
+            item.UpdatePlaybackProgress(
+                string.IsNullOrWhiteSpace(message.Title)
+                    ? item.Title.Length > 0 ? item.Title : message.VideoId
+                    : message.Title,
+                message.CurrentTime,
+                message.Duration);
 
-            library.History.Remove(item);
-            library.History.Insert(0, item);
+            if (isNew)
+            {
+                library.History.Insert(0, item);
+            }
+
             YouTubeLibraryService.Save(library);
             _lastProgressSave = DateTime.UtcNow;
         }

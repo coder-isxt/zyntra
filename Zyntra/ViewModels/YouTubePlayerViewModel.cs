@@ -145,34 +145,44 @@ public class YouTubePlayerViewModel : BaseViewModel
         if (!string.IsNullOrWhiteSpace(title))
             CurrentTitle = title;
 
+        string resolvedTitle = string.IsNullOrWhiteSpace(title) ? videoId : title;
+
         var existing = _library.History.FirstOrDefault(h => h.VideoId == videoId);
         bool isNew = existing == null;
-        existing ??= new YouTubeHistoryItem { VideoId = videoId, WatchCount = 0 };
-
-        existing.Title = string.IsNullOrWhiteSpace(title)
-            ? existing.Title.Length > 0 ? existing.Title : videoId
-            : title;
-        existing.LastPositionSeconds = Math.Max(0, positionSeconds);
-        existing.DurationSeconds = Math.Max(existing.DurationSeconds, durationSeconds);
-        existing.LastPlayedAt = DateTime.UtcNow;
         if (isNew)
-            existing.WatchCount++;
-
-        if (isNew)
-            _library.History.Insert(0, existing);
-        else
         {
-            _library.History.Remove(existing);
+            existing = new YouTubeHistoryItem { VideoId = videoId, WatchCount = 1 };
+            existing.UpdatePlaybackProgress(resolvedTitle, positionSeconds, durationSeconds);
             _library.History.Insert(0, existing);
+            SyncHistoryCollections();
         }
-
-        SyncHistoryCollections();
+        else if (existing != null)
+        {
+            existing.UpdatePlaybackProgress(
+                string.IsNullOrWhiteSpace(title)
+                    ? existing.Title.Length > 0 ? existing.Title : videoId
+                    : title,
+                positionSeconds,
+                durationSeconds);
+            RefreshContinueWatchingEntry(existing);
+        }
 
         if ((DateTime.UtcNow - _lastProgressSave).TotalSeconds >= 3 || isNew)
         {
             SaveLibrary();
             _lastProgressSave = DateTime.UtcNow;
         }
+    }
+
+    private void RefreshContinueWatchingEntry(YouTubeHistoryItem item)
+    {
+        bool shouldShow = CanResume(item);
+        int index = ContinueWatching.IndexOf(item);
+
+        if (shouldShow && index < 0)
+            ContinueWatching.Insert(0, item);
+        else if (!shouldShow && index >= 0)
+            ContinueWatching.RemoveAt(index);
     }
 
     public void SaveNow()
