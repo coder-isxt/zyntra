@@ -15,6 +15,27 @@ public class YouTubePlayerViewModel : BaseViewModel
     public ObservableCollection<YouTubePlaylist> Playlists { get; } = new();
     public ObservableCollection<YouTubePlaylistItem> SelectedPlaylistItems { get; } = new();
 
+    private string _activeSection = "Watch";
+    public string ActiveSection
+    {
+        get => _activeSection;
+        set
+        {
+            if (SetProperty(ref _activeSection, value))
+            {
+                OnPropertyChanged(nameof(IsWatchSection));
+                OnPropertyChanged(nameof(IsContinueSection));
+                OnPropertyChanged(nameof(IsHistorySection));
+                OnPropertyChanged(nameof(IsPlaylistsSection));
+            }
+        }
+    }
+
+    public bool IsWatchSection => ActiveSection == "Watch";
+    public bool IsContinueSection => ActiveSection == "Continue";
+    public bool IsHistorySection => ActiveSection == "History";
+    public bool IsPlaylistsSection => ActiveSection == "Playlists";
+
     private string _videoInput = string.Empty;
     public string VideoInput
     {
@@ -85,6 +106,7 @@ public class YouTubePlayerViewModel : BaseViewModel
     public ICommand AddCurrentToPlaylistCommand { get; }
     public ICommand PlayPlaylistItemCommand { get; }
     public ICommand RemovePlaylistItemCommand { get; }
+    public ICommand NavigateSectionCommand { get; }
 
     public event Action<string, double>? PlayRequested;
     public event Action? PipRequested;
@@ -105,6 +127,11 @@ public class YouTubePlayerViewModel : BaseViewModel
         AddCurrentToPlaylistCommand = new RelayCommand(_ => AddCurrentToPlaylist());
         PlayPlaylistItemCommand = new RelayCommand(PlayPlaylistItem);
         RemovePlaylistItemCommand = new RelayCommand(RemovePlaylistItem);
+        NavigateSectionCommand = new RelayCommand(p =>
+        {
+            if (p is string section)
+                ActiveSection = section;
+        });
     }
 
     public void RecordProgress(string videoId, string title, double positionSeconds, double durationSeconds)
@@ -163,6 +190,7 @@ public class YouTubePlayerViewModel : BaseViewModel
 
         var history = _library.History.FirstOrDefault(h => h.VideoId == videoId);
         double startSeconds = GetResumeStart(history);
+        ActiveSection = "Watch";
         PlayRequested?.Invoke(videoId, startSeconds);
     }
 
@@ -171,6 +199,7 @@ public class YouTubePlayerViewModel : BaseViewModel
         if (param is not YouTubeHistoryItem item)
             return;
 
+        ActiveSection = "Watch";
         PlayRequested?.Invoke(item.VideoId, GetResumeStart(item));
     }
 
@@ -180,6 +209,7 @@ public class YouTubePlayerViewModel : BaseViewModel
             return;
 
         var history = _library.History.FirstOrDefault(h => h.VideoId == item.VideoId);
+        ActiveSection = "Watch";
         PlayRequested?.Invoke(item.VideoId, GetResumeStart(history));
     }
 

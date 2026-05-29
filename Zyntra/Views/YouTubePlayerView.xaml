@@ -3,14 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf">
     <UserControl.Resources>
+        <Style x:Key="YouTubeNavButtonStyle" TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}">
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Margin" Value="0,2" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
         <Style x:Key="TopIconButtonStyle" TargetType="Button" BasedOn="{StaticResource ControlButtonStyle}">
-            <Setter Property="Height" Value="38" />
+            <Setter Property="Height" Value="36" />
             <Setter Property="MinWidth" Value="42" />
             <Setter Property="Padding" Value="10,0" />
             <Setter Property="FontSize" Value="12" />
         </Style>
-
-        <Style x:Key="RailActionButtonStyle" TargetType="Button" BasedOn="{StaticResource ControlButtonStyle}">
+        <Style x:Key="SmallActionButtonStyle" TargetType="Button" BasedOn="{StaticResource ControlButtonStyle}">
             <Setter Property="Height" Value="30" />
             <Setter Property="Padding" Value="10,0" />
             <Setter Property="FontSize" Value="11" />
@@ -27,10 +31,10 @@
         <!-- Top Bar -->
         <Border Grid.Row="0" Background="{StaticResource MainBrush}"
                 BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,0,0,1">
-            <Grid Margin="18,0">
+            <Grid Margin="16,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="18" />
+                    <ColumnDefinition Width="20" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="Auto" />
@@ -49,10 +53,10 @@
                                VerticalAlignment="Center" Margin="9,0,0,0" />
                 </StackPanel>
 
-                <Border Grid.Column="2" Height="38" MaxWidth="560" CornerRadius="19"
+                <Border Grid.Column="2" Height="38" MaxWidth="620" CornerRadius="19"
                         BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
                         Background="{StaticResource PanelInsetBrush}"
-                        VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                        VerticalAlignment="Center">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -63,14 +67,11 @@
                                  Tag="Search or paste a YouTube link"
                                  BorderThickness="0"
                                  Background="{StaticResource PanelInsetBrush}"
-                                 FontSize="13"
-                                 Height="36"
-                                 Padding="14,7" />
-                        <Button Grid.Column="1" ToolTip="Load video"
-                                Command="{Binding LoadVideoCommand}"
+                                 FontSize="13" Height="36" Padding="14,7" />
+                        <Button Grid.Column="1" Command="{Binding LoadVideoCommand}"
                                 Style="{StaticResource TopIconButtonStyle}"
-                                BorderThickness="1,0,0,0"
-                                Padding="0">
+                                BorderThickness="1,0,0,0" Padding="0"
+                                ToolTip="Load">
                             <Path Data="M21 21l-4.35-4.35 M10 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"
                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                   StrokeThickness="2" StrokeStartLineCap="Round"
@@ -90,159 +91,187 @@
                         <TextBlock Text="PiP" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
-
-                <Button Grid.Column="6" Content="Stop"
-                        Style="{StaticResource TopIconButtonStyle}"
+                <Button Grid.Column="6" Content="Stop" Style="{StaticResource TopIconButtonStyle}"
                         Command="{Binding StopCommand}" />
             </Grid>
         </Border>
 
-        <!-- Main Watch Surface -->
-        <Grid Grid.Row="1" Margin="18,16,18,12">
+        <!-- App Body -->
+        <Grid Grid.Row="1" Margin="16">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MinWidth="340" />
+                <ColumnDefinition Width="112" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="16" />
                 <ColumnDefinition Width="300" />
             </Grid.ColumnDefinitions>
 
-            <!-- Left: Player + shelves -->
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="2.6*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="2*" />
-                </Grid.RowDefinitions>
+            <!-- Internal Navbar -->
+            <Border Grid.Column="0" Background="{StaticResource MainBrush}" CornerRadius="8"
+                    BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1" Padding="8">
+                <StackPanel>
+                    <Button Style="{StaticResource YouTubeNavButtonStyle}"
+                            Command="{Binding NavigateSectionCommand}" CommandParameter="Watch">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconVideo}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="2" Width="16" Height="16" Stretch="Uniform" Margin="0,0,9,0" />
+                            <TextBlock Text="Watch" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource YouTubeNavButtonStyle}"
+                            Command="{Binding NavigateSectionCommand}" CommandParameter="Continue">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="M21 12a9 9 0 1 1-3-6.7 M21 3v6h-6 M10 8l5 4-5 4z"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="2" Width="16" Height="16" Stretch="Uniform" Margin="0,0,9,0" />
+                            <TextBlock Text="Continue" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource YouTubeNavButtonStyle}"
+                            Command="{Binding NavigateSectionCommand}" CommandParameter="History">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="M3 3v5h5 M3.05 13a9 9 0 1 0 2.64-6.36 M12 7v5l3 2"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="2" Width="16" Height="16" Stretch="Uniform" Margin="0,0,9,0" />
+                            <TextBlock Text="History" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource YouTubeNavButtonStyle}"
+                            Command="{Binding NavigateSectionCommand}" CommandParameter="Playlists">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="M8 6h13 M8 12h13 M8 18h13 M3 6h.01 M3 12h.01 M3 18h.01"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="2" Width="16" Height="16" Stretch="Uniform" Margin="0,0,9,0" />
+                            <TextBlock Text="Lists" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
 
-                <Border Grid.Row="0" Background="#FF0D1117" CornerRadius="8"
-                        BorderBrush="#FF1E2430" BorderThickness="1"
-                        ClipToBounds="True" MinHeight="240">
-                    <Grid>
-                        <wv2:WebView2 x:Name="PlayerWebView"
-                                      DefaultBackgroundColor="#0D1117" />
+            <!-- Main Section Host -->
+            <Grid Grid.Column="2">
+                <!-- Watch / Player View -->
+                <Grid Visibility="{Binding IsWatchSection, Converter={StaticResource BoolToVisConverter}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                        <Border x:Name="EmptyOverlay" Background="#FF0D1117">
-                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <Path Data="{StaticResource IconVideo}"
-                                      Stroke="{StaticResource AccentBrush}"
-                                      StrokeThickness="2" StrokeLineJoin="Round"
-                                      Width="48" Height="48" Stretch="Uniform"
-                                      HorizontalAlignment="Center" Opacity="0.85" />
-                                <TextBlock Text="Paste a YouTube link to start watching"
-                                           FontSize="14" FontWeight="SemiBold"
-                                           Foreground="{StaticResource SubTextBrush}"
-                                           HorizontalAlignment="Center" Margin="0,12,0,0" />
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </Border>
+                    <Border Grid.Row="0" Background="#FF0D1117" CornerRadius="8"
+                            BorderBrush="#FF1E2430" BorderThickness="1"
+                            ClipToBounds="True" MinHeight="300">
+                        <Grid>
+                            <wv2:WebView2 x:Name="PlayerWebView" DefaultBackgroundColor="#0D1117" />
+                            <Border x:Name="EmptyOverlay" Background="#FF0D1117">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <Path Data="{StaticResource IconVideo}" Stroke="{StaticResource AccentBrush}"
+                                          StrokeThickness="2" StrokeLineJoin="Round"
+                                          Width="52" Height="52" Stretch="Uniform"
+                                          HorizontalAlignment="Center" Opacity="0.85" />
+                                    <TextBlock Text="Paste a YouTube link to start watching"
+                                               FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{StaticResource SubTextBrush}"
+                                               HorizontalAlignment="Center" Margin="0,12,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
 
-                <Grid Grid.Row="1" Margin="0,12,0,14">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel>
-                        <TextBlock Text="{Binding CurrentTitle, FallbackValue='No video loaded'}"
-                                   FontSize="18" FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextBrush}"
-                                   TextTrimming="CharacterEllipsis" />
-                        <TextBlock Text="{Binding CurrentVideoId}" FontSize="11"
-                                   Foreground="{StaticResource SubTextBrush}"
-                                   Margin="0,4,0,0" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
-                        <Button Content="Save" Height="32" Padding="14,0"
+                    <Grid Grid.Row="1" Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding CurrentTitle, FallbackValue='No video loaded'}"
+                                       FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextBrush}"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding CurrentVideoId}" FontSize="11"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="0,4,0,0" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="Save to playlist" Height="32" Padding="14,0"
                                 Style="{StaticResource ControlButtonStyle}"
                                 Command="{Binding AddCurrentToPlaylistCommand}" />
-                        <Button Content="Clear history" Height="32" Padding="14,0" Margin="8,0,0,0"
-                                Style="{StaticResource ControlButtonStyle}"
-                                Command="{Binding ClearHistoryCommand}" />
-                    </StackPanel>
+                    </Grid>
                 </Grid>
 
-                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel>
-                        <TextBlock Text="Continue watching" FontSize="15" FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextBrush}" Margin="0,0,0,9" />
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                      VerticalScrollBarVisibility="Disabled"
-                                      Margin="0,0,0,16">
-                            <ItemsControl ItemsSource="{Binding ContinueWatching}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Width="190" Margin="0,0,12,0">
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="106" />
-                                                    <RowDefinition Height="Auto" />
-                                                </Grid.RowDefinitions>
-                                                <Border Background="{StaticResource PanelInsetBrush}"
-                                                        CornerRadius="7" ClipToBounds="True">
-                                                    <Grid>
-                                                        <Image Source="{Binding ThumbnailUrl}" Stretch="UniformToFill" />
-                                                        <ProgressBar Value="{Binding ProgressPercent}" Maximum="100"
-                                                                     Height="4" VerticalAlignment="Bottom" />
-                                                        <Button Content="Resume" Padding="9,3" FontSize="10"
-                                                                Style="{StaticResource AccentButtonStyle}"
-                                                                HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                                                Margin="7"
-                                                                Command="{Binding DataContext.PlayHistoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                                CommandParameter="{Binding}" />
-                                                    </Grid>
-                                                </Border>
-                                                <StackPanel Grid.Row="1" Margin="0,6,0,0">
-                                                    <TextBlock Text="{Binding Title}" FontSize="12"
-                                                               FontWeight="SemiBold"
-                                                               Foreground="{StaticResource TextBrush}"
-                                                               TextWrapping="Wrap" MaxHeight="34" />
-                                                    <TextBlock Text="{Binding ProgressText}" FontSize="10"
-                                                               Foreground="{StaticResource SubTextBrush}"
-                                                               Margin="0,3,0,0" />
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
+                <!-- Continue View -->
+                <ScrollViewer Visibility="{Binding IsContinueSection, Converter={StaticResource BoolToVisConverter}}"
+                              VerticalScrollBarVisibility="Auto">
+                    <WrapPanel>
+                        <ItemsControl ItemsSource="{Binding ContinueWatching}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="220" Margin="0,0,14,16">
+                                        <StackPanel>
+                                            <Border Height="124" CornerRadius="8" ClipToBounds="True">
+                                                <Grid>
+                                                    <Image Source="{Binding ThumbnailUrl}" Stretch="UniformToFill" />
+                                                    <ProgressBar Value="{Binding ProgressPercent}" Maximum="100"
+                                                                 Height="4" VerticalAlignment="Bottom" />
+                                                </Grid>
+                                            </Border>
+                                            <TextBlock Text="{Binding Title}" FontSize="13" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}" TextWrapping="Wrap"
+                                                       MaxHeight="38" Margin="0,7,0,0" />
+                                            <TextBlock Text="{Binding ProgressText}" FontSize="11"
+                                                       Foreground="{StaticResource SubTextBrush}" Margin="0,3,0,8" />
+                                            <Button Content="Resume" Height="30"
+                                                    Style="{StaticResource AccentButtonStyle}"
+                                                    Command="{Binding DataContext.PlayHistoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </WrapPanel>
+                </ScrollViewer>
 
-                        <TextBlock Text="Watch history" FontSize="15" FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextBrush}" Margin="0,0,0,9" />
+                <!-- History View -->
+                <Grid Visibility="{Binding IsHistorySection, Converter={StaticResource BoolToVisConverter}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid Margin="0,0,0,12">
+                        <TextBlock Text="Watch history" FontSize="20" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}" />
+                        <Button Content="Clear history" HorizontalAlignment="Right" Height="32"
+                                Padding="14,0" Style="{StaticResource ControlButtonStyle}"
+                                Command="{Binding ClearHistoryCommand}" />
+                    </Grid>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding History}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
-                                            Padding="9" Margin="0,0,0,8">
+                                            Padding="10" Margin="0,0,0,10">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="112" />
-                                                <ColumnDefinition Width="10" />
+                                                <ColumnDefinition Width="132" />
+                                                <ColumnDefinition Width="12" />
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <Border CornerRadius="6" ClipToBounds="True">
-                                                <Image Source="{Binding ThumbnailUrl}" Width="112" Height="63"
+                                                <Image Source="{Binding ThumbnailUrl}" Width="132" Height="74"
                                                        Stretch="UniformToFill" />
                                             </Border>
                                             <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Title}" FontSize="13"
-                                                           FontWeight="SemiBold"
+                                                <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold"
                                                            Foreground="{StaticResource TextBrush}"
                                                            TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Text="{Binding ProgressText}" FontSize="10.5"
-                                                           Foreground="{StaticResource SubTextBrush}"
-                                                           Margin="0,4,0,0" />
+                                                <TextBlock Text="{Binding ProgressText}" FontSize="11"
+                                                           Foreground="{StaticResource SubTextBrush}" Margin="0,4,0,0" />
                                             </StackPanel>
-                                            <Button Grid.Column="3" Content="Play" Height="30"
-                                                    Padding="12,0"
+                                            <Button Grid.Column="3" Content="Play" Height="30" Padding="12,0"
                                                     Style="{StaticResource ControlButtonStyle}"
                                                     Command="{Binding DataContext.PlayHistoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}" />
@@ -251,140 +280,131 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </StackPanel>
-                </ScrollViewer>
-            </Grid>
+                    </ScrollViewer>
+                </Grid>
 
-            <!-- Right Rail -->
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <Border Grid.Row="0" Background="{StaticResource MainBrush}" CornerRadius="8"
-                        BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
-                        Padding="12">
-                    <StackPanel>
-                        <TextBlock Text="Playlists" FontSize="15" FontWeight="SemiBold"
+                <!-- Playlists View -->
+                <Grid Visibility="{Binding IsPlaylistsSection, Converter={StaticResource BoolToVisConverter}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="12" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <TextBlock Text="Playlists" FontSize="20" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextBrush}" />
-
-                        <Grid Margin="0,10,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="8" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <TextBox Text="{Binding NewPlaylistName, UpdateSourceTrigger=PropertyChanged}"
                                      Style="{StaticResource DarkTextBoxStyle}" Tag="New playlist"
-                                     Height="34" FontSize="12" Padding="10,6" />
-                            <Button Grid.Column="2" Content="Create" Width="64"
-                                    Style="{StaticResource RailActionButtonStyle}"
+                                     Width="220" Height="34" FontSize="12" Padding="10,6" />
+                            <Button Content="Create" Height="34" Padding="14,0" Margin="8,0,0,0"
+                                    Style="{StaticResource AccentButtonStyle}"
                                     Command="{Binding CreatePlaylistCommand}" />
-                        </Grid>
+                        </StackPanel>
+                    </Grid>
 
-                        <ComboBox ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}"
-                                  DisplayMemberPath="Name" Style="{StaticResource DarkComboBoxStyle}"
-                                  Height="32" Margin="0,0,0,8" />
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="8" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Button Content="Add current" Style="{StaticResource RailActionButtonStyle}"
-                                    Command="{Binding AddCurrentToPlaylistCommand}" />
-                            <Button Grid.Column="2" Content="Delete" Width="64"
-                                    Style="{StaticResource DangerButtonStyle}"
-                                    Height="30" Padding="10,0" FontSize="11"
-                                    Command="{Binding DeletePlaylistCommand}" />
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
-                <Border Grid.Row="2" Background="{StaticResource MainBrush}" CornerRadius="8"
-                        BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
-                        Padding="12">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="260" />
+                            <ColumnDefinition Width="14" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
                         <StackPanel>
-                            <TextBlock Text="Selected playlist" FontSize="13" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextBrush}" Margin="0,0,0,10" />
-                            <ItemsControl ItemsSource="{Binding SelectedPlaylistItems}" Margin="0,0,0,18">
+                            <ComboBox ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}"
+                                      DisplayMemberPath="Name" Style="{StaticResource DarkComboBoxStyle}"
+                                      Height="34" />
+                            <Button Content="Add current video" Height="32" Margin="0,10,0,0"
+                                    Style="{StaticResource ControlButtonStyle}"
+                                    Command="{Binding AddCurrentToPlaylistCommand}" />
+                            <Button Content="Delete playlist" Height="32" Margin="0,8,0,0"
+                                    Style="{StaticResource DangerButtonStyle}"
+                                    Command="{Binding DeletePlaylistCommand}" />
+                        </StackPanel>
+
+                        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding SelectedPlaylistItems}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="92" />
-                                                <ColumnDefinition Width="9" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Border CornerRadius="6" ClipToBounds="True">
-                                                <Image Source="{Binding ThumbnailUrl}" Width="92" Height="52"
-                                                       Stretch="UniformToFill" />
-                                            </Border>
-                                            <StackPanel Grid.Column="2">
-                                                <TextBlock Text="{Binding Title}" FontSize="11.5"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="{StaticResource TextBrush}"
-                                                           TextWrapping="Wrap" MaxHeight="33" />
-                                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                    <Button Content="Play" Style="{StaticResource RailActionButtonStyle}"
-                                                            Height="24" Padding="8,0" FontSize="10"
+                                        <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
+                                                Padding="10" Margin="0,0,0,10">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="112" />
+                                                    <ColumnDefinition Width="12" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border CornerRadius="6" ClipToBounds="True">
+                                                    <Image Source="{Binding ThumbnailUrl}" Width="112" Height="63"
+                                                           Stretch="UniformToFill" />
+                                                </Border>
+                                                <TextBlock Grid.Column="2" Text="{Binding Title}" FontSize="13"
+                                                           FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"
+                                                           TextWrapping="Wrap" VerticalAlignment="Center" />
+                                                <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                                    <Button Content="Play" Height="30" Padding="10,0"
+                                                            Style="{StaticResource ControlButtonStyle}"
                                                             Command="{Binding DataContext.PlayPlaylistItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                             CommandParameter="{Binding}" />
-                                                    <Button Content="Remove" Style="{StaticResource DangerButtonStyle}"
-                                                            Height="24" Padding="8,0" FontSize="10"
-                                                            Margin="6,0,0,0"
+                                                    <Button Content="Remove" Height="30" Padding="10,0" Margin="8,0,0,0"
+                                                            Style="{StaticResource DangerButtonStyle}"
                                                             Command="{Binding DataContext.RemovePlaylistItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                             CommandParameter="{Binding}" />
                                                 </StackPanel>
-                                            </StackPanel>
-                                        </Grid>
+                                            </Grid>
+                                        </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-
-                            <TextBlock Text="Up next" FontSize="13" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextBrush}" Margin="0,0,0,10" />
-                            <ItemsControl ItemsSource="{Binding History}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="92" />
-                                                <ColumnDefinition Width="9" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Border CornerRadius="6" ClipToBounds="True">
-                                                <Image Source="{Binding ThumbnailUrl}" Width="92" Height="52"
-                                                       Stretch="UniformToFill" />
-                                            </Border>
-                                            <StackPanel Grid.Column="2">
-                                                <TextBlock Text="{Binding Title}" FontSize="11.5"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="{StaticResource TextBrush}"
-                                                           TextWrapping="Wrap" MaxHeight="33" />
-                                                <Button Content="Play" Style="{StaticResource RailActionButtonStyle}"
-                                                        Height="24" Padding="8,0" FontSize="10"
-                                                        Margin="0,5,0,0" HorizontalAlignment="Left"
-                                                        Command="{Binding DataContext.PlayHistoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding}" />
-                                            </StackPanel>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </ScrollViewer>
-                </Border>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
             </Grid>
+
+            <!-- Watch Rail -->
+            <Border Grid.Column="4" Background="{StaticResource MainBrush}" CornerRadius="8"
+                    BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1" Padding="12"
+                    Visibility="{Binding IsWatchSection, Converter={StaticResource BoolToVisConverter}}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <TextBlock Text="Up next" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}" Margin="0,0,0,10" />
+                        <ItemsControl ItemsSource="{Binding History}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,11">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="96" />
+                                            <ColumnDefinition Width="10" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border CornerRadius="6" ClipToBounds="True">
+                                            <Image Source="{Binding ThumbnailUrl}" Width="96" Height="54"
+                                                   Stretch="UniformToFill" />
+                                        </Border>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="{Binding Title}" FontSize="12"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}"
+                                                       TextWrapping="Wrap" MaxHeight="34" />
+                                            <Button Content="Play" Height="24" Padding="8,0" FontSize="10"
+                                                    Style="{StaticResource ControlButtonStyle}"
+                                                    Margin="0,5,0,0" HorizontalAlignment="Left"
+                                                    Command="{Binding DataContext.PlayHistoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
         </Grid>
 
         <Border Grid.Row="2" Background="{StaticResource MainBrush}"
                 BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,1,0,0"
-                Padding="18,7">
+                Padding="16,7">
             <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource SubTextBrush}" FontSize="12" />
         </Border>
     </Grid>
