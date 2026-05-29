@@ -1,7 +1,5 @@
 using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 using Zyntra.Models;
 using Zyntra.Services;
 
@@ -35,7 +33,7 @@ public class YouTubePlayerViewModel : BaseViewModel
                 if (value == "Continue")
                     SyncContinueWatchingToUi();
                 else if (value == "History")
-                    SyncHistoryCollections();
+                    SyncHistoryCollections(includeContinueWatching: false);
             }
         }
     }
@@ -220,14 +218,14 @@ public class YouTubePlayerViewModel : BaseViewModel
 
     private void AddHistoryItemToUi(YouTubeHistoryItem item)
     {
-        RunOnUiThread(() =>
-        {
-            History.Remove(item);
-            History.Insert(0, item);
+        var existingUi = History.FirstOrDefault(h => h.VideoId == item.VideoId);
+        if (existingUi != null)
+            History.Remove(existingUi);
 
-            if (History.Count > 50)
-                History.RemoveAt(History.Count - 1);
-        });
+        History.Insert(0, item);
+
+        while (History.Count > 50)
+            History.RemoveAt(History.Count - 1);
     }
 
     /// <summary>
@@ -236,27 +234,20 @@ public class YouTubePlayerViewModel : BaseViewModel
     /// </summary>
     private void SyncContinueWatchingToUi()
     {
-        RunOnUiThread(() =>
-        {
-            var resumeItems = _library.History
-                .Where(CanResume)
-                .OrderByDescending(h => h.LastPlayedAt)
-                .Take(5)
-                .ToList();
-
-            ContinueWatching.Clear();
-            foreach (var item in resumeItems)
-                ContinueWatching.Add(item);
-        }, DispatcherPriority.Background);
+        ContinueWatching.Clear();
+        foreach (var item in _library.History
+                     .Where(CanResume)
+                     .OrderByDescending(h => h.LastPlayedAt)
+                     .Take(5))
+            ContinueWatching.Add(item);
     }
 
-    private static void RunOnUiThread(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
+    public void SavePlaybackToDisk()
     {
-        var dispatcher = Application.Current?.Dispatcher;
-        if (dispatcher == null || dispatcher.CheckAccess())
-            action();
-        else
-            dispatcher.BeginInvoke(action, priority);
+        lock (_progressLock)
+        {
+            SaveLibrary();
+        }
     }
 
     public void SaveNow()
@@ -378,7 +369,7 @@ public class YouTubePlayerViewModel : BaseViewModel
 
     private void LoadLibrary()
     {
-        SyncHistoryCollections();
+        SyncHistoryCollections(includeContinueWatching: false);
 
         Playlists.Clear();
         foreach (var playlist in _library.Playlists.OrderBy(p => p.CreatedAt))
@@ -387,13 +378,14 @@ public class YouTubePlayerViewModel : BaseViewModel
         SelectedPlaylist = Playlists.FirstOrDefault();
     }
 
-    private void SyncHistoryCollections()
+    private void SyncHistoryCollections(bool includeContinueWatching = true)
     {
         History.Clear();
         foreach (var item in _library.History.OrderByDescending(h => h.LastPlayedAt).Take(50))
             History.Add(item);
 
-        SyncContinueWatchingToUi();
+        if (includeContinueWatching)
+            SyncContinueWatchingToUi();
     }
 
     private void RefreshSelectedPlaylistItems()

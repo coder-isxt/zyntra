@@ -1,4 +1,3 @@
-using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,10 +27,9 @@ public partial class YouTubePlayerView : UserControl
         DataContextChanged += OnDataContextChanged;
     }
 
-    private async void OnLoaded(object sender, RoutedEventArgs e)
+    private void OnLoaded(object sender, RoutedEventArgs e)
     {
         _isUnloaded = false;
-        await InitializeWebViewAsync();
         WireViewModel();
     }
 
@@ -56,7 +54,7 @@ public partial class YouTubePlayerView : UserControl
             vm.PlayRequested -= PlayVideo;
             vm.PipRequested -= OpenPip;
             vm.StopRequested -= StopVideo;
-            vm.CommitCurrentPlayback();
+            vm.SavePlaybackToDisk();
         }
 
         TeardownWebView();
@@ -100,28 +98,22 @@ public partial class YouTubePlayerView : UserControl
 
     private async Task InitializeWebViewAsync()
     {
-        if (_webViewReady)
+        if (_webViewReady || _isUnloaded)
             return;
 
         try
         {
-            string userDataFolder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Zyntra", "WebView2YouTube");
+            await YouTubeWebViewEnvironment.EnsurePlayerReadyAsync(PlayerWebView);
 
-            var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
-            await PlayerWebView.EnsureCoreWebView2Async(env);
+            if (_isUnloaded)
+                return;
 
-            string playerHostFolder = YouTubeEmbedService.EnsurePlayerHostFolder();
-            PlayerWebView.CoreWebView2.SetVirtualHostNameToFolderMapping(
-                YouTubeEmbedService.PlayerHostName,
-                playerHostFolder,
-                CoreWebView2HostResourceAccessKind.Allow);
-
-            PlayerWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
-            PlayerWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
-            PlayerWebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
-            PlayerWebView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
+            var core = PlayerWebView.CoreWebView2!;
+            core.WebMessageReceived -= OnWebMessageReceived;
+            core.Settings.AreDefaultContextMenusEnabled = true;
+            core.Settings.AreDevToolsEnabled = false;
+            core.Settings.IsStatusBarEnabled = false;
+            core.WebMessageReceived += OnWebMessageReceived;
 
             _webViewReady = true;
         }
