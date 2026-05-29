@@ -137,7 +137,7 @@ public partial class YouTubePipWindow : Window
             bool isNew = item == null;
             item ??= new YouTubeHistoryItem { VideoId = message.VideoId, WatchCount = 1 };
 
-            item.UpdatePlaybackProgress(
+            item.SetPlaybackProgressSilent(
                 string.IsNullOrWhiteSpace(message.Title)
                     ? item.Title.Length > 0 ? item.Title : message.VideoId
                     : message.Title,

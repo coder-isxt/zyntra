@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Zyntra.Models;
 using Zyntra.Services;
 
@@ -29,6 +31,11 @@ public class YouTubePlayerViewModel : BaseViewModel
                 OnPropertyChanged(nameof(IsContinueSection));
                 OnPropertyChanged(nameof(IsHistorySection));
                 OnPropertyChanged(nameof(IsPlaylistsSection));
+
+                if (value == "Continue")
+                    SyncContinueWatchingToUi();
+                else if (value == "History")
+                    SyncHistoryCollections();
             }
         }
     }
@@ -168,20 +175,18 @@ public class YouTubePlayerViewModel : BaseViewModel
             if (isNew)
             {
                 existing = new YouTubeHistoryItem { VideoId = videoId, WatchCount = 1 };
-                existing.UpdatePlaybackProgress(resolvedTitle, positionSeconds, durationSeconds, force: true);
+                existing.SetPlaybackProgressSilent(resolvedTitle, positionSeconds, durationSeconds);
                 _library.History.Insert(0, existing);
-                SyncHistoryCollections();
+                AddHistoryItemToUi(existing);
             }
             else if (existing != null)
             {
-                existing.UpdatePlaybackProgress(
+                existing.SetPlaybackProgressSilent(
                     string.IsNullOrWhiteSpace(title)
                         ? existing.Title.Length > 0 ? existing.Title : videoId
                         : title,
                     positionSeconds,
-                    durationSeconds,
-                    force);
-                RefreshContinueWatchingEntry(existing);
+                    durationSeconds);
             }
 
             if (force || isNew || (DateTime.UtcNow - _lastProgressSave).TotalSeconds >= 3)
@@ -189,6 +194,7 @@ public class YouTubePlayerViewModel : BaseViewModel
                 SaveLibrary();
                 _lastProgressSave = DateTime.UtcNow;
             }
+
         }
     }
 
@@ -212,19 +218,45 @@ public class YouTubePlayerViewModel : BaseViewModel
         return value;
     }
 
-    private void RefreshContinueWatchingEntry(YouTubeHistoryItem item)
+    private void AddHistoryItemToUi(YouTubeHistoryItem item)
     {
-        bool shouldShow = CanResume(item);
-        int index = ContinueWatching.IndexOf(item);
-        bool isInList = index >= 0;
+        RunOnUiThread(() =>
+        {
+            History.Remove(item);
+            History.Insert(0, item);
 
-        if (shouldShow == isInList)
-            return;
+            if (History.Count > 50)
+                History.RemoveAt(History.Count - 1);
+        });
+    }
 
-        if (shouldShow)
-            ContinueWatching.Insert(0, item);
+    /// <summary>
+    /// Rebuilds the Continue Watching list from library data.
+    /// Only call when the user opens that section — not during playback/seek.
+    /// </summary>
+    private void SyncContinueWatchingToUi()
+    {
+        RunOnUiThread(() =>
+        {
+            var resumeItems = _library.History
+                .Where(CanResume)
+                .OrderByDescending(h => h.LastPlayedAt)
+                .Take(5)
+                .ToList();
+
+            ContinueWatching.Clear();
+            foreach (var item in resumeItems)
+                ContinueWatching.Add(item);
+        }, DispatcherPriority.Background);
+    }
+
+    private static void RunOnUiThread(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
+    {
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher == null || dispatcher.CheckAccess())
+            action();
         else
-            ContinueWatching.RemoveAt(index);
+            dispatcher.BeginInvoke(action, priority);
     }
 
     public void SaveNow()
@@ -361,12 +393,7 @@ public class YouTubePlayerViewModel : BaseViewModel
         foreach (var item in _library.History.OrderByDescending(h => h.LastPlayedAt).Take(50))
             History.Add(item);
 
-        ContinueWatching.Clear();
-        foreach (var item in _library.History
-                     .Where(CanResume)
-                     .OrderByDescending(h => h.LastPlayedAt)
-                     .Take(5))
-            ContinueWatching.Add(item);
+        SyncContinueWatchingToUi();
     }
 
     private void RefreshSelectedPlaylistItems()

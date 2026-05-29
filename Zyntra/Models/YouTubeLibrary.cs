@@ -78,16 +78,30 @@ public class YouTubeHistoryItem : INotifyPropertyChanged
         ? Math.Clamp(LastPositionSeconds / DurationSeconds * 100, 0, 100)
         : 0;
 
-    public void UpdatePlaybackProgress(string title, double positionSeconds, double durationSeconds, bool force = false)
+    /// <summary>
+    /// Updates position in memory without raising PropertyChanged.
+    /// Used during active playback so seek/scrub does not refresh bound lists.
+    /// </summary>
+    public void SetPlaybackProgressSilent(string title, double positionSeconds, double durationSeconds)
     {
         positionSeconds = SanitizeSeconds(positionSeconds);
         durationSeconds = SanitizeSeconds(durationSeconds);
 
-        if (!force &&
-            Math.Abs(_lastPositionSeconds - positionSeconds) < 1 &&
-            Math.Abs(_durationSeconds - durationSeconds) < 0.5 &&
-            (string.IsNullOrWhiteSpace(title) || title == Title))
-            return;
+        if (!string.IsNullOrWhiteSpace(title))
+            _title = title;
+
+        _lastPositionSeconds = positionSeconds;
+        _durationSeconds = Math.Max(_durationSeconds, durationSeconds);
+        _lastPlayedAt = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Updates position and notifies bindings (use when refreshing visible lists).
+    /// </summary>
+    public void ApplyPlaybackProgressToUi(string title, double positionSeconds, double durationSeconds)
+    {
+        positionSeconds = SanitizeSeconds(positionSeconds);
+        durationSeconds = SanitizeSeconds(durationSeconds);
 
         if (!string.IsNullOrWhiteSpace(title) && title != Title)
             Title = title;
