@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Zyntra.Models;
 using Zyntra.Services;
 
@@ -29,11 +31,6 @@ public class YouTubePlayerViewModel : BaseViewModel
                 OnPropertyChanged(nameof(IsContinueSection));
                 OnPropertyChanged(nameof(IsHistorySection));
                 OnPropertyChanged(nameof(IsPlaylistsSection));
-
-                if (value == "Continue")
-                    SyncContinueWatchingToUi();
-                else if (value == "History")
-                    SyncHistoryCollections(includeContinueWatching: false);
             }
         }
     }
@@ -136,8 +133,15 @@ public class YouTubePlayerViewModel : BaseViewModel
         RemovePlaylistItemCommand = new RelayCommand(RemovePlaylistItem);
         NavigateSectionCommand = new RelayCommand(p =>
         {
-            if (p is string section)
-                ActiveSection = section;
+            if (p is not string section)
+                return;
+
+            ActiveSection = section;
+
+            if (section == "Continue")
+                ScheduleContinueWatchingRefresh();
+            else if (section == "History")
+                ScheduleHistoryRefresh();
         });
     }
 
@@ -228,17 +232,43 @@ public class YouTubePlayerViewModel : BaseViewModel
             History.RemoveAt(History.Count - 1);
     }
 
+    private void ScheduleContinueWatchingRefresh()
+    {
+        RunAfterLayout(SyncContinueWatchingToUi);
+    }
+
+    private void ScheduleHistoryRefresh()
+    {
+        RunAfterLayout(() => SyncHistoryCollections(includeContinueWatching: false));
+    }
+
+    private static void RunAfterLayout(Action action)
+    {
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher == null)
+        {
+            action();
+            return;
+        }
+
+        dispatcher.BeginInvoke(action, DispatcherPriority.Loaded);
+    }
+
     /// <summary>
     /// Rebuilds the Continue Watching list from library data.
-    /// Only call when the user opens that section — not during playback/seek.
+    /// Uses display clones so items are not shared with the History sidebar bindings.
     /// </summary>
     private void SyncContinueWatchingToUi()
     {
+        var items = _library.History
+            .Where(CanResume)
+            .OrderByDescending(h => h.LastPlayedAt)
+            .Take(5)
+            .Select(h => h.CloneForDisplay())
+            .ToList();
+
         ContinueWatching.Clear();
-        foreach (var item in _library.History
-                     .Where(CanResume)
-                     .OrderByDescending(h => h.LastPlayedAt)
-                     .Take(5))
+        foreach (var item in items)
             ContinueWatching.Add(item);
     }
 

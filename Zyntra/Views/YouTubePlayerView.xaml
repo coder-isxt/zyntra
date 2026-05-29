@@ -212,9 +212,10 @@
                                         <StackPanel>
                                             <Border Height="124" CornerRadius="8" ClipToBounds="True">
                                                 <Grid>
-                                                    <Image Source="{Binding ThumbnailUrl}" Stretch="UniformToFill" />
-                                                    <ProgressBar Value="{Binding ProgressPercent}" Maximum="100"
-                                                                 Height="4" VerticalAlignment="Bottom" />
+                                                    <Image Source="{Binding VideoId, Converter={StaticResource YouTubeThumbnailConverter}}"
+                                                           Stretch="UniformToFill" />
+                                                    <ProgressBar Value="{Binding ProgressPercent, FallbackValue=0}"
+                                                                 Maximum="100" Height="4" VerticalAlignment="Bottom" />
                                                 </Grid>
                                             </Border>
                                             <TextBlock Text="{Binding Title}" FontSize="13" FontWeight="SemiBold"
@@ -261,8 +262,8 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <Border CornerRadius="6" ClipToBounds="True">
-                                                <Image Source="{Binding ThumbnailUrl}" Width="132" Height="74"
-                                                       Stretch="UniformToFill" />
+                                                <Image Source="{Binding VideoId, Converter={StaticResource YouTubeThumbnailConverter}}"
+                                                       Width="132" Height="74" Stretch="UniformToFill" />
                                             </Border>
                                             <StackPanel Grid.Column="2" VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold"
@@ -335,8 +336,8 @@
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <Border CornerRadius="6" ClipToBounds="True">
-                                                    <Image Source="{Binding ThumbnailUrl}" Width="112" Height="63"
-                                                           Stretch="UniformToFill" />
+                                                    <Image Source="{Binding VideoId, Converter={StaticResource YouTubeThumbnailConverter}}"
+                                                           Width="112" Height="63" Stretch="UniformToFill" />
                                                 </Border>
                                                 <TextBlock Grid.Column="2" Text="{Binding Title}" FontSize="13"
                                                            FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"
@@ -379,8 +380,8 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
                                         <Border CornerRadius="6" ClipToBounds="True">
-                                            <Image Source="{Binding ThumbnailUrl}" Width="96" Height="54"
-                                                   Stretch="UniformToFill" />
+                                            <Image Source="{Binding VideoId, Converter={StaticResource YouTubeThumbnailConverter}}"
+                                                   Width="96" Height="54" Stretch="UniformToFill" />
                                         </Border>
                                         <StackPanel Grid.Column="2">
                                             <TextBlock Text="{Binding Title}" FontSize="12"

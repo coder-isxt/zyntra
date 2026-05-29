@@ -20,6 +20,7 @@
             <conv:ExeHasIconToInverseVisibilityConverter x:Key="ExeNoIconVis" />
             <conv:NonZeroToVisibilityConverter x:Key="NonZeroToVisConverter" />
             <conv:FirstCharConverter x:Key="FirstCharConverter" />
+            <conv:YouTubeThumbnailConverter x:Key="YouTubeThumbnailConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

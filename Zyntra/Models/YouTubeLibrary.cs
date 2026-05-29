@@ -74,9 +74,33 @@ public class YouTubeHistoryItem : INotifyPropertyChanged
     public string ProgressText => DurationSeconds > 0
         ? $"{FormatTime(LastPositionSeconds)} / {FormatTime(DurationSeconds)}"
         : FormatTime(LastPositionSeconds);
-    public double ProgressPercent => DurationSeconds > 0
-        ? Math.Clamp(LastPositionSeconds / DurationSeconds * 100, 0, 100)
-        : 0;
+    public double ProgressPercent
+    {
+        get
+        {
+            if (DurationSeconds <= 0 ||
+                double.IsNaN(LastPositionSeconds) ||
+                double.IsNaN(DurationSeconds) ||
+                string.IsNullOrWhiteSpace(VideoId))
+                return 0;
+
+            return Math.Clamp(LastPositionSeconds / DurationSeconds * 100, 0, 100);
+        }
+    }
+
+    public YouTubeHistoryItem CloneForDisplay()
+    {
+        var copy = new YouTubeHistoryItem
+        {
+            VideoId = VideoId,
+            WatchCount = WatchCount
+        };
+        copy.SetPlaybackProgressSilent(
+            string.IsNullOrWhiteSpace(Title) ? VideoId : Title,
+            LastPositionSeconds,
+            DurationSeconds);
+        return copy;
+    }
 
     /// <summary>
     /// Updates position in memory without raising PropertyChanged.
