@@ -106,25 +106,43 @@ public static class YouTubeEmbedService
                 const root = document.getElementById("player");
                 let player = null;
                 let progressTimer = null;
+                let wasBuffering = false;
+                let lastSentAt = 0;
 
-                function send(type, extra) {
+                function safeNumber(value) {
+                  return typeof value === "number" && isFinite(value) && value >= 0 ? value : 0;
+                }
+
+                function send(type, extra, force) {
+                  const now = Date.now();
+                  if (!force && type === "progress" && now - lastSentAt < 400) return;
+                  lastSentAt = now;
+
                   const payload = Object.assign({
                     type,
                     videoId,
                     title: "",
                     currentTime: 0,
                     duration: 0,
-                    state: -1
+                    state: -1,
+                    force: !!force
                   }, extra || {});
 
                   if (player && typeof player.getCurrentTime === "function") {
                     try {
+                      const state = player.getPlayerState ? player.getPlayerState() : -1;
+                      if (state === YT.PlayerState.BUFFERING && type !== "error") {
+                        return;
+                      }
+
                       const data = player.getVideoData ? player.getVideoData() : null;
                       payload.title = data && data.title ? data.title : payload.title;
-                      payload.currentTime = player.getCurrentTime() || 0;
-                      payload.duration = player.getDuration ? player.getDuration() || 0 : 0;
-                      payload.state = player.getPlayerState ? player.getPlayerState() : -1;
-                    } catch {}
+                      payload.currentTime = safeNumber(player.getCurrentTime());
+                      payload.duration = safeNumber(player.getDuration ? player.getDuration() : 0);
+                      payload.state = state;
+                    } catch {
+                      if (type !== "error") return;
+                    }
                   }
 
                   if (window.chrome && window.chrome.webview) {
@@ -146,7 +164,7 @@ public static class YouTubeEmbedService
                 function onYouTubeIframeAPIReady() {
                   if (!valid) {
                     root.textContent = "Invalid YouTube video ID.";
-                    send("error", { errorCode: "invalid-id" });
+                    send("error", { errorCode: "invalid-id" }, true);
                     return;
                   }
 
@@ -167,20 +185,38 @@ public static class YouTubeEmbedService
                     },
                     events: {
                       onReady: () => {
-                        send("ready");
+                        send("ready", null, true);
                         startProgressTimer();
                       },
                       onStateChange: (event) => {
-                        send("state", { state: event.data });
-                        if (event.data === YT.PlayerState.PLAYING) startProgressTimer();
-                        if (event.data === YT.PlayerState.ENDED) stopProgressTimer();
+                        if (event.data === YT.PlayerState.BUFFERING) {
+                          wasBuffering = true;
+                          return;
+                        }
+
+                        if (wasBuffering && event.data === YT.PlayerState.PLAYING) {
+                          wasBuffering = false;
+                          send("progress", { state: event.data }, true);
+                          startProgressTimer();
+                          return;
+                        }
+
+                        if (event.data === YT.PlayerState.PLAYING) {
+                          startProgressTimer();
+                          return;
+                        }
+
+                        if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+                          send("state", { state: event.data }, true);
+                          if (event.data === YT.PlayerState.ENDED) stopProgressTimer();
+                        }
                       },
-                      onError: (event) => send("error", { errorCode: event.data })
+                      onError: (event) => send("error", { errorCode: event.data }, true)
                     }
                   });
                 }
 
-                window.addEventListener("beforeunload", () => send("progress"));
+                window.addEventListener("beforeunload", () => send("progress", null, true));
 
                 if (!valid) {
                   root.textContent = "Invalid YouTube video ID.";

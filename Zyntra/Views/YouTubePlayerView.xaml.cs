@@ -18,6 +18,7 @@ public partial class YouTubePlayerView : UserControl
 
     private bool _webViewReady;
     private bool _isUnloaded;
+    private int _playbackGeneration;
 
     public YouTubePlayerView()
     {
@@ -55,7 +56,7 @@ public partial class YouTubePlayerView : UserControl
             vm.PlayRequested -= PlayVideo;
             vm.PipRequested -= OpenPip;
             vm.StopRequested -= StopVideo;
-            vm.SaveNow();
+            vm.CommitCurrentPlayback();
         }
 
         TeardownWebView();
@@ -141,15 +142,30 @@ public partial class YouTubePlayerView : UserControl
             return;
 
         await InitializeWebViewAsync();
-        if (!_webViewReady)
+        if (!_webViewReady || _isUnloaded)
             return;
+
+        vm.CommitCurrentPlayback();
+
+        _playbackGeneration++;
+        int generation = _playbackGeneration;
 
         vm.CurrentVideoId = videoId;
         vm.StatusText = startSeconds > 0
             ? $"Continuing {videoId}"
             : $"Playing {videoId}";
         EmptyOverlay.Visibility = Visibility.Collapsed;
-        PlayerWebView.CoreWebView2.Navigate(YouTubeEmbedService.BuildHostedPlayerUrl(videoId, startSeconds));
+
+        try
+        {
+            PlayerWebView.CoreWebView2.Navigate(
+                YouTubeEmbedService.BuildHostedPlayerUrl(videoId, startSeconds));
+        }
+        catch
+        {
+            if (generation == _playbackGeneration)
+                vm.StatusText = "Failed to load video";
+        }
     }
 
     private void OpenPip()
@@ -213,13 +229,18 @@ public partial class YouTubePlayerView : UserControl
             if (message == null)
                 return;
 
+            if (!string.IsNullOrWhiteSpace(vm.CurrentVideoId) &&
+                !string.Equals(message.VideoId, vm.CurrentVideoId, StringComparison.Ordinal))
+                return;
+
             if (message.Type is "ready" or "state" or "progress")
             {
                 vm.RecordProgress(
                     message.VideoId,
                     message.Title,
                     message.CurrentTime,
-                    message.Duration);
+                    message.Duration,
+                    force: message.Force);
             }
             else if (message.Type == "error")
             {
@@ -234,16 +255,19 @@ public partial class YouTubePlayerView : UserControl
 
     private void StopVideo()
     {
+        if (DataContext is YouTubePlayerViewModel vm)
+        {
+            vm.CommitCurrentPlayback();
+            vm.CurrentVideoId = string.Empty;
+            vm.StatusText = "Stopped";
+        }
+
+        _playbackGeneration++;
+
         if (_webViewReady)
             PlayerWebView.NavigateToString(BuildBlankPage());
 
         EmptyOverlay.Visibility = Visibility.Visible;
-
-        if (DataContext is YouTubePlayerViewModel vm)
-        {
-            vm.CurrentVideoId = string.Empty;
-            vm.StatusText = "Stopped";
-        }
     }
 
     private static string BuildBlankPage()
@@ -258,5 +282,6 @@ public partial class YouTubePlayerView : UserControl
         public double Duration { get; set; }
         public int State { get; set; }
         public string ErrorCode { get; set; } = string.Empty;
+        public bool Force { get; set; }
     }
 }

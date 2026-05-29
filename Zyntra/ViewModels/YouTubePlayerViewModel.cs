@@ -8,7 +8,9 @@ namespace Zyntra.ViewModels;
 public class YouTubePlayerViewModel : BaseViewModel
 {
     private readonly YouTubeLibraryData _library;
+    private readonly object _progressLock = new();
     private DateTime _lastProgressSave = DateTime.MinValue;
+    private DateTime _lastRecordUtc = DateTime.MinValue;
 
     public ObservableCollection<YouTubeHistoryItem> History { get; } = new();
     public ObservableCollection<YouTubeHistoryItem> ContinueWatching { get; } = new();
@@ -134,54 +136,94 @@ public class YouTubePlayerViewModel : BaseViewModel
         });
     }
 
-    public void RecordProgress(string videoId, string title, double positionSeconds, double durationSeconds)
+    public void RecordProgress(string videoId, string title, double positionSeconds, double durationSeconds, bool force = false)
     {
         if (string.IsNullOrWhiteSpace(videoId))
             return;
 
-        CurrentVideoId = videoId;
-        CurrentPositionSeconds = Math.Max(0, positionSeconds);
-        CurrentDurationSeconds = Math.Max(0, durationSeconds);
-        if (!string.IsNullOrWhiteSpace(title))
-            CurrentTitle = title;
+        if (!string.IsNullOrWhiteSpace(CurrentVideoId) &&
+            !string.Equals(videoId, CurrentVideoId, StringComparison.Ordinal))
+            return;
 
-        string resolvedTitle = string.IsNullOrWhiteSpace(title) ? videoId : title;
+        positionSeconds = SanitizeSeconds(positionSeconds);
+        durationSeconds = SanitizeSeconds(durationSeconds);
 
-        var existing = _library.History.FirstOrDefault(h => h.VideoId == videoId);
-        bool isNew = existing == null;
-        if (isNew)
-        {
-            existing = new YouTubeHistoryItem { VideoId = videoId, WatchCount = 1 };
-            existing.UpdatePlaybackProgress(resolvedTitle, positionSeconds, durationSeconds);
-            _library.History.Insert(0, existing);
-            SyncHistoryCollections();
-        }
-        else if (existing != null)
-        {
-            existing.UpdatePlaybackProgress(
-                string.IsNullOrWhiteSpace(title)
-                    ? existing.Title.Length > 0 ? existing.Title : videoId
-                    : title,
-                positionSeconds,
-                durationSeconds);
-            RefreshContinueWatchingEntry(existing);
-        }
+        if (!force && (DateTime.UtcNow - _lastRecordUtc).TotalMilliseconds < 350)
+            return;
 
-        if ((DateTime.UtcNow - _lastProgressSave).TotalSeconds >= 3 || isNew)
+        lock (_progressLock)
         {
-            SaveLibrary();
-            _lastProgressSave = DateTime.UtcNow;
+            _lastRecordUtc = DateTime.UtcNow;
+
+            CurrentVideoId = videoId;
+            CurrentPositionSeconds = positionSeconds;
+            CurrentDurationSeconds = Math.Max(CurrentDurationSeconds, durationSeconds);
+            if (!string.IsNullOrWhiteSpace(title))
+                CurrentTitle = title;
+
+            string resolvedTitle = string.IsNullOrWhiteSpace(title) ? videoId : title;
+
+            var existing = _library.History.FirstOrDefault(h => h.VideoId == videoId);
+            bool isNew = existing == null;
+            if (isNew)
+            {
+                existing = new YouTubeHistoryItem { VideoId = videoId, WatchCount = 1 };
+                existing.UpdatePlaybackProgress(resolvedTitle, positionSeconds, durationSeconds, force: true);
+                _library.History.Insert(0, existing);
+                SyncHistoryCollections();
+            }
+            else if (existing != null)
+            {
+                existing.UpdatePlaybackProgress(
+                    string.IsNullOrWhiteSpace(title)
+                        ? existing.Title.Length > 0 ? existing.Title : videoId
+                        : title,
+                    positionSeconds,
+                    durationSeconds,
+                    force);
+                RefreshContinueWatchingEntry(existing);
+            }
+
+            if (force || isNew || (DateTime.UtcNow - _lastProgressSave).TotalSeconds >= 3)
+            {
+                SaveLibrary();
+                _lastProgressSave = DateTime.UtcNow;
+            }
         }
+    }
+
+    public void CommitCurrentPlayback()
+    {
+        if (string.IsNullOrWhiteSpace(CurrentVideoId))
+            return;
+
+        RecordProgress(
+            CurrentVideoId,
+            CurrentTitle,
+            CurrentPositionSeconds,
+            CurrentDurationSeconds,
+            force: true);
+    }
+
+    private static double SanitizeSeconds(double value)
+    {
+        if (double.IsNaN(value) || double.IsInfinity(value) || value < 0)
+            return 0;
+        return value;
     }
 
     private void RefreshContinueWatchingEntry(YouTubeHistoryItem item)
     {
         bool shouldShow = CanResume(item);
         int index = ContinueWatching.IndexOf(item);
+        bool isInList = index >= 0;
 
-        if (shouldShow && index < 0)
+        if (shouldShow == isInList)
+            return;
+
+        if (shouldShow)
             ContinueWatching.Insert(0, item);
-        else if (!shouldShow && index >= 0)
+        else
             ContinueWatching.RemoveAt(index);
     }
 

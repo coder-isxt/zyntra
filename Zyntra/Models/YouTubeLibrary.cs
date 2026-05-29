@@ -78,14 +78,30 @@ public class YouTubeHistoryItem : INotifyPropertyChanged
         ? Math.Clamp(LastPositionSeconds / DurationSeconds * 100, 0, 100)
         : 0;
 
-    public void UpdatePlaybackProgress(string title, double positionSeconds, double durationSeconds)
+    public void UpdatePlaybackProgress(string title, double positionSeconds, double durationSeconds, bool force = false)
     {
+        positionSeconds = SanitizeSeconds(positionSeconds);
+        durationSeconds = SanitizeSeconds(durationSeconds);
+
+        if (!force &&
+            Math.Abs(_lastPositionSeconds - positionSeconds) < 1 &&
+            Math.Abs(_durationSeconds - durationSeconds) < 0.5 &&
+            (string.IsNullOrWhiteSpace(title) || title == Title))
+            return;
+
         if (!string.IsNullOrWhiteSpace(title) && title != Title)
             Title = title;
 
-        LastPositionSeconds = Math.Max(0, positionSeconds);
-        DurationSeconds = Math.Max(DurationSeconds, durationSeconds);
+        LastPositionSeconds = positionSeconds;
+        DurationSeconds = Math.Max(_durationSeconds, durationSeconds);
         LastPlayedAt = DateTime.UtcNow;
+    }
+
+    private static double SanitizeSeconds(double value)
+    {
+        if (double.IsNaN(value) || double.IsInfinity(value) || value < 0)
+            return 0;
+        return value;
     }
 
     private bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? name = null)

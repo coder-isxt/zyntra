@@ -6,6 +6,7 @@ namespace Zyntra.Services;
 
 public static class YouTubeLibraryService
 {
+    private static readonly object SaveLock = new();
     private static readonly string DataDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Zyntra");
     private static readonly string FilePath = Path.Combine(DataDir, "youtube_library.json");
@@ -28,8 +29,18 @@ public static class YouTubeLibraryService
 
     public static void Save(YouTubeLibraryData library)
     {
-        Directory.CreateDirectory(DataDir);
-        string json = JsonSerializer.Serialize(library, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(FilePath, json);
+        lock (SaveLock)
+        {
+            try
+            {
+                Directory.CreateDirectory(DataDir);
+                string json = JsonSerializer.Serialize(library, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(FilePath, json);
+            }
+            catch
+            {
+                // Ignore transient IO errors during rapid progress saves.
+            }
+        }
     }
 }
