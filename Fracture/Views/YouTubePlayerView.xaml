@@ -214,7 +214,7 @@
                                                 <Grid>
                                                     <Image Source="{Binding VideoId, Converter={StaticResource YouTubeThumbnailConverter}}"
                                                            Stretch="UniformToFill" />
-                                                    <ProgressBar Value="{Binding ProgressPercent, FallbackValue=0}"
+                                                    <ProgressBar Value="{Binding ProgressPercent, Mode=OneWay, FallbackValue=0}"
                                                                  Maximum="100" Height="4" VerticalAlignment="Bottom" />
                                                 </Grid>
                                             </Border>
