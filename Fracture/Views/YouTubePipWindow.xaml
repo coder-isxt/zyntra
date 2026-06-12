@@ -9,16 +9,18 @@
         Topmost="True"
         Background="Transparent" ResizeMode="CanResizeWithGrip">
 
-    <Border Background="{StaticResource MainBrush}" CornerRadius="8"
-            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+    <Border Background="{StaticResource MainBrush}" CornerRadius="12"
+            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+            Effect="{StaticResource PopupShadow}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="34" />
+                <RowDefinition Height="36" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <Border Grid.Row="0" Background="{StaticResource TopBrush}"
-                    CornerRadius="8,8,0,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    CornerRadius="12,12,0,0" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,0,0,1"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <Grid>
                     <TextBlock Text="YouTube PiP" Foreground="{StaticResource TextBrush}"
                                FontSize="12" FontWeight="SemiBold"

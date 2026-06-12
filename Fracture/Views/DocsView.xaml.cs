@@ -19,8 +19,8 @@ public partial class DocsView : UserControl
         if (sender is not Button btn) return;
         string tag = btn.Tag as string ?? "overview";
 
-        var activeStyle = (Style)FindResource("SidebarActiveButtonStyle");
-        var normalStyle = (Style)FindResource("SidebarButtonStyle");
+        var activeStyle = (Style)FindResource("PillButtonActiveStyle");
+        var normalStyle = (Style)FindResource("PillButtonStyle");
 
         BtnOverview.Style = tag == "overview" ? activeStyle : normalStyle;
         BtnLuaApi.Style = tag == "lua" ? activeStyle : normalStyle;
@@ -90,7 +90,7 @@ public partial class DocsView : UserControl
     {
         var row = new Border
         {
-            Background = Panel, CornerRadius = new CornerRadius(6),
+            Background = (Brush)FindResource("CardBrush"), CornerRadius = new CornerRadius(8),
             BorderBrush = Stroke, BorderThickness = new Thickness(1),
             Padding = new Thickness(14, 10, 14, 10),
             Margin = new Thickness(0, 0, 0, 6),
@@ -191,7 +191,7 @@ public partial class DocsView : UserControl
     {
         var border = new Border
         {
-            Background = Panel, CornerRadius = new CornerRadius(0, 6, 6, 0),
+            Background = (Brush)FindResource("AccentSoftBrush"), CornerRadius = new CornerRadius(0, 8, 8, 0),
             BorderBrush = Accent, BorderThickness = new Thickness(3, 0, 0, 0),
             Padding = new Thickness(16, 12, 16, 12),
             Margin = new Thickness(0, 8, 0, 12),
@@ -246,10 +246,11 @@ public partial class DocsView : UserControl
     {
         var border = new Border
         {
-            Background = Panel, CornerRadius = new CornerRadius(8),
+            Background = (Brush)FindResource("CardBrush"), CornerRadius = new CornerRadius(12),
             BorderBrush = Stroke, BorderThickness = new Thickness(1),
             Padding = new Thickness(16, 14, 16, 14),
             Margin = new Thickness(0, 0, 0, 8),
+            Effect = (System.Windows.Media.Effects.Effect)FindResource("CardShadow"),
         };
 
         var grid = new Grid();
@@ -257,12 +258,20 @@ public partial class DocsView : UserControl
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(14) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
+        var iconHolder = new Border
+        {
+            Width = 40, Height = 40, CornerRadius = new CornerRadius(10),
+            Background = (Brush)FindResource("AccentSoftBrush"),
+            VerticalAlignment = VerticalAlignment.Center,
+        };
         var iconBlock = new TextBlock
         {
-            Text = icon, FontSize = 20, VerticalAlignment = VerticalAlignment.Center,
+            Text = icon, FontSize = 18, VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
         };
-        Grid.SetColumn(iconBlock, 0);
-        grid.Children.Add(iconBlock);
+        iconHolder.Child = iconBlock;
+        Grid.SetColumn(iconHolder, 0);
+        grid.Children.Add(iconHolder);
 
         var stack = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
         stack.Children.Add(new TextBlock
@@ -291,14 +300,14 @@ public partial class DocsView : UserControl
 
         var badge = new Border
         {
-            Background = Accent, CornerRadius = new CornerRadius(10),
+            Background = (Brush)FindResource("AccentGradientBrush"), CornerRadius = new CornerRadius(10),
             Width = 22, Height = 22, VerticalAlignment = VerticalAlignment.Top,
             Margin = new Thickness(0, 1, 0, 0),
         };
         badge.Child = new TextBlock
         {
             Text = number, FontSize = 10, FontWeight = FontWeights.Bold,
-            Foreground = new SolidColorBrush(System.Windows.Media.Colors.White),
+            Foreground = new SolidColorBrush(Color.FromRgb(13, 17, 23)),
             HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
             VerticalAlignment = System.Windows.VerticalAlignment.Center,
         };

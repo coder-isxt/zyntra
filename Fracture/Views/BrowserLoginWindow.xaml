@@ -7,11 +7,12 @@
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent" ResizeMode="NoResize">
 
-    <Border Background="{StaticResource MainBrush}" CornerRadius="10"
-            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+    <Border Background="{StaticResource MainBrush}" CornerRadius="14"
+            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+            Effect="{StaticResource PopupShadow}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="38" />
+                <RowDefinition Height="40" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -19,9 +20,10 @@
 
             <!-- Title Bar -->
             <Border Grid.Row="0" Background="{StaticResource TopBrush}"
-                    CornerRadius="10,10,0,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    CornerRadius="14,14,0,0" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,0,0,1"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <Grid>
-                    <StackPanel Orientation="Horizontal" Margin="14,0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="16,0" VerticalAlignment="Center">
                         <TextBlock Text="◆" Foreground="{StaticResource AccentBrush}" FontSize="14" Margin="0,0,8,0" />
                         <TextBlock Text="Roblox Login" Foreground="{StaticResource TextBrush}"
                                    FontSize="13" FontWeight="SemiBold" />

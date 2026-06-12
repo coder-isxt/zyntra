@@ -82,6 +82,25 @@ public class NonZeroToVisibilityConverter : IValueConverter
         => throw new NotImplementedException();
 }
 
+public class ProgressRatioConverter : IMultiValueConverter
+{
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (values.Length != 3 ||
+            values[0] is not double value || values[1] is not double min || values[2] is not double max)
+            return 0d;
+
+        double range = max - min;
+        if (range <= 0)
+            return 0d;
+
+        return Math.Clamp((value - min) / range, 0d, 1d);
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
 public class FirstCharConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

@@ -22,16 +22,13 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel>
-                <TextBlock Text="Roblox Accounts" FontSize="22" FontWeight="Bold"
-                           Foreground="{StaticResource TextBrush}" />
-                <TextBlock Text="Manage your Roblox accounts and launch with any of them" FontSize="13"
-                           Foreground="{StaticResource SubTextBrush}" Margin="0,4,0,0" />
+                <TextBlock Text="Roblox Accounts" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="Manage your Roblox accounts and launch with any of them" Style="{StaticResource PageSubtitleStyle}" />
             </StackPanel>
         </Grid>
 
         <!-- Add Account Section -->
-        <Border Grid.Row="2" Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
-                BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1" Padding="16">
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -143,7 +140,7 @@
                         <!-- Avatar with health dot -->
                         <Grid Grid.Column="0" Width="36" Height="36" VerticalAlignment="Center">
                             <Border Width="36" Height="36" CornerRadius="18"
-                                    Background="{StaticResource AccentBrush}">
+                                    Background="{StaticResource AccentGradientBrush}">
                                 <TextBlock Text="{Binding DisplayName, Converter={StaticResource FirstCharConverter}}"
                                            FontSize="16" FontWeight="Bold" Foreground="#FF0D1117"
                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -181,7 +178,7 @@
                                 <TextBlock Text="{Binding DisplayName}" FontSize="14" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextBrush}" />
                                 <Border CornerRadius="4" Padding="6,1" Margin="8,0,0,0"
-                                        Background="{StaticResource ControlHoverBrush}"
+                                        Background="{StaticResource AccentSoftBrush}"
                                         Visibility="{Binding Tag, Converter={StaticResource NonEmptyToVisConverter}}">
                                     <TextBlock Text="{Binding Tag}" FontSize="10"
                                                Foreground="{StaticResource AccentBrush}" />
@@ -235,9 +232,8 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Width="170" Height="190" Background="{StaticResource PanelInsetBrush}"
-                                CornerRadius="10" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
-                                Margin="4" Cursor="Hand" MouseLeftButtonUp="OnGridCardLaunchAccount">
+                        <Border Width="170" Height="190" Style="{StaticResource CardInteractiveStyle}"
+                                Padding="0" Margin="4" MouseLeftButtonUp="OnGridCardLaunchAccount">
                             <Border.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Launch" Click="OnContextLaunch" />
@@ -259,7 +255,7 @@
                                 <!-- Avatar area -->
                                 <Grid Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <Border Width="64" Height="64" CornerRadius="32"
-                                            Background="{StaticResource AccentBrush}">
+                                            Background="{StaticResource AccentGradientBrush}">
                                         <TextBlock Text="{Binding DisplayName, Converter={StaticResource FirstCharConverter}}"
                                                    FontSize="28" FontWeight="Bold" Foreground="#FF0D1117"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -301,7 +297,7 @@
                                         <Run Text="@" /><Run Text="{Binding Username, Mode=OneWay}" />
                                     </TextBlock>
                                     <Border CornerRadius="4" Padding="6,1" Margin="0,4,0,0"
-                                            Background="{StaticResource ControlHoverBrush}"
+                                            Background="{StaticResource AccentSoftBrush}"
                                             HorizontalAlignment="Center"
                                             Visibility="{Binding Tag, Converter={StaticResource NonEmptyToVisConverter}}">
                                         <TextBlock Text="{Binding Tag}" FontSize="9.5"

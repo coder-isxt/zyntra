@@ -6,8 +6,9 @@
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent" ResizeMode="NoResize">
 
-    <Border Background="{StaticResource MainBrush}" CornerRadius="10"
-            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+    <Border Background="{StaticResource MainBrush}" CornerRadius="14"
+            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+            Effect="{StaticResource PopupShadow}">
         <Grid Margin="20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -60,13 +61,12 @@
                         Visibility="Collapsed">
                 <Border BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,1,0,0" Padding="0,10,0,0">
                     <StackPanel>
-                        <TextBlock Text="FAVORITES" FontSize="10" FontWeight="Bold"
-                                   Foreground="{StaticResource SubTextBrush}" Opacity="0.6" Margin="0,0,0,6" />
+                        <TextBlock Text="FAVORITES" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,6" />
                         <ItemsControl x:Name="FavoritesList">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="6"
-                                            Padding="10,8" Margin="0,2" Cursor="Hand"
+                                    <Border Style="{StaticResource CardInteractiveStyle}"
+                                            Padding="10,8" Margin="0,2"
                                             MouseLeftButtonUp="OnFavoriteGameClick">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -95,13 +95,12 @@
             <StackPanel x:Name="RecentPanel" Grid.Row="8" Margin="0,10,0,0"
                         Visibility="Collapsed">
                 <StackPanel>
-                    <TextBlock Text="RECENTLY PLAYED" FontSize="10" FontWeight="Bold"
-                               Foreground="{StaticResource SubTextBrush}" Opacity="0.6" Margin="0,0,0,6" />
+                    <TextBlock Text="RECENTLY PLAYED" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,6" />
                     <ItemsControl x:Name="RecentList">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="6"
-                                        Padding="10,8" Margin="0,2" Cursor="Hand"
+                                <Border Style="{StaticResource CardInteractiveStyle}"
+                                        Padding="10,8" Margin="0,2"
                                         MouseLeftButtonUp="OnRecentGameClick">
                                     <Grid>
                                         <Grid.ColumnDefinitions>

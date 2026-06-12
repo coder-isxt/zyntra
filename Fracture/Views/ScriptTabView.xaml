@@ -10,10 +10,8 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0">
-            <TextBlock x:Name="TabTitle" FontSize="22" FontWeight="Bold"
-                       Foreground="{StaticResource TextBrush}" />
-            <TextBlock Text="Script-generated tab" FontSize="13"
-                       Foreground="{StaticResource SubTextBrush}" Margin="0,4,0,0" />
+            <TextBlock x:Name="TabTitle" Style="{StaticResource PageTitleStyle}" />
+            <TextBlock Text="Script-generated tab" Style="{StaticResource PageSubtitleStyle}" />
         </StackPanel>
 
         <!-- Dynamic content -->

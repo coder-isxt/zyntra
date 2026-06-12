@@ -20,10 +20,8 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel>
-                <TextBlock Text="Scripts" FontSize="22" FontWeight="Bold"
-                           Foreground="{StaticResource TextBrush}" />
-                <TextBlock Text="Create and run automation scripts" FontSize="13"
-                           Foreground="{StaticResource SubTextBrush}" Margin="0,4,0,0" />
+                <TextBlock Text="Scripts" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="Create and run automation scripts" Style="{StaticResource PageSubtitleStyle}" />
             </StackPanel>
             <Button Grid.Column="1" Content="+ New Script" Style="{StaticResource AccentButtonStyle}"
                     Command="{Binding NewScriptCommand}" VerticalAlignment="Top" Padding="16,8" />
@@ -44,7 +42,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
+                <Border Background="{StaticResource CardBrush}" CornerRadius="12"
                         BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
                     <Grid>
                         <ListBox ItemsSource="{Binding Scripts}" SelectedItem="{Binding SelectedScript}"
@@ -118,7 +116,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- Script toolbar -->
-                    <Border Grid.Row="0" Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
+                    <Border Grid.Row="0" Background="{StaticResource CardBrush}" CornerRadius="12"
                             BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1" Padding="12,10">
                         <StackPanel>
                             <Grid>
@@ -148,7 +146,7 @@
                                         Command="{Binding DeleteScriptCommand}" />
                             </Grid>
                             <!-- Scheduler row -->
-                            <Border Margin="0,10,0,0" Padding="12,8" CornerRadius="6"
+                            <Border Margin="0,10,0,0" Padding="12,8" CornerRadius="8"
                                     Background="{StaticResource PanelBrush}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -247,7 +245,7 @@
                             <TextBlock Text="OUTPUT" FontSize="10" FontWeight="Bold"
                                        Foreground="{StaticResource SubTextBrush}" Opacity="0.6"
                                        VerticalAlignment="Center" Margin="2,0" />
-                            <Border Background="{StaticResource ControlBrush}" CornerRadius="8"
+                            <Border Background="{StaticResource AccentSoftBrush}" CornerRadius="8"
                                     Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center"
                                     Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisConverter}}">
                                 <TextBlock Text="running…" FontSize="9" FontWeight="SemiBold"
@@ -283,7 +281,7 @@
 
                 <!-- Empty state when no script selected -->
                 <Border Visibility="{Binding HasSelection, Converter={StaticResource InverseBoolToVisConverter}}"
-                        Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
+                        Background="{StaticResource CardBrush}" CornerRadius="12"
                         BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock Text="No script selected" FontSize="16" FontWeight="SemiBold"

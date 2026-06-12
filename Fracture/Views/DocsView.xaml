@@ -13,31 +13,25 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Documentation" FontSize="22" FontWeight="Bold"
-                       Foreground="{StaticResource TextBrush}" />
-            <TextBlock Text="Lua scripting API reference and plugin development guide" FontSize="13"
-                       Foreground="{StaticResource SubTextBrush}" Margin="0,4,0,0" />
+            <TextBlock Text="Documentation" Style="{StaticResource PageTitleStyle}" />
+            <TextBlock Text="Lua scripting API reference and plugin development guide" Style="{StaticResource PageSubtitleStyle}" />
         </StackPanel>
 
         <!-- Tab Bar -->
-        <Border Grid.Row="2" Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
-                BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1" Padding="4">
-            <StackPanel Orientation="Horizontal">
-                <Button x:Name="BtnOverview" Content="Overview" Padding="16,7"
-                        Style="{StaticResource SidebarActiveButtonStyle}"
-                        Click="OnDocNav" Tag="overview" FontSize="12" />
-                <Button x:Name="BtnLuaApi" Content="Lua API Reference" Padding="16,7"
-                        Style="{StaticResource SidebarButtonStyle}"
-                        Click="OnDocNav" Tag="lua" FontSize="12" />
-                <Button x:Name="BtnScriptUI" Content="Script UI API" Padding="16,7"
-                        Style="{StaticResource SidebarButtonStyle}"
-                        Click="OnDocNav" Tag="scriptui" FontSize="12" />
-            </StackPanel>
-        </Border>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button x:Name="BtnOverview" Content="Overview" Padding="18,8"
+                    Style="{StaticResource PillButtonActiveStyle}"
+                    Click="OnDocNav" Tag="overview" FontSize="12" Margin="0,0,8,0" />
+            <Button x:Name="BtnLuaApi" Content="Lua API Reference" Padding="18,8"
+                    Style="{StaticResource PillButtonStyle}"
+                    Click="OnDocNav" Tag="lua" FontSize="12" Margin="0,0,8,0" />
+            <Button x:Name="BtnScriptUI" Content="Script UI API" Padding="18,8"
+                    Style="{StaticResource PillButtonStyle}"
+                    Click="OnDocNav" Tag="scriptui" FontSize="12" />
+        </StackPanel>
 
         <!-- Content -->
-        <Border Grid.Row="4" Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
-                BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+        <Border Grid.Row="4" Style="{StaticResource CardStyle}" Padding="0">
             <ScrollViewer VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled" Padding="0">
                 <StackPanel x:Name="DocPanel" Margin="28,24,28,28" />

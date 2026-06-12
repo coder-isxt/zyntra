@@ -18,10 +18,8 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel>
-                <TextBlock Text="Applications" FontSize="22" FontWeight="Bold"
-                           Foreground="{StaticResource TextBrush}" />
-                <TextBlock Text="Manage your built-in and custom applications" FontSize="13"
-                           Foreground="{StaticResource SubTextBrush}" Margin="0,4,0,0" />
+                <TextBlock Text="Applications" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="Manage your built-in and custom applications" Style="{StaticResource PageSubtitleStyle}" />
             </StackPanel>
             <Button Grid.Column="1" Content="+ Add App" Style="{StaticResource AccentButtonStyle}"
                     Command="{Binding AddAppCommand}" VerticalAlignment="Top" />
@@ -137,7 +135,7 @@
                                 <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextBrush}" />
                                 <Border Visibility="{Binding IsBuiltIn, Converter={StaticResource BoolToVisConverter}}"
-                                        Background="{StaticResource AccentBrush}" CornerRadius="4"
+                                        Background="{StaticResource AccentGradientBrush}" CornerRadius="4"
                                         Padding="6,2" Margin="8,0,0,0" VerticalAlignment="Center">
                                     <TextBlock Text="Built-in" FontSize="10" FontWeight="Bold" Foreground="#FF0D1117" />
                                 </Border>
@@ -184,9 +182,8 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Width="150" Height="150" Background="{StaticResource PanelInsetBrush}"
-                                CornerRadius="10" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
-                                Margin="4" Cursor="Hand" MouseLeftButtonUp="OnGridCardLaunchApp">
+                        <Border Width="150" Height="150" Style="{StaticResource CardInteractiveStyle}"
+                                Padding="0" Margin="4" MouseLeftButtonUp="OnGridCardLaunchApp">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*" />
@@ -234,7 +231,7 @@
                                                Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis"
                                                HorizontalAlignment="Center" MaxWidth="130" />
                                     <Border CornerRadius="4" Padding="6,1" Margin="0,3,0,0"
-                                            Background="{StaticResource AccentBrush}"
+                                            Background="{StaticResource AccentGradientBrush}"
                                             HorizontalAlignment="Center"
                                             Visibility="{Binding IsBuiltIn, Converter={StaticResource BoolToVisConverter}}">
                                         <TextBlock Text="Built-in" FontSize="9" FontWeight="Bold" Foreground="#FF0D1117" />

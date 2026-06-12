@@ -17,17 +17,20 @@
         <vm:MainViewModel />
     </Window.DataContext>
 
-    <Border Background="{StaticResource MainBrush}" CornerRadius="10"
-            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+    <Border Background="{StaticResource MainBrush}" CornerRadius="14"
+            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+            Effect="{StaticResource PopupShadow}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="38" />
+                <RowDefinition Height="40" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <!-- Custom Title Bar -->
             <Border Grid.Row="0" Background="{StaticResource TopBrush}"
-                    CornerRadius="10,10,0,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    CornerRadius="14,14,0,0" BorderBrush="{StaticResource StrokeBrush}"
+                    BorderThickness="0,0,0,1"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -36,9 +39,9 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- App Title -->
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="14,0" VerticalAlignment="Center">
-                        <Path Data="{StaticResource IconLogo}" Stroke="{StaticResource AccentBrush}"
-                              StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="16,0" VerticalAlignment="Center">
+                        <Path Data="{StaticResource IconLogo}" Stroke="{StaticResource AccentGradientBrush}"
+                              StrokeThickness="2.25" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                               StrokeLineJoin="Round" Width="14" Height="14" Stretch="Uniform"
                               Margin="0,0,10,0" />
                         <TextBlock Text="Fracture" Foreground="{StaticResource TextBrush}"
@@ -60,7 +63,7 @@
                                       StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                       StrokeLineJoin="Round" Stretch="Uniform" />
                                 <Border Width="8" Height="8" CornerRadius="4"
-                                        Background="{StaticResource AccentBrush}"
+                                        Background="{StaticResource AccentGradientBrush}"
                                         BorderBrush="{StaticResource TopBrush}" BorderThickness="1.5"
                                         HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-2,-2,0"
                                         Visibility="{Binding UnreadNotifications, Converter={StaticResource NonZeroToVisConverter}}" />
@@ -106,9 +109,8 @@
 
                         <!-- Navigation -->
                         <StackPanel Grid.Row="0" Margin="0,10">
-                            <TextBlock Text="NAVIGATION" FontSize="10" FontWeight="Bold"
-                                       Foreground="{StaticResource SubTextBrush}"
-                                       Margin="18,6,0,6" Opacity="0.5" />
+                            <TextBlock Text="NAVIGATION" Style="{StaticResource SectionHeaderStyle}"
+                                       Margin="18,6,0,6" />
 
                             <Button x:Name="BtnApps"
                                     Command="{Binding NavigateCommand}" CommandParameter="Apps"
@@ -165,9 +167,8 @@
                                 </Grid>
                             </Button>
 
-                            <TextBlock Text="TOOLS" FontSize="10" FontWeight="Bold"
-                                       Foreground="{StaticResource SubTextBrush}"
-                                       Margin="18,16,0,6" Opacity="0.5" />
+                            <TextBlock Text="TOOLS" Style="{StaticResource SectionHeaderStyle}"
+                                       Margin="18,16,0,6" />
 
                             <Button x:Name="BtnScripts"
                                     Command="{Binding NavigateCommand}" CommandParameter="Scripts"
@@ -312,9 +313,7 @@
                                   Margin="0,0,14,14" IsHitTestVisible="False" Width="300">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="8"
-                                        BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
-                                        Padding="14,10" Margin="0,4,0,0">
+                                <Border Style="{StaticResource CardStyle}" Padding="14,10" Margin="0,4,0,0">
                                     <StackPanel>
                                         <TextBlock Text="{Binding Title}" FontSize="12" FontWeight="SemiBold"
                                                    Foreground="{StaticResource TextBrush}" />
@@ -331,8 +330,9 @@
                     <!-- Notification Panel Overlay -->
                     <Border HorizontalAlignment="Right" VerticalAlignment="Top"
                             Width="320" MaxHeight="400" Margin="0,4,8,0"
-                            Background="{StaticResource MainBrush}" CornerRadius="8"
+                            Background="{StaticResource CardBrush}" CornerRadius="12"
                             BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+                            Effect="{StaticResource PopupShadow}"
                             Visibility="{Binding NotificationPanelOpen, Converter={StaticResource BoolToVisConverter}}">
                         <Grid>
                             <Grid.RowDefinitions>
