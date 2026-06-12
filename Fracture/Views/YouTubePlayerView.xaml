@@ -104,11 +104,9 @@
         <!-- App Body -->
         <Grid Grid.Row="1" Margin="20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="124" />
+                <ColumnDefinition Width="160" />
                 <ColumnDefinition Width="16" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="16" />
-                <ColumnDefinition Width="300" />
             </Grid.ColumnDefinitions>
 
             <!-- Internal Navbar -->
@@ -412,46 +410,6 @@
                     </Grid>
                 </Grid>
             </Grid>
-
-            <!-- Watch Rail -->
-            <Border Grid.Column="4" Style="{StaticResource CardStyle}" Padding="14"
-                    Visibility="{Binding IsWatchSection, Converter={StaticResource BoolToVisConverter}}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel>
-                        <TextBlock Text="UP NEXT" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,12" />
-                        <ItemsControl ItemsSource="{Binding History}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Style="{StaticResource CardInteractiveStyle}" Padding="8" Margin="0,0,0,10">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="96" />
-                                                <ColumnDefinition Width="10" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Border CornerRadius="6" ClipToBounds="True">
-                                                <Image Source="{Binding VideoId, Converter={StaticResource YouTubeThumbnailConverter}}"
-                                                       Width="96" Height="54" Stretch="UniformToFill" />
-                                            </Border>
-                                            <StackPanel Grid.Column="2">
-                                                <TextBlock Text="{Binding Title}" FontSize="12"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="{StaticResource TextBrush}"
-                                                           TextWrapping="Wrap" MaxHeight="34" />
-                                                <Button Content="Play" Height="24" Padding="8,0" FontSize="10"
-                                                        Style="{StaticResource ControlButtonStyle}"
-                                                        Margin="0,5,0,0" HorizontalAlignment="Left"
-                                                        Command="{Binding DataContext.PlayHistoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding}" />
-                                            </StackPanel>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </ScrollViewer>
-            </Border>
         </Grid>
 
         <Border Grid.Row="2" Background="{StaticResource MainBrush}"
