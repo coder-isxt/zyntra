@@ -1,4 +1,4 @@
-# Zyntra
+# Fracture
 
 A Windows desktop app for managing multiple Roblox accounts, launching games, and automating workflows with Lua scripting. Built with WPF and .NET 8.
 
@@ -22,7 +22,7 @@ A Windows desktop app for managing multiple Roblox accounts, launching games, an
 
 ### Lua Scripting
 - Built-in code editor (VS Code-style: One Dark theme, Cascadia Code font, line numbers)
-- Full `zyntra` API auto-injected — no setup needed
+- Full `fracture` API auto-injected — no setup needed
 - **Script Scheduler** — run scripts on a timer (e.g. every 60 minutes), enable/disable per script
 - **Script UI** — create custom sidebar tabs with labels, buttons, inputs, checkboxes, dropdowns, and progress bars from Lua
 - Duplicate and manage scripts via right-click context menu
@@ -46,11 +46,11 @@ A Windows desktop app for managing multiple Roblox accounts, launching games, an
 
 ### Download
 
-Grab the latest `Zyntra.exe` from the [Releases](https://github.com/coder-isxt/zyntra/releases) page. It's a single self-contained `.exe` — no install required.
+Grab the latest `Fracture.exe` from the [Releases](https://github.com/coder-isxt/fracture/releases) page. It's a single self-contained `.exe` — no install required.
 
 ### First Run
 
-1. Launch `Zyntra.exe`
+1. Launch `Fracture.exe`
 2. Go to **Roblox Accounts** and add an account:
    - **Paste cookie** — copy your `.ROBLOSECURITY` cookie from your browser and paste it
    - **Browser Login** — click "Browser Login" to sign in directly
@@ -69,23 +69,23 @@ Open **Settings** from the sidebar to configure:
 - Default script template
 - Update checks
 
-All settings are saved to `%AppData%\Zyntra\settings.json`.
+All settings are saved to `%AppData%\Fracture\settings.json`.
 
 ---
 
 ## Scripting
 
-Zyntra uses **Lua** (via [MoonSharp](https://www.moonsharp.org/)) as its scripting engine. The `zyntra` API table is auto-injected into every script.
+Fracture uses **Lua** (via [MoonSharp](https://www.moonsharp.org/)) as its scripting engine. The `fracture` API table is auto-injected into every script.
 
 ```lua
 -- Log all accounts
-for _, acc in ipairs(zyntra.get_accounts()) do
-    zyntra.log(acc.DisplayName .. " — @" .. acc.Username)
+for _, acc in ipairs(fracture.get_accounts()) do
+    fracture.log(acc.DisplayName .. " — @" .. acc.Username)
 end
 
 -- Launch a game
-zyntra.launch_game("MyAccount", 4483381587)
-zyntra.notify("Done", "Game launched!", "Success")
+fracture.launch_game("MyAccount", 4483381587)
+fracture.notify("Done", "Game launched!", "Success")
 ```
 
 ### Scheduler
@@ -109,12 +109,12 @@ See the in-app **Docs** tab for the full API reference.
 ### Build
 
 ```bash
-git clone https://github.com/coder-isxt/zyntra.git
-cd zyntra
-dotnet publish Zyntra/Zyntra.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true -o build
+git clone https://github.com/coder-isxt/fracture.git
+cd fracture
+dotnet publish Fracture/Fracture.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true -o build
 ```
 
-Output: `build/Zyntra.exe`
+Output: `build/Fracture.exe`
 
 ### Release (maintainers)
 
@@ -122,14 +122,14 @@ Run `build.bat` to:
 1. Auto-compute the next version (`YY.M.patch`)
 2. Build a single-file Release exe
 3. Commit, tag, and push to GitHub
-4. GitHub Actions automatically creates a release with `Zyntra.exe` attached
+4. GitHub Actions automatically creates a release with `Fracture.exe` attached
 
 ---
 
 ## Project Structure
 
 ```
-Zyntra/
+Fracture/
 ├── Models/          # Data models (RobloxAccount, ScriptEntry, FavoriteGame, etc.)
 ├── ViewModels/      # MVVM ViewModels
 ├── Views/           # WPF UserControls and Windows

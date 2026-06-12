@@ -1,0 +1,130 @@
+<Window x:Class="Fracture.Views.SplashScreen"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Fracture" Icon="/logo.ico"
+        Height="360" Width="440"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent" ResizeMode="NoResize">
+
+    <Border CornerRadius="16" BorderThickness="1" BorderBrush="{StaticResource StrokeBrush}">
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FF15181F" Offset="0" />
+                <GradientStop Color="#FF1A1E28" Offset="0.5" />
+                <GradientStop Color="#FF15181F" Offset="1" />
+            </LinearGradientBrush>
+        </Border.Background>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Accent glow behind logo -->
+            <Ellipse Grid.Row="0" Width="180" Height="180" VerticalAlignment="Center" HorizontalAlignment="Center"
+                     Margin="0,-10,0,0" IsHitTestVisible="False" Opacity="0.08">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="{StaticResource AccentColor}" Offset="0" />
+                        <GradientStop Color="Transparent" Offset="1" />
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+
+            <!-- Center content -->
+            <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <!-- Logo with subtle fade-in -->
+                <Border HorizontalAlignment="Center" Margin="0,0,0,20">
+                    <Image x:Name="LogoImage" Source="/logo.ico" Width="72" Height="72"
+                           RenderOptions.BitmapScalingMode="HighQuality" Opacity="0">
+                        <Image.Triggers>
+                            <EventTrigger RoutedEvent="Image.Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                         From="0" To="1" Duration="0:0:0.5"
+                                                         BeginTime="0:0:0.1">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuadraticEase EasingMode="EaseOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Image.Triggers>
+                    </Image>
+                </Border>
+
+                <!-- App name -->
+                <TextBlock Text="Fracture" FontSize="30" FontWeight="Bold"
+                           Foreground="{StaticResource TextBrush}" HorizontalAlignment="Center"
+                           Opacity="0">
+                    <TextBlock.Triggers>
+                        <EventTrigger RoutedEvent="TextBlock.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                     From="0" To="1" Duration="0:0:0.4"
+                                                     BeginTime="0:0:0.3">
+                                        <DoubleAnimation.EasingFunction>
+                                            <QuadraticEase EasingMode="EaseOut" />
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </TextBlock.Triggers>
+                </TextBlock>
+
+                <!-- Tagline -->
+                <TextBlock Text="All-in-one Roblox management tool" FontSize="12"
+                           Foreground="{StaticResource SubTextBrush}" HorizontalAlignment="Center"
+                           Margin="0,6,0,0" Opacity="0">
+                    <TextBlock.Triggers>
+                        <EventTrigger RoutedEvent="TextBlock.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                     From="0" To="0.7" Duration="0:0:0.4"
+                                                     BeginTime="0:0:0.45">
+                                        <DoubleAnimation.EasingFunction>
+                                            <QuadraticEase EasingMode="EaseOut" />
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </TextBlock.Triggers>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- Bottom loading area -->
+            <StackPanel Grid.Row="1" Margin="36,0,36,28" HorizontalAlignment="Stretch">
+                <!-- Status text -->
+                <TextBlock x:Name="StatusText" Text="Initializing..." FontSize="11"
+                           Foreground="{StaticResource SubTextBrush}" HorizontalAlignment="Center"
+                           Margin="0,0,0,12" Opacity="0.7" />
+
+                <!-- Progress bar track -->
+                <Border x:Name="TrackBorder" CornerRadius="3" Background="{StaticResource PanelInsetBrush}"
+                        Height="4" ClipToBounds="True" SizeChanged="TrackBorder_SizeChanged">
+                    <Border x:Name="ProgressFill" CornerRadius="3" HorizontalAlignment="Left"
+                            Width="0" Height="4">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="{StaticResource AccentColor}" Offset="0" />
+                                <GradientStop Color="#FF8EB4FF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+                </Border>
+
+                <!-- Version -->
+                <TextBlock x:Name="VersionText" FontSize="10" Foreground="{StaticResource SubTextBrush}"
+                           HorizontalAlignment="Center" Margin="0,12,0,0" Opacity="0.35" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

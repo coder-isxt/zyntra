@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ========================================
-echo   Zyntra Build ^& Release Tool
+echo   Fracture Build ^& Release Tool
 echo ========================================
 echo.
 
@@ -38,19 +38,19 @@ pause >nul
 
 :: ── Update .csproj version ───────────────────────────────
 echo.
-echo Updating version to %VERSION% in Zyntra.csproj...
-powershell.exe -NoProfile -Command "$f = 'Zyntra\Zyntra.csproj'; $c = [System.IO.File]::ReadAllText($f); $c = $c -replace '<Version>[^<]*</Version>', '<Version>%VERSION%</Version>'; $c = $c -replace '<AssemblyVersion>[^<]*</AssemblyVersion>', '<AssemblyVersion>%VERSION%.0</AssemblyVersion>'; $c = $c -replace '<FileVersion>[^<]*</FileVersion>', '<FileVersion>%VERSION%.0</FileVersion>'; [System.IO.File]::WriteAllText($f, $c)"
+echo Updating version to %VERSION% in Fracture.csproj...
+powershell.exe -NoProfile -Command "$f = 'Fracture\Fracture.csproj'; $c = [System.IO.File]::ReadAllText($f); $c = $c -replace '<Version>[^<]*</Version>', '<Version>%VERSION%</Version>'; $c = $c -replace '<AssemblyVersion>[^<]*</AssemblyVersion>', '<AssemblyVersion>%VERSION%.0</AssemblyVersion>'; $c = $c -replace '<FileVersion>[^<]*</FileVersion>', '<FileVersion>%VERSION%.0</FileVersion>'; [System.IO.File]::WriteAllText($f, $c)"
 
-:: ── Kill running Zyntra ──────────────────────────────────
-taskkill /f /im Zyntra.exe >nul 2>&1
+:: ── Kill running Fracture ──────────────────────────────────
+taskkill /f /im Fracture.exe >nul 2>&1
 timeout /t 2 /nobreak >nul
 
 :: ── Clean + Build ────────────────────────────────────────
 if exist build rmdir /s /q build >nul 2>&1
 
 echo.
-echo Building Zyntra v%VERSION% (Release, single-file)...
-dotnet publish Zyntra\Zyntra.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:PublishTrimmed=false -o build
+echo Building Fracture v%VERSION% (Release, single-file)...
+dotnet publish Fracture\Fracture.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:PublishTrimmed=false -o build
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
@@ -60,7 +60,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo.
-echo Build successful! Output: build\Zyntra.exe
+echo Build successful! Output: build\Fracture.exe
 echo.
 
 :: ── Git commit, tag, push ────────────────────────────────

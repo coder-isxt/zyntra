@@ -2,9 +2,9 @@ param(
     [Parameter(Mandatory)][string]$Version
 )
 
-$repo = "coder-isxt/zyntra"
+$repo = "coder-isxt/fracture"
 $tag = "v$Version"
-$exePath = "build\Zyntra.exe"
+$exePath = "build\Fracture.exe"
 $changelogPath = "CHANGELOG.txt"
 
 # Get token from environment or git config
@@ -50,13 +50,13 @@ try {
 
 # Upload exe
 $uploadUrl = $release.upload_url -replace '\{[^}]*\}', ''
-Write-Host "Uploading Zyntra.exe..."
+Write-Host "Uploading Fracture.exe..."
 
 try {
     $bytes = [System.IO.File]::ReadAllBytes($exePath)
-    Invoke-RestMethod -Uri "$($uploadUrl)?name=Zyntra.exe&label=Zyntra.exe" `
+    Invoke-RestMethod -Uri "$($uploadUrl)?name=Fracture.exe&label=Fracture.exe" `
         -Method Post -Headers $headers -Body $bytes -ContentType "application/octet-stream" | Out-Null
-    Write-Host "Release $tag created with Zyntra.exe attached." -ForegroundColor Green
+    Write-Host "Release $tag created with Fracture.exe attached." -ForegroundColor Green
 } catch {
     Write-Host "Failed to upload exe: $_" -ForegroundColor Red
     exit 1

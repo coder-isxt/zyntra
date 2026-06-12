@@ -1,6 +1,6 @@
-# Zyntra Feature Roadmap
+# Fracture Feature Roadmap
 
-A comprehensive feature plan to evolve Zyntra from a Roblox-focused bootstrapper into a full-featured, open-source universal game launcher and app manager.
+A comprehensive feature plan to evolve Fracture from a Roblox-focused bootstrapper into a full-featured, open-source universal game launcher and app manager.
 
 ---
 
@@ -10,7 +10,7 @@ These are table-stakes for a credible open-source launch.
 
 - **Auto-updater** — Check GitHub Releases for new versions, show update prompt, download and replace exe in-place.
 - **Theme system** — Let users pick accent colors (not just purple). Store in settings. Potential for full light/dark toggle.
-- **Keybinds / hotkeys** — Global hotkey to show/hide Zyntra (e.g. `Ctrl+Shift+Z`). Configurable in Settings.
+- **Keybinds / hotkeys** — Global hotkey to show/hide Fracture (e.g. `Ctrl+Shift+Z`). Configurable in Settings.
 - **Import/export accounts** — Export encrypted account data to a file, import on another machine. Useful for backup.
 - **Multi-language support (i18n)** — Resource-file based localization. English + community-contributed translations.
 - **README + screenshots + logo** — GitHub-ready docs, feature list, installation instructions, contributing guide.
@@ -40,11 +40,11 @@ Expand beyond Roblox with a plugin-like module architecture.
 
 ## Phase 4 — Power User Features
 
-Features that differentiate Zyntra from basic launchers.
+Features that differentiate Fracture from basic launchers.
 
 - **Plugin system** — Load `.dll` plugins from a `plugins/` folder. Provide SDK/API for community extensions.
 - **Scripting / automation** — Simple task runner: "At 8pm, launch Account X into Place Y". Cron-like scheduler.
-- **Discord Rich Presence** — Show "Launching via Zyntra" or current game status in Discord.
+- **Discord Rich Presence** — Show "Launching via Fracture" or current game status in Discord.
 - **Webhook notifications** — Send a Discord/HTTP webhook when an account launches, cookie expires, etc.
 - **System resource monitor** — Show CPU/RAM/GPU usage in a sidebar widget. Track per-game resource usage.
 - **Portable mode** — Detect if running from USB/portable folder, store all data next to exe instead of %APPDATA%.
@@ -56,7 +56,7 @@ Features that build a community around the tool.
 - **Cloud sync (optional)** — Sync settings and favorites (NOT cookies) across devices via GitHub Gist or a simple backend.
 - **Community server lists** — Curated/shared lists of popular Roblox servers that users can subscribe to.
 - **Theme marketplace** — Share and download custom color themes from a community repo.
-- **Plugin repository** — Browse and install community plugins from within Zyntra.
+- **Plugin repository** — Browse and install community plugins from within Fracture.
 
 ## Phase 6 — UI/UX Enhancements
 

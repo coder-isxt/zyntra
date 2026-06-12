@@ -2,7 +2,7 @@
 - Added animated page transitions (fade + slide on navigation)
 - Added drag-and-drop reorder for apps list (replaces move up/down buttons)
 - Added unified versioning (csproj Version/AssemblyVersion/FileVersion match UpdateService.CurrentVersion)
-- Added Zyntra Scripting API (PowerShell module, Python module, context injection)
+- Added Fracture Scripting API (PowerShell module, Python module, context injection)
 - Added API Docs tab with full reference for PowerShell, Python, and Batch
 - Added Dashboard home page with stats cards and quick actions
 - Added Plugin system (install, enable/disable, remove DLL plugins)
@@ -15,7 +15,7 @@
 - Added custom game modules (launch args, env vars, working directory per app)
 - Added auto-updater (check GitHub releases)
 - Added theme system with 9 accent color presets
-- Added import/export accounts (encrypted .zyntra files)
+- Added import/export accounts (encrypted .fracture files)
 - Added Settings page (launch on startup, minimize to tray, accent picker)
 - Added system tray with quick-launch accounts
 - Added app settings dialog (edit name, description, icon, exe path)

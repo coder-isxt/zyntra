@@ -22,11 +22,11 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore Zyntra/Zyntra.csproj
+        run: dotnet restore Fracture/Fracture.csproj
 
       - name: Publish single-file exe
         run: >
-          dotnet publish Zyntra/Zyntra.csproj
+          dotnet publish Fracture/Fracture.csproj
           -c Release
           -r win-x64
           --self-contained true
@@ -38,7 +38,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: publish/Zyntra.exe
+          files: publish/Fracture.exe
           generate_release_notes: true
           draft: false
           prerelease: false

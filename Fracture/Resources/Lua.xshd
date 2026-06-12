@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<SyntaxDefinition name="Lua" extensions=".lua"
+                  xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+
+  <Color name="Comment"     foreground="#FF6A737D" />
+  <Color name="String"      foreground="#FFCE9178" />
+  <Color name="Number"      foreground="#FFB5CEA8" />
+  <Color name="Keyword"     foreground="#FFC586C0" fontWeight="normal" />
+  <Color name="Builtin"     foreground="#FF4FC1FF" />
+  <Color name="FractureApi"   foreground="#FF709BFF" fontWeight="normal" />
+  <Color name="Function"    foreground="#FFDCDCAA" />
+  <Color name="Operator"    foreground="#FFD4D4D4" />
+  <Color name="Constant"    foreground="#FF569CD6" />
+
+  <RuleSet ignoreCase="false">
+
+    <!-- Long-bracket strings [[ ... ]] -->
+    <Span color="String" multiline="true">
+      <Begin>\[\[</Begin>
+      <End>\]\]</End>
+    </Span>
+
+    <!-- Long-bracket block comments -->
+    <Span color="Comment" multiline="true">
+      <Begin>--\[\[</Begin>
+      <End>\]\]</End>
+    </Span>
+
+    <!-- Single-line comments -->
+    <Span color="Comment">
+      <Begin>--</Begin>
+    </Span>
+
+    <!-- Strings -->
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <Span begin="\\" end="."/>
+      </RuleSet>
+    </Span>
+    <Span color="String">
+      <Begin>'</Begin>
+      <End>'</End>
+      <RuleSet>
+        <Span begin="\\" end="."/>
+      </RuleSet>
+    </Span>
+
+    <!-- Keywords -->
+    <Keywords color="Keyword">
+      <Word>and</Word><Word>break</Word><Word>do</Word><Word>else</Word>
+      <Word>elseif</Word><Word>end</Word><Word>for</Word><Word>function</Word>
+      <Word>goto</Word><Word>if</Word><Word>in</Word><Word>local</Word>
+      <Word>not</Word><Word>or</Word><Word>repeat</Word><Word>return</Word>
+      <Word>then</Word><Word>until</Word><Word>while</Word>
+    </Keywords>
+
+    <!-- Constants -->
+    <Keywords color="Constant">
+      <Word>true</Word><Word>false</Word><Word>nil</Word><Word>self</Word>
+    </Keywords>
+
+    <!-- Builtin functions -->
+    <Keywords color="Builtin">
+      <Word>print</Word><Word>tostring</Word><Word>tonumber</Word><Word>type</Word>
+      <Word>ipairs</Word><Word>pairs</Word><Word>next</Word><Word>select</Word>
+      <Word>require</Word><Word>pcall</Word><Word>xpcall</Word><Word>error</Word>
+      <Word>assert</Word><Word>setmetatable</Word><Word>getmetatable</Word>
+      <Word>rawget</Word><Word>rawset</Word><Word>rawequal</Word>
+      <Word>string</Word><Word>table</Word><Word>math</Word><Word>os</Word><Word>io</Word>
+    </Keywords>
+
+    <!-- fracture API namespace -->
+    <Rule color="FractureApi">\bfracture\b</Rule>
+
+    <!-- Function definitions and calls -->
+    <Rule color="Function">\b[A-Za-z_][A-Za-z0-9_]*(?=\s*\()</Rule>
+
+    <!-- Numbers -->
+    <Rule color="Number">
+      \b0[xX][0-9a-fA-F]+\b|
+      \b\d+(\.\d+)?([eE][+-]?\d+)?\b
+    </Rule>
+
+  </RuleSet>
+</SyntaxDefinition>

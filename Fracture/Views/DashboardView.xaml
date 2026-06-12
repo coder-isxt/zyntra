@@ -1,0 +1,89 @@
+<UserControl x:Class="Fracture.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Fracture.ViewModels"
+             Loaded="OnLoaded">
+    <Grid Margin="32,28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="28" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="24" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Greeting -->
+        <StackPanel Grid.Row="0">
+            <TextBlock FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextBrush}">
+                <Run Text="{Binding Greeting, Mode=OneWay}" /><Run Text=" 👋" />
+            </TextBlock>
+            <TextBlock Text="Here's an overview of your Fracture workspace." FontSize="14"
+                       Foreground="{StaticResource SubTextBrush}" Margin="0,6,0,0" />
+        </StackPanel>
+
+        <!-- Stat Cards -->
+        <UniformGrid Grid.Row="2" Columns="3" Rows="1">
+            <!-- Apps -->
+            <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="10"
+                    BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+                    Padding="20,16" Margin="0,0,10,0" Cursor="Hand"
+                    MouseLeftButtonUp="OnNavApps">
+                <StackPanel>
+                    <TextBlock Text="⊞" FontSize="22" Foreground="{StaticResource AccentBrush}" />
+                    <TextBlock Text="{Binding AppCount}" FontSize="28" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}" Margin="0,6,0,2" />
+                    <TextBlock Text="Applications" FontSize="12"
+                               Foreground="{StaticResource SubTextBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Accounts -->
+            <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="10"
+                    BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+                    Padding="20,16" Margin="0,0,10,0" Cursor="Hand"
+                    MouseLeftButtonUp="OnNavRoblox">
+                <StackPanel>
+                    <TextBlock Text="◉" FontSize="22" Foreground="{StaticResource AccentBrush}" />
+                    <TextBlock Text="{Binding AccountCount}" FontSize="28" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}" Margin="0,6,0,2" />
+                    <TextBlock Text="Roblox Accounts" FontSize="12"
+                               Foreground="{StaticResource SubTextBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Scripts -->
+            <Border Background="{StaticResource PanelInsetBrush}" CornerRadius="10"
+                    BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1"
+                    Padding="20,16" Cursor="Hand"
+                    MouseLeftButtonUp="OnNavScripts">
+                <StackPanel>
+                    <TextBlock Text="⟐" FontSize="22" Foreground="{StaticResource AccentBrush}" />
+                    <TextBlock Text="{Binding ScriptCount}" FontSize="28" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}" Margin="0,6,0,2" />
+                    <TextBlock Text="Scripts" FontSize="12"
+                               Foreground="{StaticResource SubTextBrush}" />
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Quick Actions -->
+        <StackPanel Grid.Row="4">
+            <TextBlock Text="QUICK ACTIONS" FontSize="11" FontWeight="Bold"
+                       Foreground="{StaticResource SubTextBrush}" Opacity="0.6" Margin="0,0,0,10" />
+            <WrapPanel>
+                <Button Content="+ Add App" Style="{StaticResource AccentButtonStyle}" Padding="16,8"
+                        Margin="0,0,8,8" Click="OnQuickAddApp" />
+                <Button Content="+ New Script" Style="{StaticResource ControlButtonStyle}" Padding="16,8"
+                        Margin="0,0,8,8" Click="OnQuickNewScript" />
+            </WrapPanel>
+        </StackPanel>
+
+        <!-- Footer -->
+        <StackPanel Grid.Row="5" VerticalAlignment="Bottom">
+            <TextBlock FontSize="12" Foreground="{StaticResource SubTextBrush}" Opacity="0.5">
+                <Run Text="Fracture " /><Run Text="{Binding Version, Mode=OneWay}" />
+            </TextBlock>
+        </StackPanel>
+    </Grid>
+</UserControl>
