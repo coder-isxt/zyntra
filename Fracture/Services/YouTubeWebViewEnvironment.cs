@@ -12,7 +12,6 @@ public static class YouTubeWebViewEnvironment
 {
     private static readonly SemaphoreSlim Gate = new(1, 1);
     private static CoreWebView2Environment? _environment;
-    private static bool _virtualHostMapped;
 
     public static async Task EnsurePlayerReadyAsync(WebView2 webView)
     {
@@ -22,16 +21,13 @@ public static class YouTubeWebViewEnvironment
         var core = webView.CoreWebView2
             ?? throw new InvalidOperationException("WebView2 failed to initialize.");
 
-        if (_virtualHostMapped)
-            return;
-
+        // SetVirtualHostNameToFolderMapping applies to this CoreWebView2 instance only,
+        // so it must be (re)applied for every new instance, even when the environment is reused.
         string playerHostFolder = YouTubeEmbedService.EnsurePlayerHostFolder();
         core.SetVirtualHostNameToFolderMapping(
             YouTubeEmbedService.PlayerHostName,
             playerHostFolder,
             CoreWebView2HostResourceAccessKind.Allow);
-
-        _virtualHostMapped = true;
     }
 
     private static async Task<CoreWebView2Environment> GetOrCreateEnvironmentAsync()

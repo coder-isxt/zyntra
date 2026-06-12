@@ -62,21 +62,26 @@ public partial class YouTubePlayerView : UserControl
 
     private void TeardownWebView()
     {
-        if (!_webViewReady)
-            return;
-
         try
         {
             var core = PlayerWebView.CoreWebView2;
             if (core != null)
-            {
                 core.WebMessageReceived -= OnWebMessageReceived;
-                core.NavigateToString(BuildBlankPage());
-            }
         }
         catch
         {
             // WebView may already be disposing.
+        }
+
+        // Dispose the control so its CoreWebView2 instance is released back to the
+        // shared environment instead of leaking across tab navigations.
+        try
+        {
+            PlayerWebView.Dispose();
+        }
+        catch
+        {
+            // WebView may already be disposed.
         }
 
         _webViewReady = false;
@@ -173,15 +178,31 @@ public partial class YouTubePlayerView : UserControl
             return;
         }
 
-        var window = new YouTubePipWindow(videoId, vm.CurrentPositionSeconds)
+        try
         {
-            Owner = Window.GetWindow(this)
-        };
-        window.Show();
+            var window = new YouTubePipWindow(videoId, vm.CurrentPositionSeconds)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            window.Show();
+        }
+        catch (Exception ex)
+        {
+            vm.StatusText = $"Failed to open PiP: {ex.Message}";
+            return;
+        }
 
         if (_webViewReady)
         {
-            PlayerWebView.NavigateToString(BuildBlankPage());
+            try
+            {
+                PlayerWebView.NavigateToString(BuildBlankPage());
+            }
+            catch
+            {
+                // WebView may already be disposing.
+            }
+
             EmptyOverlay.Visibility = Visibility.Visible;
         }
 
@@ -257,7 +278,16 @@ public partial class YouTubePlayerView : UserControl
         _playbackGeneration++;
 
         if (_webViewReady)
-            PlayerWebView.NavigateToString(BuildBlankPage());
+        {
+            try
+            {
+                PlayerWebView.NavigateToString(BuildBlankPage());
+            }
+            catch
+            {
+                // WebView may already be disposing.
+            }
+        }
 
         EmptyOverlay.Visibility = Visibility.Visible;
     }

@@ -1,4 +1,3 @@
-using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
@@ -33,18 +32,10 @@ public partial class YouTubePipWindow : Window
     {
         try
         {
-            string userDataFolder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Fracture", "WebView2YouTubePip");
-
-            var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
-            await PipWebView.EnsureCoreWebView2Async(env);
-
-            string playerHostFolder = YouTubeEmbedService.EnsurePlayerHostFolder();
-            PipWebView.CoreWebView2.SetVirtualHostNameToFolderMapping(
-                YouTubeEmbedService.PlayerHostName,
-                playerHostFolder,
-                CoreWebView2HostResourceAccessKind.Allow);
+            // Share the player's CoreWebView2Environment instead of creating a second
+            // environment for the same purpose - multiple environments pointed at
+            // overlapping user-data folders are unsupported and can crash the app.
+            await YouTubeWebViewEnvironment.EnsurePlayerReadyAsync(PipWebView);
 
             PipWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
             PipWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
