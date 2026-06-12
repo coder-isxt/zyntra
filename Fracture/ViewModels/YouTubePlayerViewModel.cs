@@ -82,6 +82,20 @@ public class YouTubePlayerViewModel : BaseViewModel
         set => SetProperty(ref _newPlaylistName, value);
     }
 
+    private string _importPlaylistInput = string.Empty;
+    public string ImportPlaylistInput
+    {
+        get => _importPlaylistInput;
+        set => SetProperty(ref _importPlaylistInput, value);
+    }
+
+    private bool _isImportingPlaylist;
+    public bool IsImportingPlaylist
+    {
+        get => _isImportingPlaylist;
+        set => SetProperty(ref _isImportingPlaylist, value);
+    }
+
     private YouTubePlaylist? _selectedPlaylist;
     public YouTubePlaylist? SelectedPlaylist
     {
@@ -110,6 +124,7 @@ public class YouTubePlayerViewModel : BaseViewModel
     public ICommand AddCurrentToPlaylistCommand { get; }
     public ICommand PlayPlaylistItemCommand { get; }
     public ICommand RemovePlaylistItemCommand { get; }
+    public ICommand ImportPlaylistCommand { get; }
     public ICommand NavigateSectionCommand { get; }
 
     public event Action<string, double>? PlayRequested;
@@ -131,6 +146,7 @@ public class YouTubePlayerViewModel : BaseViewModel
         AddCurrentToPlaylistCommand = new RelayCommand(_ => AddCurrentToPlaylist());
         PlayPlaylistItemCommand = new RelayCommand(PlayPlaylistItem);
         RemovePlaylistItemCommand = new RelayCommand(RemovePlaylistItem);
+        ImportPlaylistCommand = new RelayCommand(_ => _ = ImportPlaylistAsync(), _ => !IsImportingPlaylist);
         NavigateSectionCommand = new RelayCommand(p =>
         {
             if (p is not string section)
@@ -375,6 +391,64 @@ public class YouTubePlayerViewModel : BaseViewModel
         SelectedPlaylistItems.Add(item);
         SaveLibrary();
         StatusText = $"Added to {SelectedPlaylist.Name}";
+    }
+
+    private async Task ImportPlaylistAsync()
+    {
+        string input = ImportPlaylistInput.Trim();
+        if (!YouTubeEmbedService.TryGetPlaylistId(input, out string playlistId))
+        {
+            StatusText = "Enter a valid YouTube playlist link or ID";
+            return;
+        }
+
+        IsImportingPlaylist = true;
+        StatusText = "Importing playlist...";
+
+        try
+        {
+            var result = await YouTubePlaylistService.FetchPlaylistAsync(playlistId);
+            if (result.Videos.Count == 0)
+            {
+                StatusText = "No videos found in that playlist";
+                return;
+            }
+
+            var playlist = SelectedPlaylist;
+            if (playlist == null)
+            {
+                playlist = new YouTubePlaylist { Name = result.PlaylistTitle };
+                _library.Playlists.Add(playlist);
+                Playlists.Add(playlist);
+                SelectedPlaylist = playlist;
+            }
+
+            int added = 0;
+            foreach (var video in result.Videos)
+            {
+                if (playlist.Items.Any(i => i.VideoId == video.VideoId))
+                    continue;
+
+                var item = new YouTubePlaylistItem { VideoId = video.VideoId, Title = video.Title };
+                playlist.Items.Add(item);
+                SelectedPlaylistItems.Add(item);
+                added++;
+            }
+
+            SaveLibrary();
+            ImportPlaylistInput = string.Empty;
+            StatusText = added > 0
+                ? $"Imported {added} video(s) into {playlist.Name}"
+                : $"All videos already in {playlist.Name}";
+        }
+        catch
+        {
+            StatusText = "Failed to import playlist";
+        }
+        finally
+        {
+            IsImportingPlaylist = false;
+        }
     }
 
     private void RemovePlaylistItem(object? param)

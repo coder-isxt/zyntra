@@ -369,6 +369,15 @@
                             <Button Content="Delete playlist" Height="34" Margin="0,8,0,0"
                                     Style="{StaticResource DangerButtonStyle}"
                                     Command="{Binding DeletePlaylistCommand}" />
+
+                            <TextBlock Text="IMPORT FROM YOUTUBE" Style="{StaticResource SectionHeaderStyle}"
+                                       Margin="0,20,0,8" />
+                            <TextBox Text="{Binding ImportPlaylistInput, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource DarkTextBoxStyle}" Tag="Playlist link or ID"
+                                     Height="36" FontSize="12" Padding="12,6" />
+                            <Button Content="Import playlist" Height="34" Margin="0,8,0,0"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Command="{Binding ImportPlaylistCommand}" />
                         </StackPanel>
 
                         <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">

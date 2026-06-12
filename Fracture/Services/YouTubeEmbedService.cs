@@ -9,6 +9,37 @@ public static class YouTubeEmbedService
     public const string PlayerHostName = "fracture.youtube.local";
 
     private static readonly Regex VideoIdRegex = new(@"^[A-Za-z0-9_-]{11}$", RegexOptions.Compiled);
+    private static readonly Regex PlaylistIdRegex = new(@"^[A-Za-z0-9_-]{10,}$", RegexOptions.Compiled);
+
+    public static bool TryGetPlaylistId(string input, out string playlistId)
+    {
+        playlistId = string.Empty;
+        input = input.Trim();
+
+        if (Uri.TryCreate(input, UriKind.Absolute, out var uri))
+        {
+            string host = uri.Host.ToLowerInvariant();
+            if (!host.EndsWith("youtube.com") && !host.EndsWith("youtube-nocookie.com") && !host.EndsWith("youtu.be"))
+                return false;
+
+            var query = ParseQuery(uri.Query);
+            if (query.TryGetValue("list", out var listId) && PlaylistIdRegex.IsMatch(listId))
+            {
+                playlistId = listId;
+                return true;
+            }
+
+            return false;
+        }
+
+        if (PlaylistIdRegex.IsMatch(input))
+        {
+            playlistId = input;
+            return true;
+        }
+
+        return false;
+    }
 
     public static bool TryGetVideoId(string input, out string videoId)
     {
