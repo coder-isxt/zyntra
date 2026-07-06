@@ -125,11 +125,26 @@ public static class FastFlagService
     /// <summary>Common, well-known FastFlags offered as quick toggles in the UI.</summary>
     public static readonly FastFlagPreset[] CommonPresets =
     {
+        // Performance
         new("DFIntTaskSchedulerTargetFps", "144", "Unlock FPS cap (set target FPS)"),
-        new("FFlagDebugGraphicsPreferD3D11", "True", "Force DirectX 11 rendering"),
-        new("FFlagDebugGraphicsPreferVulkan", "True", "Force Vulkan rendering"),
-        new("DFIntCameraFieldOfViewMaximum", "120", "Increase maximum field of view"),
+        new("DFIntDebugFRMQualityLevelOverride", "1", "Lock render quality to lowest (max FPS)"),
         new("FFlagDisablePostFx", "True", "Disable post-processing effects"),
+        new("FIntRenderShadowIntensity", "0", "Disable shadows"),
+        new("DFFlagDebugPauseVoxelizer", "True", "Disable voxel (dynamic) shadows"),
+        new("FIntDebugForceMSAASamples", "4", "Force anti-aliasing (MSAA samples: 0/1/2/4/8)"),
+
+        // Renderer
+        new("FFlagDebugGraphicsPreferD3D11", "True", "Force DirectX 11 rendering"),
+        new("FFlagDebugGraphicsPreferD3D11FL10", "True", "Force DirectX 11 (feature level 10, old GPUs)"),
+        new("FFlagDebugGraphicsPreferVulkan", "True", "Force Vulkan rendering"),
+        new("FFlagDebugGraphicsPreferOpenGL", "True", "Force OpenGL rendering"),
+
+        // Visuals
+        new("FFlagDebugForceFutureIsBrightPhase3", "True", "Force Future lighting technology"),
+        new("DFIntCameraFieldOfViewMaximum", "120", "Increase maximum field of view"),
         new("DFFlagDisableDPIScale", "True", "Disable DPI scaling"),
+
+        // Network
+        new("DFIntConnectionMTUSize", "900", "Lower network MTU (may reduce packet loss)"),
     };
 }
