@@ -242,6 +242,8 @@ public partial class MainWindow : Window
         BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
         BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
         BtnFastFlags.Style = tag == "FastFlags" ? activeStyle : normalStyle;
+        BtnOptimization.Style = tag == "Optimization" ? activeStyle : normalStyle;
+        BtnStartup.Style = tag == "Startup" ? activeStyle : normalStyle;
         BtnActivity.Style = tag == "Activity" ? activeStyle : normalStyle;
         BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;
     }

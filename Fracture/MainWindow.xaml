@@ -199,6 +199,36 @@
                                 </StackPanel>
                             </Button>
 
+                            <Button x:Name="BtnOptimization"
+                                    Command="{Binding NavigateCommand}" CommandParameter="Optimization"
+                                    Click="SidebarNav_Click" Tag="Optimization"
+                                    HorizontalContentAlignment="Stretch"
+                                    Style="{StaticResource SidebarButtonStyle}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource IconBolt}"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="2" StrokeLineJoin="Round"
+                                          Width="17" Height="17" Stretch="Uniform"
+                                          Margin="0,0,12,0" />
+                                    <TextBlock Text="Optimization" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button x:Name="BtnStartup"
+                                    Command="{Binding NavigateCommand}" CommandParameter="Startup"
+                                    Click="SidebarNav_Click" Tag="Startup"
+                                    HorizontalContentAlignment="Stretch"
+                                    Style="{StaticResource SidebarButtonStyle}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource IconPower}"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                          StrokeLineJoin="Round" Width="17" Height="17" Stretch="Uniform"
+                                          Margin="0,0,12,0" />
+                                    <TextBlock Text="Startup" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
                             <Button x:Name="BtnActivity"
                                     Command="{Binding NavigateCommand}" CommandParameter="Activity"
                                     Click="SidebarNav_Click" Tag="Activity"
@@ -259,6 +289,12 @@
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:FastFlagsViewModel}">
                                     <views:FastFlagsView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:OptimizationViewModel}">
+                                    <views:OptimizationView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:StartupManagerViewModel}">
+                                    <views:StartupView />
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:ActivityLogViewModel}">
                                     <views:ActivityLogView />

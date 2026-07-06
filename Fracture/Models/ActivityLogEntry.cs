@@ -9,6 +9,7 @@ public enum ActivityKind
     HealthCheck,
     AppLaunch,
     Import,
+    Optimization,
     Info
 }
 
@@ -30,6 +31,7 @@ public class ActivityLogEntry
         ActivityKind.HealthCheck => "❤️",
         ActivityKind.AppLaunch => "📦",
         ActivityKind.Import => "📥",
+        ActivityKind.Optimization => "🧹",
         _ => "•"
     };
 

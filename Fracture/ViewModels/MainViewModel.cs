@@ -51,6 +51,8 @@ public class MainViewModel : BaseViewModel
     public AppsViewModel AppsVM { get; }
     public RobloxAccountsViewModel RobloxVM { get; }
     public FastFlagsViewModel FastFlagsVM { get; }
+    public OptimizationViewModel OptimizationVM { get; }
+    public StartupManagerViewModel StartupVM { get; }
     public ActivityLogViewModel ActivityLogVM { get; }
     public SettingsViewModel SettingsVM { get; }
 
@@ -65,6 +67,8 @@ public class MainViewModel : BaseViewModel
         AppsVM = new AppsViewModel();
         RobloxVM = new RobloxAccountsViewModel();
         FastFlagsVM = new FastFlagsViewModel();
+        OptimizationVM = new OptimizationViewModel();
+        StartupVM = new StartupManagerViewModel();
         ActivityLogVM = new ActivityLogViewModel();
         SettingsVM = new SettingsViewModel();
 
@@ -144,6 +148,15 @@ public class MainViewModel : BaseViewModel
             case "FastFlags":
                 CurrentPage = FastFlagsVM;
                 CurrentPageName = "FastFlags";
+                break;
+            case "Optimization":
+                CurrentPage = OptimizationVM;
+                CurrentPageName = "Optimization";
+                break;
+            case "Startup":
+                StartupVM.Load();
+                CurrentPage = StartupVM;
+                CurrentPageName = "Startup Manager";
                 break;
             case "Activity":
                 CurrentPage = ActivityLogVM;

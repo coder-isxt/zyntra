@@ -1,0 +1,145 @@
+<UserControl x:Class="Fracture.Views.OptimizationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <!-- Shared action-card template -->
+        <DataTemplate x:Key="ActionCardTemplate">
+            <Border Style="{StaticResource CardStyle}" Padding="18,16" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Width="44" Height="44" CornerRadius="12"
+                            Background="{StaticResource AccentSoftBrush}" VerticalAlignment="Top">
+                        <TextBlock Text="{Binding Icon}" FontSize="20"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextBrush}" />
+                            <Border CornerRadius="4" Padding="6,1" Margin="8,0,0,0"
+                                    Background="{StaticResource AccentSoftBrush}" VerticalAlignment="Center"
+                                    Visibility="{Binding ShowAdminBadge, Converter={StaticResource BoolToVisConverter}}">
+                                <TextBlock Text="ADMIN" FontSize="9" FontWeight="Bold"
+                                           Foreground="{StaticResource AccentBrush}" />
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Description}" FontSize="12"
+                                   Foreground="{StaticResource SubTextBrush}"
+                                   TextWrapping="Wrap" Margin="0,3,0,0" />
+                        <TextBlock Text="{Binding ResultText}" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBrush}" Margin="0,6,0,0"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding HasResult, Converter={StaticResource BoolToVisConverter}}" />
+                    </StackPanel>
+
+                    <Button Grid.Column="3" Content="Run" Padding="20,8" VerticalAlignment="Center"
+                            Style="{StaticResource ControlButtonStyle}"
+                            Command="{Binding RunCommand}" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Margin="32,28,32,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="18" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <StackPanel>
+                <TextBlock Text="Optimization" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="Live system meters and one-click tune-ups to speed up your PC or laptop."
+                           Style="{StaticResource PageSubtitleStyle}" />
+            </StackPanel>
+            <Button Content="⚡ Run quick tune-up" Style="{StaticResource AccentButtonStyle}" Padding="18,8"
+                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                    Command="{Binding RunAllCommand}" />
+        </Grid>
+
+        <!-- Live meters -->
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="20,16">
+            <UniformGrid Columns="5">
+                <StackPanel Margin="0,0,16,0">
+                    <TextBlock Text="CPU" Style="{StaticResource SectionHeaderStyle}" />
+                    <TextBlock Text="{Binding CpuText}" FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}" Margin="0,2,0,6" />
+                    <ProgressBar Value="{Binding CpuPercent, Mode=OneWay}" Maximum="100" Height="6"
+                                 Background="{StaticResource PanelInsetBrush}" Foreground="{StaticResource AccentBrush}"
+                                 BorderThickness="0" />
+                </StackPanel>
+                <StackPanel Margin="0,0,16,0">
+                    <TextBlock Text="MEMORY" Style="{StaticResource SectionHeaderStyle}" />
+                    <TextBlock Text="{Binding RamText}" FontSize="14" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}" Margin="0,2,0,6"
+                               TextTrimming="CharacterEllipsis" />
+                    <ProgressBar Value="{Binding RamPercent, Mode=OneWay}" Maximum="100" Height="6"
+                                 Background="{StaticResource PanelInsetBrush}" Foreground="{StaticResource AccentBrush}"
+                                 BorderThickness="0" />
+                </StackPanel>
+                <StackPanel Margin="0,0,16,0">
+                    <TextBlock Text="DISK" Style="{StaticResource SectionHeaderStyle}" />
+                    <TextBlock Text="{Binding DiskText}" FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}" Margin="0,2,0,6" />
+                    <ProgressBar Value="{Binding DiskPercent, Mode=OneWay}" Maximum="100" Height="6"
+                                 Background="{StaticResource PanelInsetBrush}" Foreground="{StaticResource AccentBrush}"
+                                 BorderThickness="0" />
+                </StackPanel>
+                <StackPanel Margin="0,0,16,0">
+                    <TextBlock Text="GPU" Style="{StaticResource SectionHeaderStyle}" />
+                    <TextBlock Text="{Binding GpuText}" FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}" Margin="0,2,0,6" />
+                    <ProgressBar Value="{Binding GpuPercent, Mode=OneWay}" Maximum="100" Height="6"
+                                 Background="{StaticResource PanelInsetBrush}" Foreground="{StaticResource AccentBrush}"
+                                 BorderThickness="0" />
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="CPU TEMP" Style="{StaticResource SectionHeaderStyle}" />
+                    <TextBlock Text="{Binding TempText}" FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}" Margin="0,2,0,6" />
+                </StackPanel>
+            </UniformGrid>
+        </Border>
+
+        <!-- Elevation banner -->
+        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="14,10" Margin="0,0,0,0"
+                VerticalAlignment="Top"
+                Visibility="{Binding ShowElevatePrompt, Converter={StaticResource BoolToVisConverter}}">
+            <Grid>
+                <TextBlock VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource SubTextBrush}"
+                           Text="🛡  Some advanced optimizations need administrator rights." />
+                <Button Content="Restart as admin" Style="{StaticResource ControlButtonStyle}" Padding="14,6"
+                        HorizontalAlignment="Right" Command="{Binding ElevateCommand}" />
+            </Grid>
+        </Border>
+
+        <!-- Actions -->
+        <ScrollViewer Grid.Row="4" VerticalScrollBarVisibility="Auto" Margin="0,4,0,0">
+            <StackPanel>
+                <TextBlock Text="QUICK TUNE-UPS" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,10" />
+                <ItemsControl ItemsSource="{Binding QuickActions}"
+                              ItemTemplate="{StaticResource ActionCardTemplate}" />
+
+                <TextBlock Text="ADVANCED — USE WITH CARE" Style="{StaticResource SectionHeaderStyle}" Margin="0,10,0,10" />
+                <ItemsControl ItemsSource="{Binding AdvancedActions}"
+                              ItemTemplate="{StaticResource ActionCardTemplate}" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Status -->
+        <TextBlock Grid.Row="5" Text="{Binding StatusText}" Foreground="{StaticResource SubTextBrush}"
+                   FontSize="12" Margin="0,12,0,14" />
+    </Grid>
+</UserControl>
