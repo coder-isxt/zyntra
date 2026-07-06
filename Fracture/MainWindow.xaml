@@ -167,87 +167,6 @@
                                 </Grid>
                             </Button>
 
-                            <TextBlock Text="TOOLS" Style="{StaticResource SectionHeaderStyle}"
-                                       Margin="18,16,0,6" />
-
-                            <Button x:Name="BtnScripts"
-                                    Command="{Binding NavigateCommand}" CommandParameter="Scripts"
-                                    Click="SidebarNav_Click" Tag="Scripts"
-                                    HorizontalContentAlignment="Stretch"
-                                    Style="{StaticResource SidebarButtonStyle}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Path Grid.Column="0" Data="{StaticResource IconScripts}"
-                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                          StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                          StrokeLineJoin="Round" Width="17" Height="17" Stretch="Uniform"
-                                          Margin="0,0,12,0" />
-                                    <TextBlock Grid.Column="1" Text="Scripts" VerticalAlignment="Center"
-                                               TextTrimming="CharacterEllipsis" />
-                                    <Border Grid.Column="2" CornerRadius="9" Background="{StaticResource ControlBrush}"
-                                            Padding="6,1" MinWidth="20" Margin="6,0,0,0"
-                                            Visibility="{Binding DataContext.ShowSidebarBadges, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisConverter}}">
-                                        <TextBlock Text="{Binding DataContext.ScriptCount, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                   FontSize="10" Foreground="{StaticResource SubTextBrush}"
-                                                   HorizontalAlignment="Center" />
-                                    </Border>
-                                </Grid>
-                            </Button>
-
-                            <Button x:Name="BtnYouTube"
-                                    Command="{Binding NavigateCommand}" CommandParameter="YouTube"
-                                    Click="SidebarNav_Click" Tag="YouTube"
-                                    HorizontalContentAlignment="Stretch"
-                                    Style="{StaticResource SidebarButtonStyle}">
-                                <StackPanel Orientation="Horizontal">
-                                    <Path Data="{StaticResource IconVideo}"
-                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                          StrokeThickness="2" StrokeLineJoin="Round"
-                                          Width="17" Height="17" Stretch="Uniform"
-                                          Margin="0,0,12,0" />
-                                    <TextBlock Text="YouTube" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </Button>
-
-                            <Button x:Name="BtnDocs"
-                                    Command="{Binding NavigateCommand}" CommandParameter="Docs"
-                                    Click="SidebarNav_Click" Tag="Docs"
-                                    HorizontalContentAlignment="Stretch"
-                                    Style="{StaticResource SidebarButtonStyle}">
-                                <StackPanel Orientation="Horizontal">
-                                    <Path Data="{StaticResource IconDocs}"
-                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                          StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                          StrokeLineJoin="Round" Width="17" Height="17" Stretch="Uniform"
-                                          Margin="0,0,12,0" />
-                                    <TextBlock Text="API Docs" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </Button>
-
-                            <!-- Script Tabs (dynamic) -->
-                            <ItemsControl x:Name="ScriptTabButtons"
-                                          ItemsSource="{Binding ScriptTabs}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button Click="OnScriptTabClick" Tag="{Binding Id}" Cursor="Hand"
-                                                HorizontalContentAlignment="Stretch"
-                                                Style="{StaticResource SidebarButtonStyle}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{Binding Icon, Mode=OneWay}" FontSize="14"
-                                                           Width="17" TextAlignment="Center"
-                                                           VerticalAlignment="Center" Margin="0,0,12,0" />
-                                                <TextBlock Text="{Binding Name, Mode=OneWay}"
-                                                           VerticalAlignment="Center"
-                                                           TextTrimming="CharacterEllipsis" />
-                                            </StackPanel>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
                         </StackPanel>
 
                         <!-- Footer -->
@@ -287,18 +206,6 @@
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:RobloxAccountsViewModel}">
                                     <views:RobloxAccountsView />
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type vm:ScriptsViewModel}">
-                                    <views:ScriptsView />
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type vm:YouTubePlayerViewModel}">
-                                    <views:YouTubePlayerView />
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type vm:ScriptTabViewModel}">
-                                    <views:ScriptTabView />
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type vm:DocsViewModel}">
-                                    <views:DocsView />
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                                     <views:SettingsView />

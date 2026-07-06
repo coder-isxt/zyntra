@@ -16,7 +16,7 @@ public class SettingsViewModel : BaseViewModel
 {
     private readonly AppSettings _settings;
 
-    public static string[] PageOptions => new[] { "Roblox", "Apps", "Scripts", "Docs" };
+    public static string[] PageOptions => new[] { "Roblox", "Apps" };
 
     private bool _launchOnStartup;
     public bool LaunchOnStartup

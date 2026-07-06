@@ -41,21 +41,14 @@ public class MainViewModel : BaseViewModel
     private int _appCount;
     public int AppCount { get => _appCount; set => SetProperty(ref _appCount, value); }
 
-    private int _scriptCount;
-    public int ScriptCount { get => _scriptCount; set => SetProperty(ref _scriptCount, value); }
-
     private bool _showSidebarBadges;
     public bool ShowSidebarBadges { get => _showSidebarBadges; set => SetProperty(ref _showSidebarBadges, value); }
 
     public ObservableCollection<NotificationItem> Notifications => NotificationService.Notifications;
     public ObservableCollection<ToastItem> Toasts => ToastService.ActiveToasts;
-    public ObservableCollection<ScriptTab> ScriptTabs => ScriptUIService.Tabs;
 
     public AppsViewModel AppsVM { get; }
     public RobloxAccountsViewModel RobloxVM { get; }
-    public ScriptsViewModel ScriptsVM { get; }
-    public YouTubePlayerViewModel YouTubeVM { get; }
-    public DocsViewModel DocsVM { get; }
     public SettingsViewModel SettingsVM { get; }
 
     public ICommand NavigateCommand { get; }
@@ -67,9 +60,6 @@ public class MainViewModel : BaseViewModel
     {
         AppsVM = new AppsViewModel();
         RobloxVM = new RobloxAccountsViewModel();
-        ScriptsVM = new ScriptsViewModel();
-        YouTubeVM = new YouTubePlayerViewModel();
-        DocsVM = new DocsViewModel();
         SettingsVM = new SettingsViewModel();
 
         // Sidebar badges
@@ -79,9 +69,6 @@ public class MainViewModel : BaseViewModel
 
         // Load favorite games
         FavoriteGamesService.Load();
-
-        // Start script scheduler
-        ScriptSchedulerService.Start();
 
         // Navigate to the saved default page
         NavigateCommand = new RelayCommand(Navigate);
@@ -120,21 +107,10 @@ public class MainViewModel : BaseViewModel
         };
     }
 
-    public void NavigateToScriptTab(string tabId)
-    {
-        var tab = ScriptUIService.Tabs.FirstOrDefault(t => t.Id == tabId);
-        if (tab != null)
-        {
-            CurrentPage = new ScriptTabViewModel(tab);
-            CurrentPageName = tab.Name;
-        }
-    }
-
     public void RefreshBadgeCounts()
     {
         AccountCount = AccountStorageService.Load().Count;
         AppCount = AppStorageService.Load().Count;
-        ScriptCount = ScriptService.Load().Count;
     }
 
     private void Navigate(object? param)
@@ -151,18 +127,6 @@ public class MainViewModel : BaseViewModel
             case "Roblox":
                 CurrentPage = RobloxVM;
                 CurrentPageName = "Roblox Accounts";
-                break;
-            case "Scripts":
-                CurrentPage = ScriptsVM;
-                CurrentPageName = "Scripts";
-                break;
-            case "YouTube":
-                CurrentPage = YouTubeVM;
-                CurrentPageName = "YouTube";
-                break;
-            case "Docs":
-                CurrentPage = DocsVM;
-                CurrentPageName = "API Docs";
                 break;
             case "Settings":
                 CurrentPage = SettingsVM;
