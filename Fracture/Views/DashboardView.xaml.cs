@@ -27,8 +27,11 @@ public partial class DashboardView : UserControl
     private void OnNavRoblox(object sender, MouseButtonEventArgs e)
         => GetMain()?.NavigateCommand.Execute("Roblox");
 
-    private void OnNavScripts(object sender, MouseButtonEventArgs e)
-        => GetMain()?.NavigateCommand.Execute("Scripts");
+    private void OnNavActivity(object sender, MouseButtonEventArgs e)
+        => GetMain()?.NavigateCommand.Execute("Activity");
+
+    private void OnManageAccounts(object sender, RoutedEventArgs e)
+        => GetMain()?.NavigateCommand.Execute("Roblox");
 
     private void OnQuickAddApp(object sender, RoutedEventArgs e)
     {
@@ -37,7 +40,6 @@ public partial class DashboardView : UserControl
         main?.AppsVM.AddApp();
     }
 
-    private void OnQuickNewScript(object sender, RoutedEventArgs e)
-        => GetMain()?.NavigateCommand.Execute("Scripts");
-
+    private void OnQuickFastFlags(object sender, RoutedEventArgs e)
+        => GetMain()?.NavigateCommand.Execute("FastFlags");
 }

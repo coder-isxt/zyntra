@@ -44,6 +44,8 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="8" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="CookieInput" Grid.Column="0"
                              Style="{StaticResource DarkTextBoxStyle}"
@@ -51,7 +53,10 @@
                              FontFamily="Consolas" FontSize="12" />
                     <Button Grid.Column="2" Content="Add Cookie" Style="{StaticResource ControlButtonStyle}"
                             Click="OnAddAccountClick" />
-                    <Button Grid.Column="4" Content="🌐 Browser Login" Style="{StaticResource AccentButtonStyle}"
+                    <Button Grid.Column="4" Content="📥 Import" Style="{StaticResource ControlButtonStyle}"
+                            ToolTip="Import cookies from a .txt / .csv file"
+                            Command="{Binding ImportAccountsCommand}" />
+                    <Button Grid.Column="6" Content="🌐 Browser Login" Style="{StaticResource AccentButtonStyle}"
                             Click="OnBrowserLoginClick" />
                 </Grid>
             </Grid>
@@ -122,7 +127,9 @@
                         <Grid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Launch" Click="OnContextLaunch" />
+                                <MenuItem Header="Join Game / Server / Player..." Click="OnContextJoin" />
                                 <MenuItem Header="Set Tag" Click="OnContextSetTag" />
+                                <MenuItem Header="Edit Note..." Click="OnContextNote" />
                                 <MenuItem Header="Refresh Info" Click="OnContextRefresh" />
                                 <Separator />
                                 <MenuItem Header="Copy Username" Click="OnCopyUsername" />
@@ -187,6 +194,7 @@
                             <TextBlock FontSize="12" Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0">
                                 <Run Text="@" /><Run Text="{Binding Username, Mode=OneWay}" />
                                 <Run Text=" · ID: " /><Run Text="{Binding UserId, Mode=OneWay}" />
+                                <Run Text=" · " /><Run Text="{Binding PlaytimeText, Mode=OneWay}" />
                             </TextBlock>
                             <!-- Notes preview -->
                             <TextBlock Text="{Binding Notes}" FontSize="10.5" FontStyle="Italic"
@@ -201,6 +209,10 @@
                             <Button Content="▶ Launch" Padding="14,7"
                                     Style="{StaticResource AccentButtonStyle}"
                                     Command="{Binding DataContext.LaunchRobloxCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}" Margin="0,0,4,0" />
+                            <Button Content="Join…" Padding="10,7"
+                                    Style="{StaticResource ControlButtonStyle}" ToolTip="Join a game, server, or player"
+                                    Command="{Binding DataContext.JoinGameCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                     CommandParameter="{Binding}" Margin="0,0,4,0" />
                             <Button Content="🏷" FontSize="14" Padding="8,5"
                                     Style="{StaticResource ControlButtonStyle}" ToolTip="Set tag"
@@ -237,7 +249,9 @@
                             <Border.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Launch" Click="OnContextLaunch" />
+                                    <MenuItem Header="Join Game / Server / Player..." Click="OnContextJoin" />
                                     <MenuItem Header="Set Tag" Click="OnContextSetTag" />
+                                    <MenuItem Header="Edit Note..." Click="OnContextNote" />
                                     <MenuItem Header="Refresh Info" Click="OnContextRefresh" />
                                     <Separator />
                                     <MenuItem Header="Copy Username" Click="OnCopyUsername" />

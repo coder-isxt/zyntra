@@ -33,11 +33,7 @@ public partial class MainWindow : Window
             Loaded += (_, _) =>
             {
                 var tag = vm.SettingsVM.DefaultPage;
-                var activeStyle = (Style)FindResource("SidebarActiveButtonStyle");
-                var normalStyle = (Style)FindResource("SidebarButtonStyle");
-                BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
-                BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
-                BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;
+                ApplyNavStyles(tag);
             };
 
             // Check for updates on startup if enabled
@@ -147,6 +143,28 @@ public partial class MainWindow : Window
             menu.Items.Add(noAccounts);
         }
 
+        // Apps submenu
+        var apps = vm?.AppsVM.Apps;
+        if (apps != null && apps.Count > 0)
+        {
+            var appsMenu = new System.Windows.Forms.ToolStripMenuItem("Apps");
+            foreach (var app in apps)
+            {
+                var entry = app;
+                appsMenu.DropDownItems.Add(entry.Name, null, (_, _) =>
+                {
+                    Dispatcher.Invoke(() => vm!.AppsVM.LaunchAppEntry(entry));
+                });
+            }
+            menu.Items.Add(appsMenu);
+        }
+        else
+        {
+            var noApps = new System.Windows.Forms.ToolStripMenuItem("No apps added");
+            noApps.Enabled = false;
+            menu.Items.Add(noApps);
+        }
+
         menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) =>
         {
@@ -212,15 +230,19 @@ public partial class MainWindow : Window
     private void SidebarNav_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button clicked)
-        {
-            string tag = clicked.Tag as string ?? "Apps";
+            ApplyNavStyles(clicked.Tag as string ?? "Dashboard");
+    }
 
-            var activeStyle = (Style)FindResource("SidebarActiveButtonStyle");
-            var normalStyle = (Style)FindResource("SidebarButtonStyle");
+    private void ApplyNavStyles(string tag)
+    {
+        var activeStyle = (Style)FindResource("SidebarActiveButtonStyle");
+        var normalStyle = (Style)FindResource("SidebarButtonStyle");
 
-            BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
-            BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
-            BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;
-        }
+        BtnDashboard.Style = tag == "Dashboard" ? activeStyle : normalStyle;
+        BtnApps.Style = tag == "Apps" ? activeStyle : normalStyle;
+        BtnRoblox.Style = tag == "Roblox" ? activeStyle : normalStyle;
+        BtnFastFlags.Style = tag == "FastFlags" ? activeStyle : normalStyle;
+        BtnActivity.Style = tag == "Activity" ? activeStyle : normalStyle;
+        BtnSettings.Style = tag == "Settings" ? activeStyle : normalStyle;
     }
 }

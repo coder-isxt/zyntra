@@ -60,20 +60,18 @@
                 </StackPanel>
             </Border>
 
-            <!-- Scripts -->
+            <!-- Total Playtime -->
             <Border Style="{StaticResource CardInteractiveStyle}"
                     Padding="20,18"
-                    MouseLeftButtonUp="OnNavScripts">
+                    MouseLeftButtonUp="OnNavActivity">
                 <StackPanel>
                     <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource AccentSoftBrush}"
                             HorizontalAlignment="Left">
-                        <Path Data="{StaticResource IconScripts}" Stroke="{StaticResource AccentBrush}"
-                              StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                              StrokeLineJoin="Round" Width="18" Height="18" Stretch="Uniform" />
+                        <TextBlock Text="⏱️" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
-                    <TextBlock Text="{Binding ScriptCount}" FontSize="30" FontWeight="Bold"
+                    <TextBlock Text="{Binding PlaytimeText}" FontSize="30" FontWeight="Bold"
                                Foreground="{StaticResource TextBrush}" Margin="0,14,0,2" />
-                    <TextBlock Text="Scripts" FontSize="12"
+                    <TextBlock Text="Total Playtime" FontSize="12"
                                Foreground="{StaticResource SubTextBrush}" />
                 </StackPanel>
             </Border>
@@ -85,8 +83,10 @@
             <WrapPanel>
                 <Button Content="+ Add App" Style="{StaticResource AccentButtonStyle}" Padding="16,8"
                         Margin="0,0,8,8" Click="OnQuickAddApp" />
-                <Button Content="+ New Script" Style="{StaticResource ControlButtonStyle}" Padding="16,8"
-                        Margin="0,0,8,8" Click="OnQuickNewScript" />
+                <Button Content="Manage Accounts" Style="{StaticResource ControlButtonStyle}" Padding="16,8"
+                        Margin="0,0,8,8" Click="OnManageAccounts" />
+                <Button Content="FastFlags" Style="{StaticResource ControlButtonStyle}" Padding="16,8"
+                        Margin="0,0,8,8" Click="OnQuickFastFlags" />
             </WrapPanel>
         </StackPanel>
 

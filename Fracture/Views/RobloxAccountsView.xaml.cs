@@ -36,10 +36,22 @@ public partial class RobloxAccountsView : UserControl
             vm.LaunchRobloxCommand.Execute(acc);
     }
 
+    private void OnContextJoin(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc && DataContext is RobloxAccountsViewModel vm)
+            vm.JoinGameCommand.Execute(acc);
+    }
+
     private void OnContextSetTag(object sender, RoutedEventArgs e)
     {
         if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc && DataContext is RobloxAccountsViewModel vm)
             vm.SetTagCommand.Execute(acc);
+    }
+
+    private void OnContextNote(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi && mi.DataContext is RobloxAccount acc && DataContext is RobloxAccountsViewModel vm)
+            vm.SetNoteCommand.Execute(acc);
     }
 
     private void OnContextRefresh(object sender, RoutedEventArgs e)

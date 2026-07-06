@@ -65,6 +65,65 @@ public static class RobloxService
         return string.Empty;
     }
 
+    /// <summary>Resolves a Roblox username to its numeric user id, or null if not found.</summary>
+    public static async Task<long?> ResolveUsernameAsync(string username)
+    {
+        using var http = CreateClient();
+        using var request = new HttpRequestMessage(HttpMethod.Post, "https://users.roblox.com/v1/usernames/users");
+        string payload = JsonSerializer.Serialize(new
+        {
+            usernames = new[] { username },
+            excludeBannedUsers = false
+        });
+        request.Content = new StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+
+        var response = await http.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        string json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+        if (doc.RootElement.TryGetProperty("data", out var data) && data.GetArrayLength() > 0)
+        {
+            var item = data[0];
+            if (item.TryGetProperty("id", out var idProp))
+                return idProp.GetInt64();
+        }
+        return null;
+    }
+
+    public record UserPresence(int PresenceType, long? PlaceId, string? JobId, long? RootPlaceId)
+    {
+        public bool InGame => PresenceType == 2 && PlaceId is > 0;
+    }
+
+    /// <summary>Gets a user's current presence (game/server) using the requester's cookie for authorization.</summary>
+    public static async Task<UserPresence?> GetUserPresenceAsync(string cookie, long userId)
+    {
+        using var http = CreateClient();
+        using var request = new HttpRequestMessage(HttpMethod.Post, "https://presence.roblox.com/v1/presence/users");
+        request.Headers.Add("Cookie", $".ROBLOSECURITY={cookie}");
+        string payload = JsonSerializer.Serialize(new { userIds = new[] { userId } });
+        request.Content = new StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+
+        var response = await http.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        string json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+        if (!doc.RootElement.TryGetProperty("userPresences", out var presences) || presences.GetArrayLength() == 0)
+            return null;
+
+        var p = presences[0];
+        int type = p.TryGetProperty("userPresenceType", out var t) ? t.GetInt32() : 0;
+        long? placeId = p.TryGetProperty("placeId", out var pl) && pl.ValueKind == JsonValueKind.Number ? pl.GetInt64() : null;
+        long? rootPlaceId = p.TryGetProperty("rootPlaceId", out var rp) && rp.ValueKind == JsonValueKind.Number ? rp.GetInt64() : null;
+        string? jobId = p.TryGetProperty("gameId", out var g) && g.ValueKind == JsonValueKind.String ? g.GetString() : null;
+
+        return new UserPresence(type, placeId ?? rootPlaceId, jobId, rootPlaceId);
+    }
+
     public static async Task<string> GetAuthTicketAsync(string cookie)
     {
         using var http = CreateClient();
@@ -128,7 +187,7 @@ public static class RobloxService
         return null;
     }
 
-    public static async Task LaunchRobloxAsync(string cookie, long? placeId = null)
+    public static async Task<Process?> LaunchRobloxAsync(string cookie, long? placeId = null, string? jobId = null)
     {
         var settings = SettingsService.Load();
         string? playerPath = null;
@@ -153,11 +212,23 @@ public static class RobloxService
 
         if (placeId.HasValue && placeId.Value > 0)
         {
-            string placeLauncherUrl =
-                $"https://assetgame.roblox.com/game/PlaceLauncher.ashx?request=RequestGame" +
-                $"&browserTrackerId={browserTrackerId}&placeId={placeId.Value}&isPlayTogetherGame=false";
+            string placeLauncherUrl;
+            if (!string.IsNullOrWhiteSpace(jobId))
+            {
+                // Join a specific server instance (JobId)
+                placeLauncherUrl =
+                    $"https://assetgame.roblox.com/game/PlaceLauncher.ashx?request=RequestGameJob" +
+                    $"&browserTrackerId={browserTrackerId}&placeId={placeId.Value}&gameId={Uri.EscapeDataString(jobId)}" +
+                    $"&isPlayTogetherGame=false";
+            }
+            else
+            {
+                placeLauncherUrl =
+                    $"https://assetgame.roblox.com/game/PlaceLauncher.ashx?request=RequestGame" +
+                    $"&browserTrackerId={browserTrackerId}&placeId={placeId.Value}&isPlayTogetherGame=false";
+            }
 
-            Process.Start(new ProcessStartInfo
+            return Process.Start(new ProcessStartInfo
             {
                 FileName = playerPath,
                 Arguments = $"--play -a \"https://www.roblox.com/Login/Negotiate.ashx\" -t \"{authTicket}\" " +
@@ -166,15 +237,13 @@ public static class RobloxService
                 UseShellExecute = false,
             });
         }
-        else
+
+        return Process.Start(new ProcessStartInfo
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = playerPath,
-                Arguments = $"--app --launchtime={launchTime} -t \"{authTicket}\" " +
-                            $"-a \"https://www.roblox.com/Login/Negotiate.ashx\"",
-                UseShellExecute = false,
-            });
-        }
+            FileName = playerPath,
+            Arguments = $"--app --launchtime={launchTime} -t \"{authTicket}\" " +
+                        $"-a \"https://www.roblox.com/Login/Negotiate.ashx\"",
+            UseShellExecute = false,
+        });
     }
 }

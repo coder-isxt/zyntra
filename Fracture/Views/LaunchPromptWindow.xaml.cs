@@ -9,6 +9,8 @@ namespace Fracture.Views;
 public partial class LaunchPromptWindow : Window
 {
     public long? PlaceId { get; private set; }
+    public string? JobId { get; private set; }
+    public string? TargetUsername { get; private set; }
     public bool JustLaunch { get; private set; }
 
     public string AccountName
@@ -85,6 +87,48 @@ public partial class LaunchPromptWindow : Window
         }
 
         PlaceId = placeId;
+        JustLaunch = false;
+        DialogResult = true;
+        Close();
+    }
+
+    private void OnJoinServerClick(object sender, RoutedEventArgs e)
+    {
+        string placeText = ServerPlaceIdInput.Text.Trim();
+        string jobText = ServerJobIdInput.Text.Trim();
+
+        if (string.IsNullOrEmpty(placeText) || !long.TryParse(placeText, out long placeId) || placeId <= 0)
+        {
+            MessageBox.Show("Please enter a valid Place ID for the server.", "Fracture",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(jobText))
+        {
+            MessageBox.Show("Please enter the Server (Job) ID.", "Fracture",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        PlaceId = placeId;
+        JobId = jobText;
+        JustLaunch = false;
+        DialogResult = true;
+        Close();
+    }
+
+    private void OnJoinUserClick(object sender, RoutedEventArgs e)
+    {
+        string username = UsernameInput.Text.Trim();
+        if (string.IsNullOrEmpty(username))
+        {
+            MessageBox.Show("Please enter a username to follow.", "Fracture",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        TargetUsername = username;
         JustLaunch = false;
         DialogResult = true;
         Close();

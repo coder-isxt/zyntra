@@ -12,4 +12,22 @@ public class RobloxAccount
     public string Notes { get; set; } = string.Empty;
     public bool? CookieValid { get; set; }
     public DateTime? LastHealthCheck { get; set; }
+
+    // Activity tracking
+    public double TotalPlaytimeSeconds { get; set; }
+    public int SessionCount { get; set; }
+    public DateTime? LastPlayedAt { get; set; }
+
+    /// <summary>Human-friendly total playtime, e.g. "3h 12m" or "45m".</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string PlaytimeText
+    {
+        get
+        {
+            var span = TimeSpan.FromSeconds(TotalPlaytimeSeconds);
+            if (span.TotalMinutes < 1) return "Not played yet";
+            if (span.TotalHours < 1) return $"{(int)span.TotalMinutes}m played";
+            return $"{(int)span.TotalHours}h {span.Minutes}m played";
+        }
+    }
 }

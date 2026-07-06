@@ -112,6 +112,20 @@
                             <TextBlock Text="NAVIGATION" Style="{StaticResource SectionHeaderStyle}"
                                        Margin="18,6,0,6" />
 
+                            <Button x:Name="BtnDashboard"
+                                    Command="{Binding NavigateCommand}" CommandParameter="Dashboard"
+                                    Click="SidebarNav_Click" Tag="Dashboard"
+                                    HorizontalContentAlignment="Stretch"
+                                    Style="{StaticResource SidebarButtonStyle}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource IconDashboard}"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="2" StrokeLineJoin="Round"
+                                          Width="17" Height="17" Stretch="Uniform" Margin="0,0,12,0" />
+                                    <TextBlock Text="Dashboard" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
                             <Button x:Name="BtnApps"
                                     Command="{Binding NavigateCommand}" CommandParameter="Apps"
                                     Click="SidebarNav_Click" Tag="Apps"
@@ -167,6 +181,39 @@
                                 </Grid>
                             </Button>
 
+                            <TextBlock Text="TOOLS" Style="{StaticResource SectionHeaderStyle}"
+                                       Margin="18,16,0,6" />
+
+                            <Button x:Name="BtnFastFlags"
+                                    Command="{Binding NavigateCommand}" CommandParameter="FastFlags"
+                                    Click="SidebarNav_Click" Tag="FastFlags"
+                                    HorizontalContentAlignment="Stretch"
+                                    Style="{StaticResource SidebarButtonStyle}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource IconFlag}"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                          StrokeLineJoin="Round" Width="17" Height="17" Stretch="Uniform"
+                                          Margin="0,0,12,0" />
+                                    <TextBlock Text="FastFlags" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button x:Name="BtnActivity"
+                                    Command="{Binding NavigateCommand}" CommandParameter="Activity"
+                                    Click="SidebarNav_Click" Tag="Activity"
+                                    HorizontalContentAlignment="Stretch"
+                                    Style="{StaticResource SidebarButtonStyle}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource IconActivity}"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                          StrokeLineJoin="Round" Width="17" Height="17" Stretch="Uniform"
+                                          Margin="0,0,12,0" />
+                                    <TextBlock Text="Activity Log" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
                         </StackPanel>
 
                         <!-- Footer -->
@@ -201,11 +248,20 @@
                     <Border Background="{StaticResource PanelBrush}">
                         <ContentControl x:Name="PageHost" Content="{Binding CurrentPage}">
                             <ContentControl.Resources>
+                                <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+                                    <views:DashboardView />
+                                </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:AppsViewModel}">
                                     <views:AppsView />
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:RobloxAccountsViewModel}">
                                     <views:RobloxAccountsView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:FastFlagsViewModel}">
+                                    <views:FastFlagsView />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:ActivityLogViewModel}">
+                                    <views:ActivityLogView />
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                                     <views:SettingsView />

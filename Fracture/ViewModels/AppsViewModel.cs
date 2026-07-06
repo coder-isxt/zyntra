@@ -85,6 +85,9 @@ public class AppsViewModel : BaseViewModel
         ApplyFilter();
     }
 
+    /// <summary>Public entry point used by the tray menu to launch an app by entry.</summary>
+    public void LaunchAppEntry(AppEntry app) => LaunchApp(app);
+
     private void LaunchApp(object? param)
     {
         var app = param as AppEntry ?? SelectedApp;
@@ -118,6 +121,7 @@ public class AppsViewModel : BaseViewModel
             }
 
             Process.Start(psi);
+            ActivityLogService.Log(Models.ActivityKind.AppLaunch, $"Launched app {app.Name}");
         }
         catch (Exception ex)
         {

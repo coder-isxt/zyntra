@@ -19,11 +19,11 @@ public class DashboardViewModel : BaseViewModel
         set => SetProperty(ref _accountCount, value);
     }
 
-    private int _scriptCount;
-    public int ScriptCount
+    private string _playtimeText = "0h 0m";
+    public string PlaytimeText
     {
-        get => _scriptCount;
-        set => SetProperty(ref _scriptCount, value);
+        get => _playtimeText;
+        set => SetProperty(ref _playtimeText, value);
     }
 
     private string _greeting = string.Empty;
@@ -50,9 +50,14 @@ public class DashboardViewModel : BaseViewModel
 
     public void Refresh()
     {
+        var accounts = AccountStorageService.Load();
         AppCount = AppStorageService.Load().Count;
-        AccountCount = AccountStorageService.Load().Count;
-        ScriptCount = ScriptService.Load().Count;
+        AccountCount = accounts.Count;
+
+        double totalSeconds = accounts.Sum(a => a.TotalPlaytimeSeconds);
+        var span = TimeSpan.FromSeconds(totalSeconds);
+        PlaytimeText = $"{(int)span.TotalHours}h {span.Minutes}m";
+
         UpdateGreeting();
     }
 

@@ -47,8 +47,11 @@ public class MainViewModel : BaseViewModel
     public ObservableCollection<NotificationItem> Notifications => NotificationService.Notifications;
     public ObservableCollection<ToastItem> Toasts => ToastService.ActiveToasts;
 
+    public DashboardViewModel DashboardVM { get; }
     public AppsViewModel AppsVM { get; }
     public RobloxAccountsViewModel RobloxVM { get; }
+    public FastFlagsViewModel FastFlagsVM { get; }
+    public ActivityLogViewModel ActivityLogVM { get; }
     public SettingsViewModel SettingsVM { get; }
 
     public ICommand NavigateCommand { get; }
@@ -58,8 +61,11 @@ public class MainViewModel : BaseViewModel
 
     public MainViewModel()
     {
+        DashboardVM = new DashboardViewModel();
         AppsVM = new AppsViewModel();
         RobloxVM = new RobloxAccountsViewModel();
+        FastFlagsVM = new FastFlagsViewModel();
+        ActivityLogVM = new ActivityLogViewModel();
         SettingsVM = new SettingsViewModel();
 
         // Sidebar badges
@@ -69,6 +75,8 @@ public class MainViewModel : BaseViewModel
 
         // Load favorite games
         FavoriteGamesService.Load();
+
+        DashboardVM.NavigateCommand = new RelayCommand(Navigate);
 
         // Navigate to the saved default page
         NavigateCommand = new RelayCommand(Navigate);
@@ -120,6 +128,11 @@ public class MainViewModel : BaseViewModel
 
         switch (page)
         {
+            case "Dashboard":
+                DashboardVM.Refresh();
+                CurrentPage = DashboardVM;
+                CurrentPageName = "Dashboard";
+                break;
             case "Apps":
                 CurrentPage = AppsVM;
                 CurrentPageName = "Apps";
@@ -127,6 +140,14 @@ public class MainViewModel : BaseViewModel
             case "Roblox":
                 CurrentPage = RobloxVM;
                 CurrentPageName = "Roblox Accounts";
+                break;
+            case "FastFlags":
+                CurrentPage = FastFlagsVM;
+                CurrentPageName = "FastFlags";
+                break;
+            case "Activity":
+                CurrentPage = ActivityLogVM;
+                CurrentPageName = "Activity Log";
                 break;
             case "Settings":
                 CurrentPage = SettingsVM;

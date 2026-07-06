@@ -1,0 +1,90 @@
+<UserControl x:Class="Fracture.Views.FastFlagsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="32,28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <StackPanel>
+                <TextBlock Text="FastFlags" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="Tweak Roblox engine flags (FPS unlock, renderer, FOV). Applied to every installed Roblox version."
+                           Style="{StaticResource PageSubtitleStyle}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="Reload" Style="{StaticResource ControlButtonStyle}" Padding="16,8"
+                        Command="{Binding ReloadCommand}" Margin="0,0,8,0" />
+                <Button Content="Clear all" Style="{StaticResource DangerButtonStyle}" Padding="16,8"
+                        Command="{Binding ClearCommand}" Margin="0,0,8,0" />
+                <Button Content="Save FastFlags" Style="{StaticResource AccentButtonStyle}" Padding="18,8"
+                        Command="{Binding SaveCommand}" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Body -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Presets -->
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Padding="16">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="QUICK TOGGLES"
+                               Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,10" />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Presets}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                            <TextBlock Text="{Binding Description}" FontSize="13"
+                                                       FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"
+                                                       TextWrapping="Wrap" />
+                                            <TextBlock FontSize="11" Foreground="{StaticResource SubTextBrush}"
+                                                       Opacity="0.7" Margin="0,2,0,0" TextWrapping="Wrap">
+                                                <Run Text="{Binding Key, Mode=OneWay}" /><Run Text=" = " /><Run Text="{Binding Value, Mode=OneWay}" />
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <CheckBox Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- JSON editor -->
+            <Border Grid.Column="2" Style="{StaticResource CardStyle}" Padding="16">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="CLIENTAPPSETTINGS.JSON"
+                               Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,10" />
+                    <TextBox Text="{Binding FlagsJson, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource DarkTextBoxStyle}"
+                             FontFamily="Consolas" FontSize="13"
+                             AcceptsReturn="True" AcceptsTab="True" TextWrapping="NoWrap"
+                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                             VerticalContentAlignment="Top" />
+                </DockPanel>
+            </Border>
+        </Grid>
+
+        <!-- Status -->
+        <TextBlock Grid.Row="3" Text="{Binding StatusText}" Foreground="{StaticResource SubTextBrush}"
+                   FontSize="12" Margin="0,14,0,0" />
+    </Grid>
+</UserControl>
